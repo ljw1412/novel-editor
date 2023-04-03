@@ -1,0 +1,51 @@
+:root {
+  --app-header-height: 40px;
+  --app-header-z-index: 5000;
+}
+
+body[app-will-close='true'] {
+  --app-header-z-index: 1000;
+}
+
+.app-no-drag {
+  -webkit-app-region: no-drag;
+}
+
+.app-drag {
+  -webkit-app-region: drag;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.layout-lr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.layout-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.layout-center-p {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.layout-center-px {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.layout-center-py {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}

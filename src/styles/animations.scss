@@ -1,0 +1,26 @@
+/* fade */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* right-in */
+.right-in-enter-active,
+.right-in-leave-active {
+  transition: transform 0.4s ease-in;
+}
+
+.right-in-enter-to,
+.right-in-leave-from {
+  transform: translateX(0);
+}
+
+.right-in-enter-from,
+.right-in-leave-to {
+  transform: translateX(100%);
+}
