@@ -33,36 +33,22 @@ async function create() {
     //TODO: 保存到store中
 
     configStore.addRecentProject(only(prj, 'title path') as Editor.RecentRecord)
+    configStore.setCurrentProject(prj)
     $router.push({ name: 'AppEditor' })
-  } catch (error: any) {
-    console.log(error)
-
-    Notification.error({
-      title: '错误',
-      content: error.message,
-      position: 'bottomRight'
-    })
-    console.dir(error)
-  }
+  } catch (error: any) {}
 }
 
 async function selectProjectDir() {
-  const result = await $API.Electron.selectDir({
-    defaultPath: projectDir.value
-  })
-  if (result.err) {
-    Notification.error({
-      title: '错误',
-      content: result.error.message,
-      position: 'bottomRight'
+  try {
+    const result = await $API.Electron.selectDir({
+      defaultPath: projectDir.value
     })
-    return
-  }
-  const { canceled, filePaths } = result
-  if (canceled) return
-  if (filePaths.length) {
-    projectDir.value = filePaths[0]
-  }
+    const { canceled, filePaths } = result
+    if (canceled) return
+    if (filePaths.length) {
+      projectDir.value = filePaths[0]
+    }
+  } catch (error) {}
 }
 
 watch(

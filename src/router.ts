@@ -25,17 +25,20 @@ const routes = [
           {
             path: 'welcome',
             name: 'AppHomeWelcome',
-            component: AppHomeWelcome
+            component: AppHomeWelcome,
+            meta: { title: '欢迎' }
           },
           {
             path: 'create',
             name: 'AppHomeCreate',
-            component: AppHomeCreate
+            component: AppHomeCreate,
+            meta: { title: '创建项目' }
           },
           {
             path: 'open',
             name: 'AppHomeOpener',
-            component: AppHomeOpener
+            component: AppHomeOpener,
+            meta: { title: '打开项目' }
           }
         ]
       },

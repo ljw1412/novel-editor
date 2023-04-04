@@ -12,7 +12,13 @@ const handle = createHandle(channel, {
   },
 
   async createProject(e, win, data) {
-    return await ProjectService.createProject(data as Editor.Project)
+    const { project } = data
+    return await ProjectService.createProject(project as Editor.Project)
+  },
+
+  async openProject(e, win, data) {
+    const { path } = data
+    return await ProjectService.openProject(path)
   }
 })
 

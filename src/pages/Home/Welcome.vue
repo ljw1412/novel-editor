@@ -1,6 +1,9 @@
 <script setup lang="ts" name="AppHomeWelcome">
+import { useRouter } from 'vue-router'
 import { useConfigStore } from '/@/stores/config'
+import $API from '/@/apis'
 
+const $router = useRouter()
 const configStore = useConfigStore()
 const appInfo = window.bridge.package
 const versions = window.bridge.versions
@@ -18,6 +21,14 @@ const linkList = [
     icon: '/icons/acgcon.svg'
   }
 ]
+
+async function openProject(path: string) {
+  try {
+    const project = await $API.Electron.openProject(path)
+    configStore.setCurrentProject(project)
+    $router.push({ name: 'AppEditor' })
+  } catch (error) {}
+}
 </script>
 
 <template>
@@ -41,7 +52,10 @@ const linkList = [
             v-for="item of configStore.recentList.slice(0, 5)"
             class="recent-item flex items-center"
           >
-            <a-link class="max-w-[60%] flex-shrink-0 truncate">
+            <a-link
+              class="max-w-[60%] flex-shrink-0 truncate"
+              @click="openProject(item.path)"
+            >
               {{ item.title }}
             </a-link>
             <span class="flex-grow truncate pl-2" style="line-height: 1.5715">
