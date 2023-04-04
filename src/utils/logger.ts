@@ -30,6 +30,10 @@ export const baseLog =
     }
     console.group(title, leftStyles, rightStyles, message)
     data.forEach((item) => {
+      if (Array.isArray(item)) {
+        console.log(...item)
+        return
+      }
       console.log(item)
     })
     console.groupEnd()

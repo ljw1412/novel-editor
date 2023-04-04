@@ -12,4 +12,17 @@ const $route = useRoute()
   </main>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+#app-header {
+  flex-shrink: 0;
+}
+
+#app-main {
+  flex: 1 0 auto;
+
+  > * {
+    width: 100%;
+    height: 100%;
+  }
+}
+</style>

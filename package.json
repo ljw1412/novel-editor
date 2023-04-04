@@ -2,7 +2,7 @@
   "name": "novel-editor",
   "version": "0.0.0",
   "main": "dist-electron/main/index.js",
-  "description": "小说编辑器.",
+  "description": "小说编辑器",
   "author": "ljw1412",
   "license": "MIT",
   "private": true,
@@ -45,6 +45,7 @@
     "@arco-design/web-vue": "^2.44.7",
     "@vueuse/core": "^9.13.0",
     "d3": "^7.8.4",
+    "electron-json-storage": "^4.6.0",
     "pinia": "^2.0.33",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6"

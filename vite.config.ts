@@ -16,6 +16,9 @@ export default defineConfig(({ command }) => {
   const isBuild = command === 'build'
   const sourcemap = isServe || !!process.env.VSCODE_DEBUG
 
+  const isDev = process.env.NODE_ENV === 'development'
+  const isProd = process.env.NODE_ENV === 'production'
+
   return {
     plugins: [
       vue(),
@@ -44,6 +47,7 @@ export default defineConfig(({ command }) => {
             build: {
               sourcemap,
               minify: isBuild,
+              watch: isDev ? {} : null,
               outDir: 'dist-electron/main',
               rollupOptions: {
                 external: Object.keys(

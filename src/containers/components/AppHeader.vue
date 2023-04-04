@@ -35,6 +35,7 @@ const configStore = useConfigStore()
   transition: color 0.15s ease-out, background-color 0.2s ease-out;
   will-change: color, background-color;
   z-index: var(--app-header-z-index);
+  opacity: var(--app-header-opacity);
 
   .header-left {
     height: 100%;

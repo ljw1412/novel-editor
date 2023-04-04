@@ -11,28 +11,26 @@ declare namespace NodeJS {
   }
 }
 
-// declare global {
 type IpcListener = (
   event: Electron.IpcMainEvent,
   action: string,
   data?: Record<string, any>
-) => void
+) => any
 
 type IpcAction = (
   event: Electron.IpcMainEvent,
   win: Electron.BrowserWindow | null,
   data?: Record<string, any>
-) => void
+) => any
 
 type IpcInvokeListener = (
   event: Electron.IpcMainInvokeEvent,
   action: string,
   data?: Record<string, any>
-) => void
+) => any
 
 type IpcInvokeAction = (
   event: Electron.IpcMainInvokeEvent,
   win: Electron.BrowserWindow | null,
   data?: Record<string, any>
-) => void
-// }
+) => any

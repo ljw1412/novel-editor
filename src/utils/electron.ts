@@ -1,13 +1,13 @@
-import { ipcRenderer } from 'electron'
-import type { IpcRendererEvent } from 'electron/renderer'
 import * as logger from '/@/utils/logger'
 import { noop } from './assist'
 
-export async function ipcInvoke(
+const { ipcRenderer } = window.bridge.electron
+
+export async function ipcInvoke<T = any>(
   channel: string,
   action: string,
   data: Record<string, any> = {}
-) {
+): Promise<T> {
   // data.tabId = window.tabId
   logger.send(`invoke => ${channel}`, action, data)
   const result = await ipcRenderer.invoke(channel, action, data)

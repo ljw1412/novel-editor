@@ -8,7 +8,7 @@ export const useWinStore = defineStore('winStore', {
   }),
   actions: {
     updateMaximize(maximize: boolean) {
-      this.maximize = maximize
+      this.maximize = maximize || false
     },
 
     async minimize() {

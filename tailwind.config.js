@@ -10,7 +10,9 @@ module.exports = {
       4: '16px',
       5: '24px',
       6: '32px',
-      7: '48px'
+      7: '48px',
+      8: '56px',
+      9: '64px'
     },
     extend: {}
   },

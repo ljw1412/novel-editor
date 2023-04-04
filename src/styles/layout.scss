@@ -1,10 +1,15 @@
 :root {
   --app-header-height: 40px;
   --app-header-z-index: 5000;
+  --app-header-opacity: 0.75;
 }
 
 body[app-will-close='true'] {
   --app-header-z-index: 1000;
+}
+
+body[app-status='focus'] {
+  --app-header-opacity: 1;
 }
 
 .app-no-drag {

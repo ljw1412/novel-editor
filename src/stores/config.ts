@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import { useLocalStorage, toReactive } from '@vueuse/core'
-import { ipcInvoke } from '/@/utils/electron'
 
 const config = toReactive(
   useLocalStorage('APP_CONFIG', {
@@ -8,10 +7,16 @@ const config = toReactive(
   })
 )
 
+const recentList = useLocalStorage<Editor.RecentRecord[]>('RECENT_PROJECT', [])
+
 export const useConfigStore = defineStore('configStore', {
   state: () => ({}),
 
   getters: {
+    recentList() {
+      return recentList.value
+    },
+
     theme() {
       return config.theme.now
     },
@@ -29,6 +34,10 @@ export const useConfigStore = defineStore('configStore', {
 
     flushBodyTheme() {
       document.body.setAttribute('arco-theme', this.theme)
+    },
+
+    addRecentProject(project: Editor.RecentRecord) {
+      recentList.value.unshift(project)
     }
   }
 })
