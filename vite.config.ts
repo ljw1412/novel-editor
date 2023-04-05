@@ -47,12 +47,25 @@ export default defineConfig(({ command }) => {
             build: {
               sourcemap,
               minify: isBuild,
-              watch: isDev ? {} : null,
               outDir: 'dist-electron/main',
               rollupOptions: {
                 external: Object.keys(
                   'dependencies' in pkg ? pkg.dependencies : {}
-                )
+                ),
+                output: {
+                  manualChunks: (id, { getModuleInfo, getModuleIds }) => {
+                    if (/\/electron\/main\/(\S+)\//.test(id)) {
+                      const [, name] = id.match(/\/electron\/main\/(\S+)\//)
+                      return name
+                    }
+                    if (id.includes('tailwindcss')) {
+                      return 'tailwindcss'
+                    }
+                    if (id.includes('node_modules')) {
+                      return 'vendor'
+                    }
+                  }
+                }
               }
             }
           }
