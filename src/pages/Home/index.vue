@@ -4,16 +4,16 @@ const APP_BELONG_TO = import.meta.env.VITE_APP_BELONG_TO
 </script>
 
 <template>
-  <div class="app-home flex">
+  <div class="app-home flex text-color-2 select-none">
     <div class="flex flex-col max-w-[1200px] w-3/4 h-[600px] m-auto">
       <div class="app-home__header flex-shrink-0">
         <h1 class="inline-block">{{ APP_TITLE }}</h1>
-        <p class="inline-block text-color-3 text-[24px] ml-3">
+        <p class="inline-block text-color-3 text-2xl ml-3">
           {{ APP_BELONG_TO }}荣誉出品
         </p>
       </div>
 
-      <div class="app-home__content relative flex-grow">
+      <div class="app-home__content relative flex-grow mt-5">
         <router-view v-slot="{ Component }">
           <transition name="bottom-in">
             <component :is="Component" />
@@ -26,9 +26,6 @@ const APP_BELONG_TO = import.meta.env.VITE_APP_BELONG_TO
 
 <style lang="scss">
 .app-home {
-  user-select: none;
-  color: var(--color-text-2);
-
   &__content {
     .arco-page-header-wrapper {
       padding: 0;

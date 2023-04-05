@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ComputedRef } from 'vue'
+import { computed, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AppControls from './AppControls.vue'
 import { useConfigStore } from '/@/stores/config'
@@ -18,6 +18,7 @@ const title = computed(() => {
 
 interface AppHeaderMenuItem {
   group: string
+  active: boolean
   children: {
     label: string
     disabled?: any
@@ -25,13 +26,18 @@ interface AppHeaderMenuItem {
   }[]
 }
 
-const menu: AppHeaderMenuItem[] = [
+const menu = reactive<AppHeaderMenuItem[]>([
   {
     group: '文件',
+    active: false,
     children: [
       {
+        label: '首选项',
+        fn: () => {}
+      },
+      {
         label: '关闭项目',
-        disabled: computed(() => configStore.isProjectLoaded),
+        disabled: computed(() => !configStore.isProjectLoaded),
         fn: () => {
           configStore.clearProject()
           $router.push({ name: 'AppHomeWelcome' })
@@ -42,6 +48,7 @@ const menu: AppHeaderMenuItem[] = [
   // { group: '编辑', children: [] },
   {
     group: '帮助',
+    active: false,
     children: [
       {
         label: '关于',
@@ -49,7 +56,7 @@ const menu: AppHeaderMenuItem[] = [
       }
     ]
   }
-]
+])
 
 function handleMenuSelect(value?: string | number | Record<string, any>) {
   console.log(value)
@@ -67,9 +74,14 @@ function handleMenuSelect(value?: string | number | Record<string, any>) {
           v-for="item of menu"
           position="bl"
           content-class="app-header-popmenu"
+          v-model:popup-visible="item.active"
+          :render-to-body="false"
           @select="handleMenuSelect"
         >
-          <div class="menu-item inline-block app-no-drag px-3 py-1">
+          <div
+            class="text-btn inline-block app-no-drag px-3 py-1 rounded-md"
+            :class="{ active: item.active }"
+          >
             {{ item.group }}
           </div>
           <template #content>
@@ -85,10 +97,10 @@ function handleMenuSelect(value?: string | number | Record<string, any>) {
       </a-space>
     </div>
     <div class="header-center layout-center-p">{{ title }}</div>
-    <div class="header-right layout-lr">
+    <div class="layout-lr h-full">
       <div class="actions mr-2">
         <div
-          class="action-btn app-no-drag layout-center rounded-md"
+          class="action-btn text-btn app-no-drag layout-center rounded-md cursor-pointer"
           type="text"
           @click="configStore.toggleDarkMode"
         >
@@ -106,7 +118,7 @@ function handleMenuSelect(value?: string | number | Record<string, any>) {
 #app-header {
   position: relative;
   height: var(--app-header-height);
-  color: #cccccc;
+  color: #eeeeee;
   background-color: var(--app-theme);
   transition: color 0.15s ease-out, background-color 0.2s ease-out;
   will-change: color, background-color;
@@ -114,35 +126,11 @@ function handleMenuSelect(value?: string | number | Record<string, any>) {
   opacity: var(--app-header-opacity);
   user-select: none;
 
-  .header-left {
-    // height: 100%;
-
-    .menu-item {
-      &:hover {
-        border-radius: 4px;
-        background-color: var(--color-fill-4);
-      }
-    }
-  }
-
-  .header-right {
-    height: 100%;
-  }
-
   .actions {
     .action-btn {
-      cursor: pointer;
       width: 32px;
       height: 32px;
       font-size: 16px;
-
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.16);
-      }
-
-      &:active {
-        background-color: rgba(255, 255, 255, 0.3);
-      }
     }
   }
 }

@@ -54,3 +54,14 @@ body[app-status='focus'] {
   top: 50%;
   transform: translateY(-50%);
 }
+
+.text-btn {
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.16);
+  }
+
+  &.active,
+  &:active {
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+}

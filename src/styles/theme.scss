@@ -30,22 +30,6 @@ body[arco-theme='dark'] {
   --app-color-bg: var(--color-bg-3);
 }
 
-@for $i from 1 through 4 {
-  .bg-color-#{$i} {
-    background-color: var(--color-bg-#{$i});
-  }
-}
-
-@for $i from 1 through 4 {
-  .text-color-#{$i} {
-    color: var(--color-text-#{$i});
-  }
-}
-
-.text-color-common {
-  color: var(--app-color-common);
-}
-
 .text-color-black {
   color: #000000;
 }

@@ -70,7 +70,7 @@ init()
       ref="formRef"
       :model="project"
       auto-label-width
-      class="w-[70%] mx-auto"
+      class="w-3/4 mx-auto"
     >
       <a-form-item
         label="名称"

@@ -35,25 +35,25 @@ async function openProject(path: string) {
   <div class="app-home-welcome flex">
     <div class="welcome-left flex-shrink-0 w-1/2">
       <a-typography-title :heading="4">启动</a-typography-title>
-      <a-space direction="vertical" size="mini" fill>
+      <a-space direction="vertical" size="mini" fill class="text-lg">
         <a-link @click="$router.push({ name: 'AppHomeCreate' })">
-          <icon-folder-add size="32" class="mr-2" />
-          <span class="block link-text">新建项目...</span>
+          <icon-folder-add size="32" class="stroke-3 mr-2" />
+          <span class="block self-end">新建项目...</span>
         </a-link>
         <a-link @click="$router.push({ name: 'AppHomeOpener' })">
-          <icon-folder size="32" class="mr-2" />
-          <span class="block link-text">打开项目...</span>
+          <icon-folder size="32" class="stroke-3 mr-2" />
+          <span class="block self-end">打开项目...</span>
         </a-link>
       </a-space>
       <template v-if="configStore.recentList.length">
         <a-typography-title :heading="4">最近</a-typography-title>
-        <a-space direction="vertical" size="mini" fill>
+        <a-space direction="vertical" size="mini" fill class="text-lg">
           <div
             v-for="item of configStore.recentList.slice(0, 5)"
             class="recent-item flex items-center"
           >
             <a-link
-              class="max-w-[60%] flex-shrink-0 truncate"
+              class="max-w-3/5 flex-shrink-0 truncate"
               @click="openProject(item.path)"
             >
               {{ item.title }}
@@ -62,6 +62,7 @@ async function openProject(path: string) {
               {{ item.path }}
             </span>
           </div>
+          <a-link v-if="configStore.recentList.length > 5">更多...</a-link>
         </a-space>
       </template>
     </div>
@@ -78,9 +79,9 @@ async function openProject(path: string) {
           :key="link.title"
           :href="link.url"
           target="_blank"
-          class="link-card block"
+          class="link-card block text-color-2 hover:text-color-1"
         >
-          <div class="flex bg-color-2 text-[16px] p-1">
+          <div class="flex bg-color-2 text-lg p-1">
             <component
               v-if="link.icon.startsWith('icon-')"
               :is="link.icon"
@@ -90,9 +91,9 @@ async function openProject(path: string) {
             <img
               v-else
               :src="link.icon"
-              class="link-icon inline-block w-[1em] h-[1em]"
+              class="link-icon text-2xl inline-block w-[1em] h-[1em]"
             />
-            <div class="layout-lr link-text flex-grow">
+            <div class="layout-lr flex-grow link-text">
               <span class="inline-block">{{ link.title }}</span>
               <icon-launch class="mr-2" />
             </div>
@@ -109,35 +110,18 @@ async function openProject(path: string) {
     color: inherit;
   }
 
-  .welcome-left {
-    .arco-icon {
-      stroke-width: 3;
-    }
-
-    .link-text {
-      font-size: 16px;
-      align-self: flex-end;
-    }
+  .arco-link {
+    font-size: inherit;
   }
 
   .welcome-right {
-    .link-card {
-      &:hover {
-        .link-text {
-          color: var(--color-text-1);
-        }
-      }
-    }
-
     .link-icon {
       flex-shrink: 0;
-      font-size: 24px;
       margin: 8px 12px 8px 8px;
     }
 
     .link-text {
       transition: color 0.15s ease-out;
-      color: var(--color-text-2);
     }
   }
 }
