@@ -22,11 +22,16 @@ const handle: IpcInvokeListener = createHandle(channel, {
     }
   },
   hide: (e, win) => {},
-  close: (e, win) => {
-    const allWindows = BrowserWindow.getAllWindows()
-    allWindows.reverse().forEach((win) => {
-      win.close()
-    })
+  close: (e, win, data) => {
+    const { who } = data
+    if (who === 'main') {
+      const allWindows = BrowserWindow.getAllWindows()
+      allWindows.reverse().forEach((win) => {
+        win.close()
+      })
+      return
+    }
+    win.close()
   }
 })
 

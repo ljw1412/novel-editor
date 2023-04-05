@@ -4,7 +4,6 @@ import { useRoute, useRouter } from 'vue-router'
 import AppControls from './AppControls.vue'
 import { useConfigStore } from '/@/stores/config'
 
-defineProps({ who: { type: String, default: 'child' } })
 const $route = useRoute()
 const $router = useRouter()
 const configStore = useConfigStore()
@@ -109,7 +108,7 @@ function handleMenuSelect(value?: string | number | Record<string, any>) {
           />
         </div>
       </div>
-      <AppControls :who="who"></AppControls>
+      <AppControls who="main"></AppControls>
     </div>
   </header>
 </template>

@@ -6,23 +6,10 @@ const $route = useRoute()
 </script>
 
 <template>
-  <AppHeader who="main"></AppHeader>
-  <main id="app-main" class="app-main">
+  <AppHeader></AppHeader>
+  <main id="app-main" class="app-main flex-grow">
     <RouterView></RouterView>
   </main>
 </template>
 
-<style lang="scss">
-#app-header {
-  flex-shrink: 0;
-}
-
-#app-main {
-  flex: 1 0 auto;
-
-  > * {
-    width: 100%;
-    height: 100%;
-  }
-}
-</style>
+<style lang="scss"></style>

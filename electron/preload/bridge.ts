@@ -12,7 +12,11 @@ function freeze(obj: Object, key: string | string[]) {
   const keyList = typeof key === 'string' ? key.split(' ') : key
   const newObj = { ...obj }
   keyList.forEach((key) => {
-    if (obj[key]) newObj[key] = obj[key]
+    if (typeof obj[key] === 'function') {
+      newObj[key] = (...args) => obj[key](...args)
+    } else {
+      newObj[key] = obj[key]
+    }
   })
   return newObj
 }

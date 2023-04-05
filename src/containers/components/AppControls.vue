@@ -34,7 +34,13 @@ const btnList = computed(
         action: 'close',
         name: '关闭',
         icon: 'icon-close',
-        fn: props.who === 'main' ? winStore.beforeClose : winStore.close
+        fn: () => {
+          if (props.who === 'main') {
+            winStore.beforeClose()
+          } else {
+            winStore.close(props.who)
+          }
+        }
       }
     ] as ActionButton[]
 )

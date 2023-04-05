@@ -1,12 +1,10 @@
 import { defineStore } from 'pinia'
-import { useLocalStorage, toReactive } from '@vueuse/core'
-import { useRouter } from 'vue-router'
+import { useLocalStorage } from '@vueuse/core'
+import { watch } from 'vue'
 
-const config = toReactive(
-  useLocalStorage('APP_CONFIG', {
-    theme: { now: 'dark', before: '' }
-  })
-)
+const config = useLocalStorage('APP_CONFIG', {
+  theme: { now: 'dark', before: '' }
+})
 
 const recentList = useLocalStorage<Editor.RecentRecord[]>('RECENT_PROJECT', [])
 
@@ -17,11 +15,11 @@ export const useConfigStore = defineStore('configStore', {
 
   getters: {
     theme() {
-      return config.theme.now
+      return config.value.theme.now
     },
 
     isDarkMode() {
-      return config.theme.now === 'dark'
+      return config.value.theme.now === 'dark'
     },
 
     recentList() {
@@ -32,11 +30,13 @@ export const useConfigStore = defineStore('configStore', {
       return !!state.project.path
     }
   },
+
   actions: {
     toggleDarkMode() {
       const currentTheme = this.theme || ''
-      config.theme.now = this.theme === 'dark' ? config.theme.before : 'dark'
-      config.theme.before = currentTheme
+      config.value.theme.now =
+        this.theme === 'dark' ? config.value.theme.before : 'dark'
+      config.value.theme.before = currentTheme
       this.flushBodyTheme()
     },
 
@@ -57,3 +57,11 @@ export const useConfigStore = defineStore('configStore', {
     }
   }
 })
+
+watch(
+  () => config.value.theme.now,
+  () => {
+    const configStore = useConfigStore()
+    configStore.flushBodyTheme()
+  }
+)

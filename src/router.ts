@@ -1,7 +1,8 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import * as logger from '/@/utils/logger'
 
-import AppMain from '/@/containers/Main.vue'
+import ContainerMain from '/@/containers/Main.vue'
+import ContainerSeparate from '/@/containers/Separate.vue'
 import AppHome from '/@/pages/Home/index.vue'
 import AppHomeWelcome from '/@/pages/Home/Welcome.vue'
 import AppHomeCreate from '/@/pages/Home/Create.vue'
@@ -13,7 +14,7 @@ const routes = [
   {
     path: '/main',
     name: 'AppMain',
-    component: AppMain,
+    component: ContainerMain,
     redirect: { name: 'AppHomeWelcome' },
     children: [
       {
@@ -45,6 +46,21 @@ const routes = [
       { path: 'edit', name: 'AppEditor', component: AppEditor }
     ],
     meta: { module: 'main' }
+  },
+  // 内置浏览器
+  {
+    path: '/browser',
+    name: 'AppBuiltInBrowser',
+    component: ContainerSeparate,
+    meta: { separate: true, isWebView: true }
+  },
+  // 带标题栏的独立页面
+  {
+    path: '/view',
+    name: 'AppView',
+    component: ContainerSeparate,
+    meta: { separate: true },
+    children: []
   }
 ]
 

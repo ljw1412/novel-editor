@@ -16,12 +16,16 @@ export default defineConfig(({ command }) => {
   const isBuild = command === 'build'
   const sourcemap = isServe || !!process.env.VSCODE_DEBUG
 
-  const isDev = process.env.NODE_ENV === 'development'
-  const isProd = process.env.NODE_ENV === 'production'
-
   return {
+    base: isBuild ? '' : '/',
     plugins: [
-      vue(),
+      vue({
+        template: {
+          compilerOptions: {
+            isCustomElement: (tag) => ['webview'].includes(tag)
+          }
+        }
+      }),
       vueSetupExtend(),
       htmlBanner([
         '',
@@ -37,7 +41,8 @@ export default defineConfig(({ command }) => {
           onstart(options) {
             if (process.env.VSCODE_DEBUG) {
               console.log(
-                /* For `.vscode/.debug.script.mjs` */ '[startup] Electron App'
+                /* For `.vscode/.debug.script.mjs` */
+                '[startup] Electron App'
               )
             } else {
               options.startup()
@@ -99,15 +104,9 @@ export default defineConfig(({ command }) => {
         '/@/': join(__dirname, 'src') + '/'
       }
     },
-    server:
-      process.env.VSCODE_DEBUG &&
-      (() => {
-        const url = new URL(pkg.debug.env.VITE_DEV_SERVER_URL)
-        return {
-          host: url.hostname,
-          port: +url.port
-        }
-      })(),
+    server: process.env.VSCODE_DEBUG
+      ? { host: '127.0.0.1', port: 3344 }
+      : { port: 12121 },
     clearScreen: false
   }
 })

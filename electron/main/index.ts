@@ -1,24 +1,13 @@
-import { app, BrowserWindow, shell, ipcMain, nativeTheme } from 'electron'
+import { app, BrowserWindow, shell, nativeTheme, dialog } from 'electron'
 import { release } from 'node:os'
 import { join } from 'node:path'
 import IpcLoader from './ipc'
 import windowListener from './listeners/windowListener'
+import windowOpenHandler from './listeners/windowOpenHandler'
+import { getPageUrl } from './services/window'
 
-// The built directory structure
-//
-// ├─┬ dist-electron
-// │ ├─┬ main
-// │ │ └── index.js    > Electron-Main
-// │ └─┬ preload
-// │   └── index.js    > Preload-Scripts
-// ├─┬ dist
-// │ └── index.html    > Electron-Renderer
-//
-process.env.DIST_ELECTRON = join(__dirname, '..')
-process.env.DIST = join(process.env.DIST_ELECTRON, '../dist')
-process.env.PUBLIC = process.env.VITE_DEV_SERVER_URL
-  ? join(process.env.DIST_ELECTRON, '../public')
-  : process.env.DIST
+// 初始化APP环境变量和创建需要的文件夹
+import './env'
 
 // Disable GPU Acceleration for Windows 7
 if (release().startsWith('6.1')) app.disableHardwareAcceleration()
@@ -40,8 +29,6 @@ nativeTheme.themeSource = 'dark'
 const env = import.meta.env
 // Here, you can also use other preload
 const preload = join(__dirname, '../preload/index.js')
-const url = process.env.VITE_DEV_SERVER_URL
-const indexHtml = join(process.env.DIST, 'index.html')
 
 function createWindow() {
   win = new BrowserWindow({
@@ -63,13 +50,11 @@ function createWindow() {
     }
   })
 
-  if (process.env.VITE_DEV_SERVER_URL) {
-    // electron-vite-vue#298
-    win.loadURL(url)
-    // Open devTool if the app is not packaged
+  const url = getPageUrl('main')
+  win.loadURL(url)
+
+  if (env.MODE === 'development') {
     win.webContents.openDevTools()
-  } else {
-    win.loadFile(indexHtml)
   }
 
   // Test actively push message to the Electron-Renderer
@@ -104,6 +89,7 @@ if (env.MODE === 'development') {
 app.whenReady().then(() => {
   const win = createWindow()
   windowListener(win)
+  windowOpenHandler(win)
   IpcLoader.bind()
 })
 
@@ -127,22 +113,5 @@ app.on('activate', () => {
     allWindows[0].focus()
   } else {
     createWindow()
-  }
-})
-
-// New window example arg: new windows url
-ipcMain.handle('open-win', (_, arg) => {
-  const childWindow = new BrowserWindow({
-    webPreferences: {
-      preload,
-      nodeIntegration: true,
-      contextIsolation: false
-    }
-  })
-
-  if (process.env.VITE_DEV_SERVER_URL) {
-    childWindow.loadURL(`${url}#${arg}`)
-  } else {
-    childWindow.loadFile(indexHtml, { hash: arg })
   }
 })

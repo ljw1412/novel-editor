@@ -8,7 +8,7 @@ const listener = createListener(channel, {})
 
 const handle = createHandle(channel, {
   getDefaultProjectDir() {
-    return ProjectService.APP_DEFAULT_PREJOCT_DIR
+    return ProjectService.getDefaultPrejectDir()
   },
 
   async createProject(e, win, data) {

@@ -1,7 +1,7 @@
 /**
  * @see https://www.electron.build/configuration/configuration
  */
-{
+const config = {
   appId: 'novel-editor',
   asar: true,
   icon: 'public/favicon.ico',
@@ -29,3 +29,5 @@
     deleteAppDataOnUninstall: false
   }
 }
+
+module.exports = config

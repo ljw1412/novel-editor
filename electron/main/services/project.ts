@@ -1,13 +1,13 @@
-import { app } from 'electron'
+import { app, dialog } from 'electron'
 import path from 'node:path'
 import fs from 'node:fs'
 import fsp from 'node:fs/promises'
 
 const CONFIG_FILENAME = 'project.novelprj'
 
-export const APP_DATA_PATH = path.join(app.getAppPath(), 'data')
-export const APP_DEFAULT_PREJOCT_DIR = path.join(APP_DATA_PATH, 'projects')
-fs.mkdirSync(APP_DEFAULT_PREJOCT_DIR, { recursive: true })
+export function getDefaultPrejectDir() {
+  return process.env.APP_DEFAULT_PROJECT_PATH
+}
 
 export async function createProject(project: Editor.Project) {
   const { path: prjDir } = project

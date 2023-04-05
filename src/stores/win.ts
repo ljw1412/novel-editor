@@ -35,8 +35,8 @@ export const useWinStore = defineStore('winStore', {
       })
     },
 
-    async close() {
-      await ipcInvoke('window', 'close')
+    async close(who = 'child') {
+      await ipcInvoke('window', 'close', { who })
     }
   }
 })
