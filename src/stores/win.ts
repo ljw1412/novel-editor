@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { Modal } from '@arco-design/web-vue'
-import { ipcInvoke } from '/@/utils/electron'
+import $API from '/@/apis'
 
 export const useWinStore = defineStore('winStore', {
   state: () => ({
@@ -12,12 +12,11 @@ export const useWinStore = defineStore('winStore', {
     },
 
     async minimize() {
-      await ipcInvoke('window', 'minimize')
+      return $API.Electron.win.control('minimize')
     },
 
     async toggleMaximize() {
-      const maximize = await ipcInvoke('window', 'toggleMaximize')
-      this.maximize = maximize
+      this.maximize = await $API.Electron.win.control('toggleMaximize')
     },
 
     async beforeClose() {
@@ -36,7 +35,7 @@ export const useWinStore = defineStore('winStore', {
     },
 
     async close(who = 'child') {
-      await ipcInvoke('window', 'close', { who })
+      return $API.Electron.win.control('close', who)
     }
   }
 })

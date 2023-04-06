@@ -1,13 +1,11 @@
-import { app, BrowserWindow, shell, nativeTheme, dialog } from 'electron'
+import { app, BrowserWindow, shell, nativeTheme } from 'electron'
 import { release } from 'node:os'
 import { join } from 'node:path'
+import './env'
 import IpcLoader from './ipc'
 import windowListener from './listeners/windowListener'
 import windowOpenHandler from './listeners/windowOpenHandler'
-import { getPageUrl } from './services/window'
-
-// 初始化APP环境变量和创建需要的文件夹
-import './env'
+import { getVuePageUrl, initPresetWindows } from './services/window'
 
 // Disable GPU Acceleration for Windows 7
 if (release().startsWith('6.1')) app.disableHardwareAcceleration()
@@ -26,9 +24,6 @@ if (!app.requestSingleInstanceLock()) {
 // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 let win: BrowserWindow | null = null
 nativeTheme.themeSource = 'dark'
-const env = import.meta.env
-// Here, you can also use other preload
-const preload = join(__dirname, '../preload/index.js')
 
 function createWindow() {
   win = new BrowserWindow({
@@ -41,7 +36,7 @@ function createWindow() {
     backgroundColor: '#2a2a2b',
     icon: join(process.env.PUBLIC, 'favicon.ico'),
     webPreferences: {
-      preload
+      preload: join(__dirname, '../preload/index.js')
       // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
       // Consider using contextBridge.exposeInMainWorld
       // Read more on https://www.electronjs.org/docs/latest/tutorial/context-isolation
@@ -50,10 +45,12 @@ function createWindow() {
     }
   })
 
-  const url = getPageUrl('main')
+  const url = getVuePageUrl('main')
   win.loadURL(url)
 
-  if (env.MODE === 'development') {
+  console.log(import.meta.env)
+
+  if (import.meta.env.DEV) {
     win.webContents.openDevTools()
   }
 
@@ -72,7 +69,7 @@ function createWindow() {
 }
 
 // Install "Vue.js devtools"
-if (env.MODE === 'development') {
+if (import.meta.env.DEV) {
   app
     .whenReady()
     .then(() => import('electron-devtools-installer'))
@@ -91,6 +88,7 @@ app.whenReady().then(() => {
   windowListener(win)
   windowOpenHandler(win)
   IpcLoader.bind()
+  const presetWindows = initPresetWindows()
 })
 
 app.on('window-all-closed', () => {

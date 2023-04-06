@@ -8,6 +8,7 @@ import AppHomeWelcome from '/@/pages/Home/Welcome.vue'
 import AppHomeCreate from '/@/pages/Home/Create.vue'
 import AppHomeOpener from '/@/pages/Home/Opener.vue'
 import AppEditor from '/@/pages/Editor/index.vue'
+import AppSetting from '/@/pages/Setting/index.vue'
 
 const routes = [
   { path: '/', redirect: { name: 'AppHomeWelcome' } },
@@ -60,7 +61,19 @@ const routes = [
     name: 'AppView',
     component: ContainerSeparate,
     meta: { separate: true },
-    children: []
+    children: [
+      {
+        path: '/setting',
+        name: 'AppSetting',
+        component: AppSetting,
+        meta: {
+          title: '首选项',
+          minimizable: false,
+          hideIcon: true,
+          maximizable: false
+        }
+      }
+    ]
   }
 ]
 
@@ -69,6 +82,7 @@ const router = createRouter({
   history: createWebHashHistory()
 })
 
+window.$router = router
 export default router
 
 router.beforeEach((to, from, next) => {

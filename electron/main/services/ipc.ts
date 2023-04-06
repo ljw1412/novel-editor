@@ -23,7 +23,7 @@ export function createListener(
   before?: BeforeListener
 ): IpcListener {
   return async (e, action, data) => {
-    console.log(`[${channel}:on]#${action} ${data}`)
+    console.log(`[${channel}:on]#${action}`, data)
     if (before && (await before(e, action, data))) return
     const win = getSenderOwner(e.sender)
     const fn = actions[action]

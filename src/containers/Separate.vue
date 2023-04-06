@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ipcOff, ipcOn, ipcSend } from '/@/utils/electron'
+import { ipcOff, ipcOn } from '/@/utils/ipc'
 import AppHeaderMini from './components/AppHeaderMini.vue'
 
 const $route = useRoute()

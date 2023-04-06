@@ -6,7 +6,7 @@ import ArcoVue from '@arco-design/web-vue'
 import ArcoVueIcon from '@arco-design/web-vue/es/icon'
 import { useWinStore } from '/@/stores/win'
 import { useConfigStore } from '/@/stores/config'
-import { ipcOn } from '/@/utils/electron'
+import { ipcOn } from '/@/utils/ipc'
 
 import '@arco-design/web-vue/dist/arco.css'
 import '/@/styles/index.scss'

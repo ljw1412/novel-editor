@@ -39,6 +39,13 @@ const APP_BELONG_TO = import.meta.env.VITE_APP_BELONG_TO
       width: 100%;
       height: 100%;
       pointer-events: none;
+      background-color: var(--app-color-bg);
+    }
+    > [class*='-enter-active'] {
+      z-index: 1;
+    }
+    > [class*='-leave-active'] {
+      z-index: 0;
     }
   }
 }

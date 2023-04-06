@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue'
+import { computed, reactive, ComputedRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AppControls from './AppControls.vue'
 import { useConfigStore } from '/@/stores/config'
+import $API from '/@/apis'
 
 const $route = useRoute()
 const $router = useRouter()
@@ -20,6 +21,7 @@ interface AppHeaderMenuItem {
   active: boolean
   children: {
     label: string
+    isHide?: boolean | ComputedRef<boolean>
     disabled?: any
     fn: () => void
   }[]
@@ -32,10 +34,13 @@ const menu = reactive<AppHeaderMenuItem[]>([
     children: [
       {
         label: '首选项',
-        fn: () => {}
+        fn: () => {
+          $API.Electron.win.openPresetWindow('首选项')
+        }
       },
       {
         label: '关闭项目',
+        isHide: computed(() => !configStore.isProjectLoaded),
         disabled: computed(() => !configStore.isProjectLoaded),
         fn: () => {
           configStore.clearProject()
@@ -86,6 +91,7 @@ function handleMenuSelect(value?: string | number | Record<string, any>) {
           <template #content>
             <a-doption
               v-for="child of item.children"
+              v-show="!child.isHide"
               :value="child"
               :disabled="child.disabled"
             >

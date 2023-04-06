@@ -58,10 +58,14 @@ export default defineConfig(({ command }) => {
                   'dependencies' in pkg ? pkg.dependencies : {}
                 ),
                 output: {
+                  chunkFileNames: '[name].js',
                   manualChunks: (id, { getModuleInfo, getModuleIds }) => {
                     if (/\/electron\/main\/(\S+)\//.test(id)) {
                       const [, name] = id.match(/\/electron\/main\/(\S+)\//)
                       return name
+                    }
+                    if (/\/electron\/main\/env/.test(id)) {
+                      return 'app-env'
                     }
                     if (id.includes('tailwindcss')) {
                       return 'tailwindcss'

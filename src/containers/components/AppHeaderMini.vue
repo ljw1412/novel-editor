@@ -4,9 +4,11 @@ import { useRoute, useRouter } from 'vue-router'
 import { useConfigStore } from '/@/stores/config'
 import AppControls from './AppControls.vue'
 import AppFavicon from './AppFavicon.vue'
+import { safeBoolean } from '/@/utils/assist'
 
 const props = defineProps({ title: String, icon: String })
 const $route = useRoute()
+const hideIcon = safeBoolean($route.meta.hideIcon as boolean)
 const $router = useRouter()
 const configStore = useConfigStore()
 
@@ -19,7 +21,12 @@ const mTitle = computed(() => {
   <header id="app-header-mini" class="app-header-mini app-drag layout-lr">
     <div class="header-left flex align-center">
       <div class="ml-2 flex items-center leading-none">
-        <AppFavicon :icon="icon" :size="18" class="flex-shrink-0"></AppFavicon>
+        <AppFavicon
+          v-if="!hideIcon"
+          :icon="icon"
+          :size="18"
+          class="flex-shrink-0"
+        ></AppFavicon>
         <div class="ml-2">{{ mTitle }}</div>
       </div>
     </div>
