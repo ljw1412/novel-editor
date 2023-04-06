@@ -59,7 +59,7 @@ export default defineConfig(({ command }) => {
                 ),
                 output: {
                   chunkFileNames: '[name].js',
-                  manualChunks: (id, { getModuleInfo, getModuleIds }) => {
+                  manualChunks: (id) => {
                     if (/\/electron\/main\/(\S+)\//.test(id)) {
                       const [, name] = id.match(/\/electron\/main\/(\S+)\//)
                       return name
@@ -111,6 +111,21 @@ export default defineConfig(({ command }) => {
     server: process.env.VSCODE_DEBUG
       ? { host: '127.0.0.1', port: 3344 }
       : { port: 12121 },
-    clearScreen: false
+    clearScreen: false,
+    build: {
+      chunkSizeWarningLimit: 1024,
+      rollupOptions: {
+        output: {
+          manualChunks: (id) => {
+            if (id.includes('@arco-design/web-vue')) {
+              return 'arco-design-vue'
+            }
+            if (id.includes('node_modules')) {
+              return 'vendor'
+            }
+          }
+        }
+      }
+    }
   }
 })

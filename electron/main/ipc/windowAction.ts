@@ -50,6 +50,9 @@ const handle: IpcInvokeListener = createHandle(channel, {
       return win.hide()
     }
     win.close()
+  },
+  toggleDevTools: (e, win, data) => {
+    win.webContents.toggleDevTools()
   }
 })
 

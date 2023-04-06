@@ -59,6 +59,12 @@ const menu = reactive<AppHeaderMenuItem[]>([
     active: false,
     children: [
       {
+        label: '切换开发者工具',
+        fn: () => {
+          $API.Electron.win.control('toggleDevTools')
+        }
+      },
+      {
         label: '关于',
         fn: () => {}
       }
@@ -67,7 +73,6 @@ const menu = reactive<AppHeaderMenuItem[]>([
 ])
 
 function handleMenuSelect(value?: string | number | Record<string, any>) {
-  console.log(value)
   if (typeof value === 'object' && value.fn) {
     value.fn()
   }

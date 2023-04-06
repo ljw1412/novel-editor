@@ -2,6 +2,7 @@
 import { useRouter } from 'vue-router'
 import { useConfigStore } from '/@/stores/config'
 import $API from '/@/apis'
+import { getPublicUrl } from '/@/utils/url'
 
 const $router = useRouter()
 const configStore = useConfigStore()
@@ -18,7 +19,7 @@ const linkList = [
   {
     title: '御宅世界',
     url: 'https://anime.acgcon.top/',
-    icon: '/icons/acgcon.svg'
+    icon: getPublicUrl('/icons/acgcon.svg')
   }
 ]
 

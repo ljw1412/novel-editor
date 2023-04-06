@@ -27,7 +27,9 @@ export const useWinStore = defineStore('winStore', {
         content: '您保存过了吗？真的要离开了吗？',
         maskClosable: false,
         modalStyle: { 'text-align': 'center' },
-        onOk: this.close,
+        onOk: () => {
+          this.close('main')
+        },
         onCancel: () => {
           document.body.removeAttribute(qualifiedName)
         }
