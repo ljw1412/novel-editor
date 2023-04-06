@@ -1,6 +1,10 @@
 import { ipcMain } from 'electron'
 import { createHandle, createListener } from '../services/ipc'
 import * as ProjectService from '../services/project'
+import { handleWrap } from '../utils/function'
+import storage from '../utils/storage'
+
+storage.setDataPath(process.env.APP_DATA_PATH)
 
 const channel = 'project'
 
@@ -13,13 +17,25 @@ const handle = createHandle(channel, {
 
   async createProject(e, win, data) {
     const { project } = data
-    return await ProjectService.createProject(project as Editor.Project)
+    storage.setDataPath(project.path)
+    return handleWrap(async () => {
+      return await ProjectService.createProject(project as Editor.Project)
+    })
   },
 
   async openProject(e, win, data) {
     const { path } = data
-    return await ProjectService.openProject(path)
-  }
+    storage.setDataPath(path)
+    return handleWrap(async () => {
+      return await ProjectService.openProject(path)
+    })
+  },
+
+  async createVolume(e, win, data) {},
+
+  async createChapter(e, win, data) {},
+
+  async uploadImage(e, win, data) {}
 })
 
 function bind() {

@@ -40,8 +40,12 @@ const menu = reactive<AppHeaderMenuItem[]>([
       },
       {
         label: '关闭项目',
-        isHide: computed(() => !configStore.isProjectLoaded),
-        disabled: computed(() => !configStore.isProjectLoaded),
+        isHide: computed(
+          () => !configStore.isProjectLoaded && $route.name !== 'AppEditor'
+        ),
+        disabled: computed(
+          () => !configStore.isProjectLoaded && $route.name !== 'AppEditor'
+        ),
         fn: () => {
           configStore.clearProject()
           $router.push({ name: 'AppHomeWelcome' })
@@ -72,7 +76,10 @@ function handleMenuSelect(value?: string | number | Record<string, any>) {
 
 <template>
   <header id="app-header" class="app-header app-drag layout-lr">
-    <div class="header-left flex align-center">
+    <div class="header-left flex items-center">
+      <div class="inline-flex items-center px-2">
+        <icon-pen-fill size="22" />
+      </div>
       <a-space size="mini" class="ml-1">
         <a-dropdown
           v-for="item of menu"
@@ -83,7 +90,7 @@ function handleMenuSelect(value?: string | number | Record<string, any>) {
           @select="handleMenuSelect"
         >
           <div
-            class="text-btn inline-block app-no-drag px-3 py-1 rounded-md"
+            class="text-btn inline-block app-no-drag px-3 py-[2px] rounded-md text-lg"
             :class="{ active: item.active }"
           >
             {{ item.group }}

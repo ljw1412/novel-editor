@@ -1,7 +1,9 @@
 <script setup lang="ts" name="AppEditor">
 import { ref, computed } from 'vue'
+import EditorInfo from './components/Info.vue'
 
 const isCollapsed = ref(false)
+const isSideResizing = ref(false)
 const asideWidth = ref(300)
 const currentTab = ref('章节')
 
@@ -14,6 +16,10 @@ const asideWidthComp = computed({
   }
 })
 
+function resizeMovingStart() {
+  isSideResizing.value = true
+}
+
 function resizeMoving({ width }: { width: number }) {
   if (width < 100) {
     isCollapsed.value = true
@@ -25,10 +31,15 @@ function resizeMoving({ width }: { width: number }) {
   }
 }
 
+function resizeMovingEnd() {
+  isSideResizing.value = false
+}
+
 const actions = [
-  { label: '章节', icon: 'icon-bookmark' },
-  { label: '世界观', icon: 'icon-common' },
-  { label: '人物', icon: 'icon-user-group' }
+  { label: '章节', icon: 'icon-bookmark', component: null },
+  { label: '世界观', icon: 'icon-common', component: null },
+  { label: '人物', icon: 'icon-user-group', component: null },
+  { label: '基础信息', icon: 'icon-info-circle', component: EditorInfo }
 ]
 
 function handleActionItemClick(item: { label: string }) {
@@ -43,12 +54,16 @@ function handleActionItemClick(item: { label: string }) {
 
 <template>
   <div class="app-editor flex">
+    <!-- 侧边栏 -->
     <a-resize-box
       component="aside"
-      class="max-w-[600px] select-none"
+      class="aside-resize-box max-w-[600px] select-none"
+      :class="{ resizing: isSideResizing }"
       :style="{ minWidth: isCollapsed ? '56px' : '256px' }"
       v-model:width="asideWidthComp"
+      @moving-start="resizeMovingStart"
       @moving="resizeMoving"
+      @moving-end="resizeMovingEnd"
     >
       <template #resize-trigger="{ direction }">
         <div class="aside-resize-line h-full w-[3px] bg-color-common"></div>
@@ -82,9 +97,16 @@ function handleActionItemClick(item: { label: string }) {
           <section class="part-title h-[40px] layout-lr px-3 shadow-sm">
             <section>{{ currentTab }}</section>
           </section>
+          <component
+            v-for="item of actions"
+            v-show="item.label === currentTab"
+            :key="'pane-' + item.label"
+            :is="item.component"
+          ></component>
         </section>
       </section>
     </a-resize-box>
+    <!-- 主体 -->
     <main class="editor h-full flex-grow overflow-auto"></main>
   </div>
 </template>
@@ -93,13 +115,19 @@ function handleActionItemClick(item: { label: string }) {
 .app-editor {
   background-color: var(--editor-bg);
 
-  .arco-resizebox-trigger {
-    padding: 0 1px;
-    opacity: 0;
-    transition: opacity 0.2s;
+  .aside-resize-box {
+    .arco-resizebox-trigger {
+      padding: 0 1px;
+      opacity: 0;
+      transition: opacity 0.2s;
 
-    &:hover,
-    &:active {
+      &:hover,
+      &:active {
+        opacity: 1;
+      }
+    }
+
+    &.resizing .arco-resizebox-trigger {
       opacity: 1;
     }
   }

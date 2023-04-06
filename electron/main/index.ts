@@ -48,8 +48,6 @@ function createWindow() {
   const url = getVuePageUrl('main')
   win.loadURL(url)
 
-  console.log(import.meta.env)
-
   if (import.meta.env.DEV) {
     win.webContents.openDevTools()
   }

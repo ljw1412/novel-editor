@@ -56,7 +56,7 @@ export class BuiltInBrowser {
     windowOpenHandler(this.win)
 
     this.view = new BrowserView()
-    this.view.setBounds({ x: 0, y: 40, width: 1280, height: 720 - 40 })
+    this.view.setBounds({ x: 1, y: 40, width: 1280 - 2, height: 720 - 40 - 1 })
     this.view.setAutoResize({ width: true, height: true })
 
     this.win.once('ready-to-show', () => {
