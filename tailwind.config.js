@@ -52,6 +52,7 @@ module.exports = {
         'color-2': 'var(--color-bg-2)',
         'color-3': 'var(--color-bg-3)',
         'color-4': 'var(--color-bg-4)',
+        'color-common': 'var(--app-color-common)',
         app: 'var(--app-color-bg)'
       }
     }
