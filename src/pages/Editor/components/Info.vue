@@ -22,7 +22,10 @@ const projectData = computed(() => {
 </script>
 
 <template>
-  <div class="editor-info py-2 px-3">
+  <a-scrollbar
+    outer-class="editor-info h-full"
+    class="h-full overflow-auto py-2 px-3"
+  >
     <a-descriptions
       :data="projectData"
       size="small"
@@ -30,7 +33,7 @@ const projectData = computed(() => {
       :column="1"
       :value-style="{ wordBreak: 'break-all', paddingRight: 0 }"
     />
-  </div>
+  </a-scrollbar>
 </template>
 
 <style lang="scss"></style>

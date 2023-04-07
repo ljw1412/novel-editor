@@ -1,13 +1,14 @@
 <script setup lang="ts" name="AppEditor">
-import { ref, computed } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { useProjectStore } from '/@/stores'
+import { useConfigStore, useProjectStore } from '/@/stores'
 import * as logger from '/@/utils/logger'
 import EditorInfo from './components/Info.vue'
 import EditorWorld from './components/World.vue'
 import $API from '/@/apis'
 
 const projectStore = useProjectStore()
+const configStore = useConfigStore()
 const $route = useRoute()
 if (!projectStore.isProjectLoaded && $route.query.path) {
   logger.warning('项目重加载', $route.query.path)
@@ -20,10 +21,19 @@ if (!projectStore.isProjectLoaded && $route.query.path) {
   })()
 }
 
+const actions = [
+  { label: '小说', icon: 'icon-bookmark', component: null },
+  { label: '世界观', icon: 'icon-common', component: EditorWorld },
+  { label: '人物', icon: 'icon-user-group', component: null },
+  { label: '基础信息', icon: 'icon-info-circle', component: EditorInfo }
+]
+const isCollapsed = ref(configStore.sidebar.isCollapsed || false)
+const asideWidth = ref(configStore.sidebar.width || 300)
+const currentTab = ref(configStore.sidebar.tab || actions[0].label)
 const isSideResizing = ref(false)
-const isCollapsed = ref(false)
-const asideWidth = ref(300)
-const currentTab = ref('小说')
+if (!actions.map((i) => i.label).includes(currentTab.value)) {
+  currentTab.value = actions[0].label
+}
 
 const asideWidthComp = computed({
   get() {
@@ -53,13 +63,6 @@ function resizeMovingEnd() {
   isSideResizing.value = false
 }
 
-const actions = [
-  { label: '小说', icon: 'icon-bookmark', component: null },
-  { label: '世界观', icon: 'icon-common', component: EditorWorld },
-  { label: '人物', icon: 'icon-user-group', component: null },
-  { label: '基础信息', icon: 'icon-info-circle', component: EditorInfo }
-]
-
 function handleActionItemClick(item: { label: string }) {
   if (currentTab.value === item.label) {
     isCollapsed.value = !isCollapsed.value
@@ -68,6 +71,15 @@ function handleActionItemClick(item: { label: string }) {
     isCollapsed.value = false
   }
 }
+
+function updateState() {
+  configStore.sidebar.isCollapsed = isCollapsed.value
+  configStore.sidebar.width = asideWidth.value
+  configStore.sidebar.tab = currentTab.value
+}
+
+onUnmounted(updateState)
+window.addEventListener('unload', updateState)
 </script>
 
 <template>
@@ -117,18 +129,14 @@ function handleActionItemClick(item: { label: string }) {
           >
             <section>{{ currentTab }}</section>
           </section>
-          <a-scrollbar
-            class="part-content overflow-auto h-full"
-            style=""
-            outer-class="flex-grow h-0"
-          >
+          <div class="part-content flex-grow h-0">
             <component
               v-for="item of actions"
               v-show="item.label === currentTab"
               :key="'pane-' + item.label"
               :is="item.component"
             ></component>
-          </a-scrollbar>
+          </div>
         </section>
       </section>
     </a-resize-box>
@@ -146,6 +154,7 @@ function handleActionItemClick(item: { label: string }) {
       padding: 0 1px;
       opacity: 0;
       transition: opacity 0.2s;
+      z-index: 1;
 
       &:hover,
       &:active {
