@@ -2,16 +2,17 @@
 import { computed, reactive, ComputedRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AppControls from './AppControls.vue'
-import { useConfigStore } from '/@/stores/config'
+import { useConfigStore, useProjectStore } from '/@/stores'
 import $API from '/@/apis'
 
 const $route = useRoute()
 const $router = useRouter()
 const configStore = useConfigStore()
+const projectStore = useProjectStore()
 
 const title = computed(() => {
   const routeTitle = $route.meta.title || ''
-  const projectTitle = configStore.project.title || ''
+  const projectTitle = projectStore.project.title || ''
   const appTitle = import.meta.env.VITE_APP_TITLE
   return [routeTitle, projectTitle, appTitle].filter((i) => i).join(' - ')
 })
@@ -41,13 +42,13 @@ const menu = reactive<AppHeaderMenuItem[]>([
       {
         label: '关闭项目',
         isHide: computed(
-          () => !configStore.isProjectLoaded && $route.name !== 'AppEditor'
+          () => !projectStore.isProjectLoaded && $route.name !== 'AppEditor'
         ),
         disabled: computed(
-          () => !configStore.isProjectLoaded && $route.name !== 'AppEditor'
+          () => !projectStore.isProjectLoaded && $route.name !== 'AppEditor'
         ),
         fn: () => {
-          configStore.clearProject()
+          projectStore.clearProject()
           $router.push({ name: 'AppHomeWelcome' })
         }
       }

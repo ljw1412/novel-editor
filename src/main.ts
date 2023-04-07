@@ -1,11 +1,10 @@
-import { createApp } from 'vue'
+import { createApp, watch } from 'vue'
 import App from './App.vue'
 import router from '/@/router'
 import { createPinia } from 'pinia'
 import ArcoVue from '@arco-design/web-vue'
 import ArcoVueIcon from '@arco-design/web-vue/es/icon'
-import { useWinStore } from '/@/stores/win'
-import { useConfigStore } from '/@/stores/config'
+import { useWinStore, useConfigStore } from '/@/stores'
 import { ipcOn } from '/@/utils/ipc'
 
 import '@arco-design/web-vue/dist/arco.css'
@@ -33,4 +32,12 @@ ipcOn('window', (e, action, data) => {
   }
 })
 
-useConfigStore().flushBodyTheme()
+// 主题监听
+const configStore = useConfigStore()
+configStore.flushBodyTheme()
+watch(
+  () => configStore.theme.now,
+  () => {
+    configStore.flushBodyTheme()
+  }
+)

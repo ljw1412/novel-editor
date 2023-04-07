@@ -1,20 +1,20 @@
 <script setup lang="ts" name="EditorInfo">
 import { computed } from 'vue'
-import { useConfigStore } from '/@/stores/config'
+import { useProjectStore } from '/@/stores'
 import { formatDate } from '/@/utils/date'
 
-const conifgStore = useConfigStore()
+const projectStore = useProjectStore()
 
 const projectData = computed(() => {
   return [
-    { label: '标题', value: conifgStore.project.title || '' },
-    { label: '作者', value: conifgStore.project.author || '' },
-    { label: '简介', value: conifgStore.project.desc || '' },
-    { label: '保存位置', value: conifgStore.project.path || '' },
+    { label: '标题', value: projectStore.project.title || '' },
+    { label: '作者', value: projectStore.project.author || '' },
+    { label: '简介', value: projectStore.project.desc || '' },
+    { label: '保存位置', value: projectStore.project.path || '' },
     {
       label: '创建时间',
-      value: conifgStore.project.createTime
-        ? formatDate(conifgStore.project.createTime)
+      value: projectStore.project.createTime
+        ? formatDate(projectStore.project.createTime)
         : ''
     }
   ]

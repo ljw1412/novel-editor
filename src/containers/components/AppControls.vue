@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { useWinStore } from '/@/stores/win'
+import { useWinStore } from '/@/stores'
 import { safeBoolean } from '/@/utils/assist'
 
 const props = defineProps({

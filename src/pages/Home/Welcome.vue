@@ -1,11 +1,11 @@
 <script setup lang="ts" name="AppHomeWelcome">
 import { useRouter } from 'vue-router'
-import { useConfigStore } from '/@/stores/config'
 import $API from '/@/apis'
+import { useProjectStore } from '/@/stores'
 import { getPublicUrl } from '/@/utils/url'
 
 const $router = useRouter()
-const configStore = useConfigStore()
+const projectStore = useProjectStore()
 const appInfo = window.bridge.package
 const versions = window.bridge.versions
 
@@ -25,9 +25,9 @@ const linkList = [
 
 async function openProject(path: string) {
   try {
-    const project = await $API.Electron.openProject(path)
-    configStore.setCurrentProject(project)
-    $router.push({ name: 'AppEditor' })
+    const project = await $API.Electron.project.openProject(path)
+    projectStore.setCurrentProject(project)
+    $router.push({ name: 'AppEditor', query: { path } })
   } catch (error) {}
 }
 </script>
@@ -46,11 +46,11 @@ async function openProject(path: string) {
           <span class="block self-end">打开项目...</span>
         </a-link>
       </a-space>
-      <template v-if="configStore.recentList.length">
+      <template v-if="projectStore.recentList.length">
         <a-typography-title :heading="4">最近</a-typography-title>
         <a-space direction="vertical" size="mini" fill class="text-lg">
           <div
-            v-for="item of configStore.recentList.slice(0, 5)"
+            v-for="item of projectStore.recentList.slice(0, 5)"
             class="recent-item flex items-center"
           >
             <a-link
@@ -63,7 +63,7 @@ async function openProject(path: string) {
               {{ item.path }}
             </span>
           </div>
-          <a-link v-if="configStore.recentList.length > 5">更多...</a-link>
+          <a-link v-if="projectStore.recentList.length > 5">更多...</a-link>
         </a-space>
       </template>
     </div>

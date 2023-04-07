@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useConfigStore } from '/@/stores/config'
+import { useConfigStore } from '/@/stores'
 import AppControls from './AppControls.vue'
 import AppFavicon from './AppFavicon.vue'
 import { safeBoolean } from '/@/utils/assist'

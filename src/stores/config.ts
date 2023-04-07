@@ -1,67 +1,35 @@
-import { defineStore } from 'pinia'
 import { useLocalStorage } from '@vueuse/core'
-import { watch } from 'vue'
+import { defineStore } from 'pinia'
 
 const config = useLocalStorage('APP_CONFIG', {
-  theme: { now: 'dark', before: '' }
+  theme: { now: 'dark', before: '' },
+  sidebar: { tab: '', width: 300, isCollapsed: false }
 })
 
-const recentList = useLocalStorage<Editor.RecentRecord[]>('RECENT_PROJECT', [])
-
 export const useConfigStore = defineStore('configStore', {
-  state: () => ({
-    project: {} as Editor.Project
-  }),
+  state: () => ({ config }),
 
   getters: {
-    theme() {
-      return config.value.theme.now
-    },
-
-    isDarkMode() {
-      return config.value.theme.now === 'dark'
-    },
-
-    recentList() {
-      return recentList.value
-    },
-
-    isProjectLoaded(state) {
-      return !!state.project.path
-    }
+    theme: (state) => state.config.theme,
+    sidebar: (state) => state.config.sidebar,
+    isDarkMode: (state) => state.config.theme.now === 'dark'
   },
 
   actions: {
+    /**
+     * 切换黑暗模式
+     */
     toggleDarkMode() {
-      const currentTheme = this.theme || ''
-      config.value.theme.now =
-        this.theme === 'dark' ? config.value.theme.before : 'dark'
-      config.value.theme.before = currentTheme
+      const currentTheme = this.theme.now || ''
+      this.theme.now = this.isDarkMode ? this.theme.before : 'dark'
+      this.theme.before = currentTheme
       this.flushBodyTheme()
     },
-
+    /**
+     * 刷新页面主题
+     */
     flushBodyTheme() {
-      document.body.setAttribute('arco-theme', this.theme)
-    },
-
-    addRecentProject(project: Editor.RecentRecord) {
-      recentList.value.unshift(project)
-    },
-
-    setCurrentProject(project: Editor.Project) {
-      this.project = project
-    },
-
-    clearProject() {
-      this.project = {} as Editor.Project
+      document.body.setAttribute('arco-theme', this.theme.now)
     }
   }
 })
-
-watch(
-  () => config.value.theme.now,
-  () => {
-    const configStore = useConfigStore()
-    configStore.flushBodyTheme()
-  }
-)

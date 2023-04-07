@@ -3,11 +3,11 @@ import { ref, reactive, watch, toRaw } from 'vue'
 import $API from '/@/apis'
 import { FormInstance, Notification } from '@arco-design/web-vue'
 import { useRouter } from 'vue-router'
-import { useConfigStore } from '/@/stores/config'
 import { only } from '/@/utils/object'
+import { useProjectStore } from '/@/stores'
 
 const $router = useRouter()
-const configStore = useConfigStore()
+const prjStore = useProjectStore()
 const formRef = ref<FormInstance>()
 const sep = ref('')
 const projectDir = ref('')
@@ -20,27 +20,13 @@ const project = reactive<Editor.Project>({
 })
 
 async function init() {
-  sep.value = await $API.Electron.getSeparator()
-  projectDir.value = await $API.Electron.getDefaultDir()
-}
-
-async function create() {
-  const errors = await formRef.value?.validate()
-  if (errors) return
-
-  try {
-    const prj = await $API.Electron.createProject(toRaw(project))
-    //TODO: 保存到store中
-
-    configStore.addRecentProject(only(prj, 'title path') as Editor.RecentRecord)
-    configStore.setCurrentProject(prj)
-    $router.push({ name: 'AppEditor' })
-  } catch (error: any) {}
+  sep.value = await $API.Electron.shell.getSeparator()
+  projectDir.value = await $API.Electron.project.getDefaultDir()
 }
 
 async function selectProjectDir() {
   try {
-    const result = await $API.Electron.selectDir({
+    const result = await $API.Electron.shell.selectDir({
       defaultPath: projectDir.value
     })
     const { canceled, filePaths } = result
@@ -49,6 +35,18 @@ async function selectProjectDir() {
       projectDir.value = filePaths[0]
     }
   } catch (error) {}
+}
+
+async function create() {
+  const errors = await formRef.value?.validate()
+  if (errors) return
+
+  try {
+    const prj = await $API.Electron.project.createProject(toRaw(project))
+    prjStore.addRecentProject(only(prj, 'title path') as Editor.RecentRecord)
+    prjStore.setCurrentProject(prj)
+    $router.push({ name: 'AppEditor', query: { path: prj.path } })
+  } catch (error: any) {}
 }
 
 watch(

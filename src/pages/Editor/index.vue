@@ -1,11 +1,29 @@
 <script setup lang="ts" name="AppEditor">
 import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { useProjectStore } from '/@/stores'
+import * as logger from '/@/utils/logger'
 import EditorInfo from './components/Info.vue'
+import EditorWorld from './components/World.vue'
+import $API from '/@/apis'
 
-const isCollapsed = ref(false)
+const projectStore = useProjectStore()
+const $route = useRoute()
+if (!projectStore.isProjectLoaded && $route.query.path) {
+  logger.warning('项目重加载', $route.query.path)
+  ;(async () => {
+    try {
+      const path = $route.query.path as string
+      const project = await $API.Electron.project.openProject(path)
+      projectStore.setCurrentProject(project)
+    } catch (error) {}
+  })()
+}
+
 const isSideResizing = ref(false)
+const isCollapsed = ref(false)
 const asideWidth = ref(300)
-const currentTab = ref('章节')
+const currentTab = ref('小说')
 
 const asideWidthComp = computed({
   get() {
@@ -36,8 +54,8 @@ function resizeMovingEnd() {
 }
 
 const actions = [
-  { label: '章节', icon: 'icon-bookmark', component: null },
-  { label: '世界观', icon: 'icon-common', component: null },
+  { label: '小说', icon: 'icon-bookmark', component: null },
+  { label: '世界观', icon: 'icon-common', component: EditorWorld },
   { label: '人物', icon: 'icon-user-group', component: null },
   { label: '基础信息', icon: 'icon-info-circle', component: EditorInfo }
 ]
@@ -91,18 +109,26 @@ function handleActionItemClick(item: { label: string }) {
           </a-tooltip>
         </section>
         <section
-          v-if="!isCollapsed"
-          class="part min-w-[200px] h-full flex-grow"
+          v-show="!isCollapsed"
+          class="part flex flex-col min-w-[200px] h-full flex-grow"
         >
-          <section class="part-title h-[40px] layout-lr px-3 shadow-sm">
+          <section
+            class="part-title layout-lr h-[40px] px-3 shadow-sm flex-shrink-0"
+          >
             <section>{{ currentTab }}</section>
           </section>
-          <component
-            v-for="item of actions"
-            v-show="item.label === currentTab"
-            :key="'pane-' + item.label"
-            :is="item.component"
-          ></component>
+          <a-scrollbar
+            class="part-content overflow-auto h-full"
+            style=""
+            outer-class="flex-grow h-0"
+          >
+            <component
+              v-for="item of actions"
+              v-show="item.label === currentTab"
+              :key="'pane-' + item.label"
+              :is="item.component"
+            ></component>
+          </a-scrollbar>
         </section>
       </section>
     </a-resize-box>

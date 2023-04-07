@@ -2,47 +2,58 @@ import type { RouteLocationRaw } from 'vue-router'
 import { ipcInvoke, ipcSend } from '/@/utils/ipc'
 import * as logger from '/@/utils/logger'
 
-/**
- * 获取项目的默认文件夹
- * @returns
- */
-export async function getDefaultDir() {
-  return ipcInvoke<string>('project', 'getDefaultProjectDir')
+export const shell = {
+  channel: 'shell',
+  /**
+   * 获取系统路径的分隔符号
+   * @returns
+   */
+  async getSeparator() {
+    return ipcInvoke<string>(this.channel, 'getSeparator')
+  },
+  /**
+   * 选择文件夹
+   * @param options
+   * @returns
+   */
+  async selectDir(options?: { defaultPath: string }) {
+    return ipcInvoke(this.channel, 'selectDir', options)
+  }
 }
 
-/**
- * 创建项目
- * @param project
- * @returns
- */
-export async function createProject(project: Editor.Project) {
-  return ipcInvoke<Editor.Project>('project', 'createProject', { project })
-}
+export const project = {
+  channel: 'project',
+  /**
+   * 获取项目的默认文件夹
+   * @returns
+   */
+  async getDefaultDir() {
+    return ipcInvoke<string>(this.channel, 'getDefaultProjectDir')
+  },
+  /**
+   * 创建项目
+   * @param project
+   * @returns
+   */
+  async createProject(project: Editor.Project) {
+    return ipcInvoke<Editor.Project>(this.channel, 'createProject', { project })
+  },
+  /**
+   * 打开项目
+   * @param path
+   * @returns
+   */
+  async openProject(path: string) {
+    return ipcInvoke<Editor.Project>(this.channel, 'openProject', { path })
+  },
 
-/**
- * 打开项目
- * @param path
- * @returns
- */
-export async function openProject(path: string) {
-  return ipcInvoke<Editor.Project>('project', 'openProject', { path })
-}
+  createVolume(name: string) {
+    return ipcInvoke<Editor.Project>(this.channel, 'openProject', { name })
+  },
 
-/**
- * 获取系统路径的分隔符号
- * @returns
- */
-export async function getSeparator() {
-  return ipcInvoke<string>('shell', 'getSeparator')
-}
+  createChapter() {},
 
-/**
- * 选择文件夹
- * @param options
- * @returns
- */
-export async function selectDir(options?: { defaultPath: string }) {
-  return ipcInvoke('shell', 'selectDir', options)
+  uploadImage() {}
 }
 
 export const win = {
