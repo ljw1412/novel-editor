@@ -49,6 +49,11 @@ export default defineConfig(({ command }) => {
             }
           },
           vite: {
+            resolve: {
+              alias: {
+                '/@/': join(__dirname, 'electron/main') + '/'
+              }
+            },
             build: {
               sourcemap,
               minify: isBuild,

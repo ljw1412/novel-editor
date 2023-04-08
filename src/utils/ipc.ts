@@ -18,20 +18,21 @@ export async function ipcInvoke<T = any>(
   logger.send(`invoke => ${channel}`, action, data)
   const result = await ipcRenderer.invoke(channel, action, data)
   if (typeof result === 'object' && result.err) {
+    if (!result.data) result.data = {}
     logger.error(`invoke => ${channel}`, action, result)
     if (!options.silent && result.error) {
       Notification.remove('ipc-error')
       setTimeout(() => {
         Notification.error({
           id: 'ipc-error',
-          title: '错误',
-          content: result.error.message,
+          title: result.title || '错误',
+          content: result.message || result.error.message,
           position: 'bottomRight',
           closable: true
         })
       }, 0)
     }
-    return Promise.reject(result.error)
+    return Promise.reject(result)
   }
   logger.receive(`invoke => ${channel}`, action, result)
   return result

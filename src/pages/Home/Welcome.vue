@@ -23,12 +23,20 @@ const linkList = [
   }
 ]
 
-async function openProject(path: string) {
+async function openProject(item: Editor.RecentRecord) {
   try {
-    const project = await $API.Electron.project.openProject(path)
+    const project = await $API.Electron.project.openProject(item.path)
     projectStore.setCurrentProject(project)
-    $router.push({ name: 'AppEditor', query: { path } })
-  } catch (error) {}
+    $router.push({ name: 'AppEditor', query: { path: item.path } })
+  } catch (error: any) {
+    console.log('openProject', error)
+    if (error.data.isRemoved) {
+      const index = projectStore.recentList.findIndex(
+        (record) => item === record
+      )
+      if (~index) projectStore.recentList.splice(index, 1)
+    }
+  }
 }
 </script>
 
@@ -36,7 +44,7 @@ async function openProject(path: string) {
   <div class="app-home-welcome flex">
     <div class="welcome-left flex-shrink-0 w-1/2">
       <a-typography-title :heading="4">启动</a-typography-title>
-      <a-space direction="vertical" size="mini" fill class="text-lg">
+      <a-space direction="vertical" size="mini" fill class="text-md">
         <a-link @click="$router.push({ name: 'AppHomeCreate' })">
           <icon-folder-add size="32" class="stroke-3 mr-2" />
           <span class="block self-end">新建项目...</span>
@@ -48,14 +56,14 @@ async function openProject(path: string) {
       </a-space>
       <template v-if="projectStore.recentList.length">
         <a-typography-title :heading="4">最近</a-typography-title>
-        <a-space direction="vertical" size="mini" fill class="text-lg">
+        <a-space direction="vertical" size="mini" fill class="text-md">
           <div
             v-for="item of projectStore.recentList.slice(0, 5)"
             class="recent-item flex items-center"
           >
             <a-link
               class="max-w-3/5 flex-shrink-0 truncate"
-              @click="openProject(item.path)"
+              @click="openProject(item)"
             >
               {{ item.title }}
             </a-link>
@@ -82,7 +90,7 @@ async function openProject(path: string) {
           target="_blank"
           class="link-card block text-color-2 hover:text-color-1"
         >
-          <div class="flex bg-color-2 text-lg p-1">
+          <div class="flex bg-color-2 text-md p-1">
             <component
               v-if="link.icon.startsWith('icon-')"
               :is="link.icon"

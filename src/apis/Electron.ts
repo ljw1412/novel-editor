@@ -47,13 +47,33 @@ export const project = {
     return ipcInvoke<Editor.Project>(this.channel, 'openProject', { path })
   },
 
+  initData(names: string[], path: string) {
+    return ipcInvoke(this.channel, 'initData', { names, path })
+  },
+
   createVolume(name: string) {
-    return ipcInvoke<Editor.Project>(this.channel, 'openProject', { name })
+    return ipcInvoke<Editor.Project>(this.channel, 'createVolume', { name })
   },
 
   createChapter() {},
 
-  uploadImage() {}
+  uploadImage() {},
+
+  saveData(name: string, data: object, path: string) {
+    return ipcInvoke(this.channel, 'saveData', { name, data, path })
+  },
+
+  getData(name: string, path: string) {
+    return ipcInvoke(this.channel, 'getData', { name, path })
+  },
+
+  getManyData(names: string[], path: string) {
+    return ipcInvoke(this.channel, 'getManyData', { names, path })
+  },
+
+  hasNamesData(names: string[], path: string) {
+    return ipcInvoke(this.channel, 'hasNamesData', { names, path })
+  }
 }
 
 export const win = {

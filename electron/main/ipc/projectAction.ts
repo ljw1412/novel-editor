@@ -15,27 +15,60 @@ const handle = createHandle(channel, {
     return ProjectService.getDefaultPrejectDir()
   },
 
-  async createProject(e, win, data) {
-    const { project } = data
-    storage.setDataPath(project.path)
-    return handleWrap(async () => {
-      return await ProjectService.createProject(project as Editor.Project)
+  async createProject(e, win, payload) {
+    const { project } = payload
+    return handleWrap(() => {
+      return ProjectService.createProject(project as Editor.Project)
     })
   },
 
-  async openProject(e, win, data) {
-    const { path } = data
-    storage.setDataPath(path)
-    return handleWrap(async () => {
-      return await ProjectService.openProject(path)
+  async openProject(e, win, payload) {
+    const { path } = payload
+    return handleWrap(() => {
+      return ProjectService.openProject(path)
     })
   },
 
-  async createVolume(e, win, data) {},
+  async initData(e, win, payload) {
+    const { names = [], path } = payload
+    return handleWrap(() => {
+      return ProjectService.initProjectData(path, names)
+    })
+  },
 
-  async createChapter(e, win, data) {},
+  async saveData(e, win, payload) {
+    const { name, data, path } = payload
+    return handleWrap(() => {
+      return ProjectService.saveData(name, data, path)
+    })
+  },
 
-  async uploadImage(e, win, data) {}
+  async getData(e, win, payload) {
+    const { name, path } = payload
+    return handleWrap(() => {
+      return ProjectService.getData(name, path)
+    })
+  },
+
+  async getManyData(e, win, payload) {
+    const { names, path } = payload
+    return handleWrap(() => {
+      return ProjectService.getManyData(names, path)
+    })
+  },
+
+  async hasNamesData(e, win, payload) {
+    const { names, path } = payload
+    return handleWrap(() => {
+      return ProjectService.hasNamesData(names, path)
+    })
+  },
+
+  async createVolume(e, win, payload) {},
+
+  async createChapter(e, win, payload) {},
+
+  async uploadImage(e, win, payload) {}
 })
 
 function bind() {

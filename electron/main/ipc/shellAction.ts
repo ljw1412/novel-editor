@@ -24,9 +24,9 @@ const handle = createHandle(channel, {
     })
   },
 
-  saveFile: async (e, win, data) => {
+  saveFile: async (e, win, payload) => {
     try {
-      const { content = '', filters } = data
+      const { content = '', filters } = payload
       const result = await dialog.showSaveDialog({
         title: '保存文件',
         filters
@@ -40,8 +40,8 @@ const handle = createHandle(channel, {
     }
   },
 
-  selectDir: async (e, win, data) => {
-    const { defaultPath } = data
+  selectDir: async (e, win, payload) => {
+    const { defaultPath } = payload
     try {
       const result = await dialog.showOpenDialog({
         title: '选择文件夹',

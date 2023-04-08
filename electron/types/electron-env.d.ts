@@ -14,23 +14,23 @@ declare namespace NodeJS {
 type IpcListener = (
   event: Electron.IpcMainEvent,
   action: string,
-  data?: Record<string, any>
+  payload?: Record<string, any>
 ) => any
 
 type IpcAction = (
   event: Electron.IpcMainEvent,
   win: Electron.BrowserWindow | null,
-  data?: Record<string, any>
+  payload?: Record<string, any>
 ) => any
 
 type IpcInvokeListener = (
   event: Electron.IpcMainInvokeEvent,
   action: string,
-  data?: Record<string, any>
+  payload?: Record<string, any>
 ) => any
 
 type IpcInvokeAction = (
   event: Electron.IpcMainInvokeEvent,
   win: Electron.BrowserWindow | null,
-  data?: Record<string, any>
+  payload?: Record<string, any>
 ) => any

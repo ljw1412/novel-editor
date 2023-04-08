@@ -2,7 +2,7 @@ import { createApp, watch } from 'vue'
 import App from './App.vue'
 import router from '/@/router'
 import { createPinia } from 'pinia'
-import ArcoVue from '@arco-design/web-vue'
+import ArcoVue, { Notification } from '@arco-design/web-vue'
 import ArcoVueIcon from '@arco-design/web-vue/es/icon'
 import { useWinStore, useConfigStore } from '/@/stores'
 import { ipcOn } from '/@/utils/ipc'
@@ -11,6 +11,8 @@ import '@arco-design/web-vue/dist/arco.css'
 import '/@/styles/index.scss'
 
 const app = createApp(App)
+
+Notification._context = app._context
 
 app
   .use(createPinia())

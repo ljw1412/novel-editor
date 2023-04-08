@@ -28,7 +28,8 @@ module.exports = {
       xs: '12px',
       sm: '13px',
       base: '14px',
-      lg: '16px',
+      md: '16px',
+      lg: '18px',
       xl: '20px',
       '2xl': '24px',
       '3xl': '28px'
@@ -40,6 +41,18 @@ module.exports = {
       4: '4'
     },
     extend: {
+      lineHeight: {
+        1: '1',
+        2: '1.25',
+        3: '12px',
+        4: '16px',
+        5: '24px',
+        6: '32px',
+        7: '48px',
+        8: '56px',
+        9: '64px'
+      },
+
       textColor: {
         'color-0': 'var(--color-text-0)',
         'color-1': 'var(--color-text-1)',

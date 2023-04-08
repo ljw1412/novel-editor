@@ -96,7 +96,7 @@ function handleMenuSelect(value?: string | number | Record<string, any>) {
           @select="handleMenuSelect"
         >
           <div
-            class="text-btn inline-block app-no-drag px-3 py-[2px] rounded-md text-lg"
+            class="text-btn inline-block app-no-drag px-3 py-[2px] rounded-md text-md"
             :class="{ active: item.active }"
           >
             {{ item.group }}

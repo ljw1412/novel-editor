@@ -3,7 +3,7 @@
 type IpcListener = (
   event: Electron.IpcRendererEvent,
   action: string,
-  data?: Record<string, any>
+  payload?: Record<string, any>
 ) => void
 
 declare interface Window {

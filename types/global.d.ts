@@ -1,3 +1,10 @@
+declare namespace Electron {
+  interface BrowserWindow {
+    name?: string
+    isPreset?: boolean
+  }
+}
+
 interface WindowConfig {
   url: string
   // 静默启动
@@ -8,9 +15,7 @@ interface WindowConfig {
   name?: string
 }
 
-declare namespace Electron {
-  interface BrowserWindow {
-    name?: string
-    isPreset?: boolean
-  }
+interface ApiError extends Error {
+  title: string
+  data: Record<string, any>
 }

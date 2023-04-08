@@ -5,8 +5,8 @@ import * as winService from '../services/window'
 const channel = 'window'
 
 const listener = createListener(channel, {
-  openPresetWindow(e, win, data) {
-    const { name = '' } = data
+  openPresetWindow(e, win, payload) {
+    const { name = '' } = payload
     if (!winService.presetWindowNames.includes(name)) {
       console.error(`[预制窗体${name}]不在预制窗体列表中！`)
       return
@@ -23,7 +23,7 @@ const listener = createListener(channel, {
 })
 
 const handle: IpcInvokeListener = createHandle(channel, {
-  minimize: (e, win, data) => {
+  minimize: (e, win, payload) => {
     if (!win) return false
     win.minimize()
   },
@@ -37,8 +37,8 @@ const handle: IpcInvokeListener = createHandle(channel, {
       return true
     }
   },
-  close: (e, win, data) => {
-    const { who } = data
+  close: (e, win, payload) => {
+    const { who } = payload
     if (who === 'main') {
       const allWindows = BrowserWindow.getAllWindows()
       allWindows.reverse().forEach((win) => {
@@ -51,7 +51,7 @@ const handle: IpcInvokeListener = createHandle(channel, {
     }
     win.close()
   },
-  toggleDevTools: (e, win, data) => {
+  toggleDevTools: (e, win, payload) => {
     win.webContents.toggleDevTools()
   }
 })
