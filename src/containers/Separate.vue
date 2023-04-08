@@ -36,6 +36,7 @@ if ($route.meta.isWebView) {
   <AppHeaderMini
     :title="title"
     :icon="isLoading ? 'icon-loading' : favicon"
+    class="flex-shrink-0"
   ></AppHeaderMini>
   <main id="app-separate" class="app-separate">
     <RouterView v-if="!$route.meta.isWebView"></RouterView>

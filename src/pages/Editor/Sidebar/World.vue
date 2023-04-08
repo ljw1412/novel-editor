@@ -1,27 +1,20 @@
-<script setup lang="ts" name="EditorWorld">
-import { computed, reactive, ref, toRaw } from 'vue'
+<script setup lang="ts" name="SidebarWorld">
+import { computed, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import $API from '/@/apis'
-import { useProjectStore } from '/@/stores'
+import { useProjectStore, useEditorStore, useConfigStore } from '/@/stores'
 import Page, { PageObject } from '/@/classes/Page'
 import { Notification } from '@arco-design/web-vue'
-import PageItem from './PageItem.vue'
+import PageItem from '../components/PageItem.vue'
 
 const $route = useRoute()
+const configStore = useConfigStore()
 const projectStore = useProjectStore()
-const activeKey = ref(['summary'])
+const editorStore = useEditorStore()
+
 const summary = reactive<Page[]>([])
 const timeline = reactive<Page[]>([])
 const keywords = reactive<Page[]>([])
-const isAdding = ref(false)
-const allPageList = computed(() => {
-  const list = [...summary, ...timeline, ...keywords]
-  return [...list, ...list.map((page) => page.children || []).flat()]
-})
-
-summary.push(new Page('测试'))
-summary.length = 0
-
 const collapsePaneList = [
   {
     key: 'summary',
@@ -43,27 +36,27 @@ const collapsePaneList = [
     key: 'keywords',
     title: '关键词 / keywords',
     list: keywords,
-    placeholder: '输入年份，如：2023年、甲乙年',
+    placeholder: '输入年份或年月或年月日',
     allowAdd: true,
     allowAddChild: false
   }
 ]
+const activeKey = ref([configStore.sidebar['tab.world'] || 'summary'])
+const isAdding = ref(false)
+const allPageList = computed(() => {
+  const list = [...summary, ...timeline, ...keywords]
+  return [...list, ...list.map((page) => page.children || []).flat()]
+})
 
-function saveWorldData() {
-  const path = projectStore.project.path || ($route.query.path as string)
-  const data = {
-    summary: summary.map((page) => page.toObject()),
-    timeline: timeline.map((page) => page.toObject()),
-    keywords: keywords.map((page) => page.toObject())
-  }
-  $API.Electron.project.saveData('world', data, path)
+function handeCollapseChange([activeKey]: (string | number)[]) {
+  configStore.sidebar['tab.world'] = activeKey as string
 }
 
-function addItemPage(key: string) {
+function addItemPage(key: string, list: Page[]) {
   activeKey.value = [key]
   isAdding.value = true
-  const list = key === 'timeline' ? timeline : keywords
   const page = new Page()
+  page.action = key
   page.isEdit = true
   list.push(page)
 }
@@ -71,14 +64,14 @@ function addItemPage(key: string) {
 function handlePageTextChange(page: Page) {
   page.isEdit = false
   if (isAdding.value) {
-    const list = activeKey.value[0] === 'timeline' ? timeline : keywords
+    const list = page.action === 'timeline' ? timeline : keywords
     if (!page.title.trim()) {
       list.pop()
     } else {
       handlePageClick(page)
       const path = projectStore.project.path || ($route.query.path as string)
       $API.Electron.project.saveData(
-        `world.${activeKey.value[0]}`,
+        `world.${page.action}`,
         list.map((item) => item.toObject()),
         path
       )
@@ -87,19 +80,12 @@ function handlePageTextChange(page: Page) {
   }
 }
 
-function handlePageCancel(page: Page) {
+function handlePageCancel(page: Page, list: Page[]) {
   if (isAdding.value) {
-    const list = activeKey.value[0] === 'timeline' ? timeline : keywords
+    // const list = page.action === 'timeline' ? timeline : keywords
     list.pop()
     isAdding.value = false
   }
-}
-
-function handlePageAddChild(page: Page) {
-  isAdding.value = true
-  const childPage = new Page()
-  childPage.isEdit = true
-  page.children.push(childPage)
 }
 
 function handlePageChildTextChange(page: Page, parentPage: Page) {
@@ -109,10 +95,10 @@ function handlePageChildTextChange(page: Page, parentPage: Page) {
       parentPage.children.pop()
     } else {
       handlePageClick(page)
-      const list = activeKey.value[0] === 'timeline' ? timeline : keywords
+      const list = page.action === 'timeline' ? timeline : keywords
       const path = projectStore.project.path || ($route.query.path as string)
       $API.Electron.project.saveData(
-        `world.${activeKey.value[0]}`,
+        `world.${page.action}`,
         list.map((item) => item.toObject()),
         path
       )
@@ -121,12 +107,12 @@ function handlePageChildTextChange(page: Page, parentPage: Page) {
   }
 }
 
-function handlePageChildCancel(page: Page) {
-  if (isAdding.value) {
-    page.children.pop()
-    isAdding.value = false
-  }
-}
+// function handlePageChildCancel(page: Page) {
+//   if (isAdding.value) {
+//     page.children.pop()
+//     isAdding.value = false
+//   }
+// }
 
 function handlePageClick(page: Page, parentPage?: Page) {
   if (page.isEdit) return
@@ -134,6 +120,7 @@ function handlePageClick(page: Page, parentPage?: Page) {
     page.isSelected = false
   })
   page.isSelected = true
+  editorStore.switchPage('world', page, parentPage)
 }
 
 function updateDataList(list: Page[], data: Page[]) {
@@ -176,12 +163,13 @@ loadData()
 </script>
 
 <template>
-  <div class="editor-world h-full">
+  <div class="sidebar-world h-full">
     <a-collapse
       v-model:active-key="activeKey"
       :bordered="false"
       accordion
       class="flex flex-col h-full"
+      @change="handeCollapseChange"
     >
       <a-collapse-item
         v-for="item of collapsePaneList"
@@ -194,7 +182,7 @@ loadData()
             v-if="item.allowAdd"
             v-show="!isAdding"
             class="text-btn w-5 h-5 layout-center rounded"
-            @click.stop="addItemPage(item.key)"
+            @click.stop="addItemPage(item.key, item.list)"
           >
             <icon-plus />
           </div>
@@ -208,8 +196,8 @@ loadData()
             :is-adding="isAdding"
             :placeholder="item.placeholder"
             @text-change="handlePageTextChange"
-            @cancel="handlePageCancel"
-            @add-child="handlePageAddChild"
+            @cancel="handlePageCancel(page, item.list)"
+            @add-child="addItemPage(item.key, page.children)"
             @page-click="handlePageClick(page)"
           >
             <template #children>
@@ -220,7 +208,7 @@ loadData()
                 :is-edit="sPage.isEdit"
                 is-child
                 @text-change="handlePageChildTextChange(sPage, page)"
-                @cancel="handlePageChildCancel(page)"
+                @cancel="handlePageCancel(sPage, page.children)"
                 @page-click="handlePageClick(sPage, page)"
               ></PageItem>
             </template>
@@ -232,46 +220,6 @@ loadData()
 </template>
 
 <style lang="scss">
-.editor-world {
-  .arco-collapse-item {
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-    border-bottom: none;
-
-    &.arco-collapse-item-active {
-      height: 0;
-      flex-grow: 1;
-    }
-
-    .arco-collapse-item-header {
-      padding-top: 4px;
-      padding-bottom: 4px;
-      padding-right: 4px;
-      min-height: 34px;
-    }
-
-    .arco-collapse-item-content {
-      padding: 0;
-
-      .arco-collapse-item-content-box {
-        padding: 0;
-        height: 100%;
-      }
-      &.arco-collapse-item-content-expend {
-        height: 100% !important;
-      }
-    }
-
-    &:hover {
-      .editor-page-item {
-        .children {
-          &::before {
-            opacity: 0.15;
-          }
-        }
-      }
-    }
-  }
+.sidebar-world {
 }
 </style>

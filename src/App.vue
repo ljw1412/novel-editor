@@ -18,14 +18,10 @@ body {
   flex-direction: column;
 }
 
-#app-header,
-#app-header-mini {
-  flex-shrink: 0;
-}
-
 #app-main,
 #app-separate {
   flex: 1 0 auto;
+  height: calc(100% - var(--app-header-height));
   border: 1px solid rgba(var(--app-theme-rgb), var(--app-border-opacity));
   border-top: none;
   transition: border-color 0.2s ease-out;
@@ -33,6 +29,7 @@ body {
   > * {
     width: 100%;
     height: 100%;
+    overflow: hidden;
   }
 }
 </style>

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, watch, PropType, nextTick } from 'vue'
+import { ref, watch, PropType, nextTick, computed } from 'vue'
 import Page from '/@/classes/Page'
 import type { InputInstance } from '@arco-design/web-vue'
+import { useFocus } from '@vueuse/core'
 
 const props = defineProps({
   isEdit: Boolean,
@@ -12,20 +13,35 @@ const props = defineProps({
   page: { type: Object as PropType<Page>, default: () => ({}) }
 })
 const $emit = defineEmits(['page-click', 'text-change', 'cancel', 'add-child'])
+const pageItemEl = ref<HTMLElement>()
 const inputRef = ref<InputInstance>()
 const inputText = ref('')
-const isFocus = ref(false)
+const isInputFocus = ref(false)
+const { focused: isItemFocus } = useFocus(pageItemEl)
+const isChildSelected = computed(() => {
+  return props.page.children.some((item) => item.isSelected)
+})
+const pageItemClass = computed(() => {
+  const classList: (string | Record<string, boolean>)[] = [
+    { active: props.page.isSelected, focus: isItemFocus.value }
+  ]
+  if (props.isChild) {
+    classList.push(props.isEdit ? 'pl-7' : 'pl-8')
+  } else {
+    classList.push(props.isEdit ? 'pl-[26px]' : 'pl-[34px]')
+  }
+  return classList
+})
 
 function handleInputFocus() {
-  console.log('handleInputFocus')
-
-  isFocus.value = true
+  // console.log('handleInputFocus')
+  isInputFocus.value = true
 }
 
 function handleInputBlur() {
-  if (!isFocus.value) return
-  console.log('handleInputBlur')
-  isFocus.value = false
+  if (!isInputFocus.value) return
+  // console.log('handleInputBlur')
+  isInputFocus.value = false
   if (inputText.value.trim()) {
     props.page.title = inputText.value.trim()
     $emit('text-change', props.page)
@@ -35,14 +51,13 @@ function handleInputBlur() {
 }
 
 function handleEscapeKeydown() {
-  console.log('handleEscapeKeydown')
-  isFocus.value = false
+  // console.log('handleEscapeKeydown')
+  isInputFocus.value = false
   $emit('cancel', props.page)
 }
 
 function handlePressEnter() {
-  console.log('handlePressEnter')
-
+  // console.log('handlePressEnter')
   if (inputText.value.trim()) {
     props.page.title = inputText.value.trim()
     $emit('text-change', props.page)
@@ -68,10 +83,15 @@ watch(
 </script>
 
 <template>
-  <div class="editor-page-item" :class="{ active: page.isSelected }">
+  <div
+    class="editor-page-item"
+    :class="{ active: page.isSelected, 'child-selected': isChildSelected }"
+  >
     <div
+      ref="pageItemEl"
       class="page-item h-6 pr-2 cursor-pointer flex items-center"
-      :class="[isChild ? 'pl-8' : 'pl-[34px]', { active: page.isSelected }]"
+      :class="pageItemClass"
+      :tabindex="page.isSelected ? 0 : -1"
       @click="$emit('page-click', page)"
     >
       <a-input
@@ -79,6 +99,7 @@ watch(
         v-model="inputText"
         size="small"
         ref="inputRef"
+        class="px-[7px]"
         :placeholder="placeholder"
         @focus="handleInputFocus"
         @blur="handleInputBlur"
@@ -135,6 +156,11 @@ watch(
       transition: opacity 0.15s ease-in;
       opacity: 0;
     }
+  }
+
+  &.child-selected > .children::before,
+  &.active > .children::before {
+    opacity: 0.15;
   }
 }
 </style>

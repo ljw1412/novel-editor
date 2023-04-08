@@ -1,4 +1,4 @@
-<script setup lang="ts" name="EditorInfo">
+<script setup lang="ts" name="SidebarInfo">
 import { computed } from 'vue'
 import { useProjectStore } from '/@/stores'
 import { formatDate } from '/@/utils/date'
@@ -23,7 +23,7 @@ const projectData = computed(() => {
 
 <template>
   <a-scrollbar
-    outer-class="editor-info h-full"
+    outer-class="sidebar-info h-full"
     class="h-full overflow-auto py-2 px-3"
   >
     <a-descriptions

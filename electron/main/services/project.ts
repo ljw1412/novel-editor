@@ -8,7 +8,9 @@ export function getDefaultPrejectDir() {
 }
 
 const INIT_FILE_MAP = {
-  'world.summary': [{ title: '故事背景', content: '', children: [] }],
+  'world.summary': [
+    { title: '故事背景', content: '', action: 'summary', children: [] }
+  ],
   'world.timeline': [],
   'world.keywords': []
 }

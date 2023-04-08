@@ -1,4 +1,4 @@
-<script setup lang="ts" name="AppHomeOpener"></script>
+<script setup lang="ts" name="HomeOpener"></script>
 
 <template>
   <div class="app-home-opener">

@@ -6,8 +6,8 @@ const $route = useRoute()
 </script>
 
 <template>
-  <AppHeader></AppHeader>
-  <main id="app-main" class="app-main flex-grow">
+  <AppHeader class="flex-shrink-0"></AppHeader>
+  <main id="app-main" class="app-main">
     <RouterView></RouterView>
   </main>
 </template>

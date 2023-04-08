@@ -1,4 +1,4 @@
-<script setup lang="ts" name="AppHomeCreate">
+<script setup lang="ts" name="HomeCreate">
 import { ref, reactive, watch, toRaw } from 'vue'
 import $API from '/@/apis'
 import { FormInstance, Notification } from '@arco-design/web-vue'

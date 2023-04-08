@@ -1,4 +1,4 @@
-<script setup lang="ts" name="AppHomeWelcome">
+<script setup lang="ts" name="HomeWelcome">
 import { useRouter } from 'vue-router'
 import $API from '/@/apis'
 import { useProjectStore } from '/@/stores'
@@ -45,11 +45,11 @@ async function openProject(item: Editor.RecentRecord) {
     <div class="welcome-left flex-shrink-0 w-1/2">
       <a-typography-title :heading="4">启动</a-typography-title>
       <a-space direction="vertical" size="mini" fill class="text-md">
-        <a-link @click="$router.push({ name: 'AppHomeCreate' })">
+        <a-link @click="$router.push({ name: 'HomeCreate' })">
           <icon-folder-add size="32" class="stroke-3 mr-2" />
           <span class="block self-end">新建项目...</span>
         </a-link>
-        <a-link @click="$router.push({ name: 'AppHomeOpener' })">
+        <a-link @click="$router.push({ name: 'HomeOpener' })">
           <icon-folder size="32" class="stroke-3 mr-2" />
           <span class="block self-end">打开项目...</span>
         </a-link>

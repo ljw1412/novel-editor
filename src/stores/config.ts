@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 
 const config = useLocalStorage('APP_CONFIG', {
   theme: { now: 'dark', before: '' },
-  sidebar: { tab: '', width: 300, isCollapsed: false }
+  sidebar: { tab: '', 'tab.world': '', width: 300, isCollapsed: false }
 })
 
 export const useConfigStore = defineStore('configStore', {

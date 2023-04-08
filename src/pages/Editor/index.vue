@@ -1,15 +1,14 @@
 <script setup lang="ts" name="AppEditor">
 import { ref, computed, onUnmounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useConfigStore, useProjectStore } from '/@/stores'
-import * as logger from '/@/utils/logger'
-import EditorInfo from './components/Info.vue'
-import EditorWorld from './components/World.vue'
 import $API from '/@/apis'
+import * as logger from '/@/utils/logger'
 
 const projectStore = useProjectStore()
 const configStore = useConfigStore()
 const $route = useRoute()
+const $router = useRouter()
 if (!projectStore.isProjectLoaded && $route.query.path) {
   logger.warning('项目重加载', $route.query.path)
   ;(async () => {
@@ -22,18 +21,19 @@ if (!projectStore.isProjectLoaded && $route.query.path) {
 }
 
 const actions = [
-  { label: '小说', icon: 'icon-bookmark', component: null },
-  { label: '世界观', icon: 'icon-common', component: EditorWorld },
-  { label: '人物', icon: 'icon-user-group', component: null },
-  { label: '基础信息', icon: 'icon-info-circle', component: EditorInfo }
+  { name: 'EditorBookshelf', label: '小说', icon: 'icon-bookmark' },
+  { name: 'EditorWorld', label: '世界观', icon: 'icon-common' },
+  { name: 'EditorCharacter', label: '人物', icon: 'icon-user-group' },
+  { name: 'EditorInfo', label: '基础信息', icon: 'icon-info-circle' }
 ]
 const isCollapsed = ref(configStore.sidebar.isCollapsed || false)
 const asideWidth = ref(configStore.sidebar.width || 300)
-const currentTab = ref(configStore.sidebar.tab || actions[0].label)
+const currentTab = ref(configStore.sidebar.tab || actions[0].name)
 const isSideResizing = ref(false)
-if (!actions.map((i) => i.label).includes(currentTab.value)) {
-  currentTab.value = actions[0].label
+if (!actions.map((i) => i.name).includes(currentTab.value)) {
+  currentTab.value = actions[0].name
 }
+$router.replace({ name: currentTab.value, query: $route.query })
 
 const asideWidthComp = computed({
   get() {
@@ -63,12 +63,13 @@ function resizeMovingEnd() {
   isSideResizing.value = false
 }
 
-function handleActionItemClick(item: { label: string }) {
-  if (currentTab.value === item.label) {
+function handleActionItemClick(item: { name: string }) {
+  if (currentTab.value === item.name) {
     isCollapsed.value = !isCollapsed.value
   } else {
-    currentTab.value = item.label
+    currentTab.value = item.name
     isCollapsed.value = false
+    $router.replace({ name: item.name, query: $route.query })
   }
 }
 
@@ -87,7 +88,7 @@ window.addEventListener('unload', updateState)
     <!-- 侧边栏 -->
     <a-resize-box
       component="aside"
-      class="aside-resize-box max-w-[600px] select-none"
+      class="aside-resize-box max-w-[600px] flex-shrink-0 h-full select-none"
       :class="{ resizing: isSideResizing }"
       :style="{ minWidth: isCollapsed ? '56px' : '256px' }"
       v-model:width="asideWidthComp"
@@ -109,7 +110,7 @@ window.addEventListener('unload', updateState)
           >
             <div
               class="action-item relative layout-center w-[56px] h-[56px] cursor-pointer opacity-50 hover:opacity-100"
-              :class="{ active: !isCollapsed && item.label === currentTab }"
+              :class="{ active: !isCollapsed && item.name === currentTab }"
               @click="handleActionItemClick(item)"
             >
               <component
@@ -127,21 +128,22 @@ window.addEventListener('unload', updateState)
           <section
             class="part-title layout-lr h-[40px] px-3 shadow-sm flex-shrink-0"
           >
-            <section>{{ currentTab }}</section>
+            <section>{{ $route.meta.title }}</section>
           </section>
           <div class="part-content flex-grow h-0">
-            <component
-              v-for="item of actions"
-              v-show="item.label === currentTab"
-              :key="'pane-' + item.label"
-              :is="item.component"
-            ></component>
+            <router-view name="sidebar" v-slot="{ Component, route }">
+              <keep-alive>
+                <component :is="Component" :key="route.name" />
+              </keep-alive>
+            </router-view>
           </div>
         </section>
       </section>
     </a-resize-box>
     <!-- 主体 -->
-    <main class="editor h-full flex-grow overflow-auto"></main>
+    <main class="editor h-full flex-grow overflow-auto">
+      <router-view></router-view>
+    </main>
   </div>
 </template>
 
@@ -171,10 +173,68 @@ window.addEventListener('unload', updateState)
     background-color: var(--editor-sidebar-bg);
 
     .actions {
+      border-right: 1px solid var(--color-border-2);
       background-color: var(--editor-sidebar-actions-bg);
     }
 
     .part {
+    }
+
+    .arco-collapse {
+      border-radius: initial;
+    }
+
+    .arco-collapse-item {
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      border-bottom: none;
+
+      &.arco-collapse-item-active {
+        height: 0;
+        flex-grow: 1;
+      }
+
+      .arco-collapse-item-header {
+        padding-top: 4px;
+        padding-bottom: 4px;
+        padding-right: 4px;
+        min-height: 34px;
+        background-color: var(--color-bg-4);
+
+        &:focus {
+          outline: 1px solid var(--app-color-common);
+          outline-offset: -1px;
+        }
+      }
+
+      .arco-collapse-item-content {
+        background-color: initial;
+        padding: 0;
+
+        .arco-collapse-item-content-box {
+          padding: 0;
+          height: 100%;
+        }
+        &.arco-collapse-item-content-expend {
+          height: 100% !important;
+        }
+      }
+
+      .page-item {
+        &:focus {
+          outline: 1px solid var(--app-color-common);
+          outline-offset: -1px;
+        }
+      }
+
+      &:hover {
+        .editor-page-item {
+          .children::before {
+            opacity: 0.15;
+          }
+        }
+      }
     }
   }
 

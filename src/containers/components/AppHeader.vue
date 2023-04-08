@@ -49,7 +49,7 @@ const menu = reactive<AppHeaderMenuItem[]>([
         ),
         fn: () => {
           projectStore.clearProject()
-          $router.push({ name: 'AppHomeWelcome' })
+          $router.push({ name: 'HomeWelcome' })
         }
       }
     ]
