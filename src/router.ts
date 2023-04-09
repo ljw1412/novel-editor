@@ -14,7 +14,7 @@ import BookshelfContent from '/@/pages/Editor/Content/Bookshelf.vue'
 import CharacterSidebar from '/@/pages/Editor/Sidebar/Character.vue'
 import CharacterContent from '/@/pages/Editor/Content/Character.vue'
 import WorldSidebar from '/@/pages/Editor/Sidebar/World.vue'
-import WorldContent from '/@/pages/Editor/Content/World.vue'
+import WorldCommon from '/@/pages/Editor/Content/World/Common.vue'
 import WorldTimeline from './pages/Editor/Content/World/Timeline.vue'
 import InfoSidebar from '/@/pages/Editor/Sidebar/Info.vue'
 import EditorInfo from '/@/pages/Editor/Content/Info.vue'
@@ -83,9 +83,9 @@ const routes = [
             components: {
               sidebar: WorldSidebar,
               // TODO: 可能要独立页面
-              default: WorldContent
+              default: WorldCommon
             },
-            meta: { title: '世界观', subtitle: '简介' }
+            meta: { title: '世界观', subtitle: '简介', key: 'summary' }
           },
           {
             path: 'world/timeline',
@@ -94,7 +94,7 @@ const routes = [
               sidebar: WorldSidebar,
               default: WorldTimeline
             },
-            meta: { title: '世界观', subtitle: '时间线' }
+            meta: { title: '世界观', subtitle: '时间线', key: 'timeline' }
           },
           {
             path: 'world/keywords',
@@ -102,9 +102,9 @@ const routes = [
             components: {
               sidebar: WorldSidebar,
               // TODO: 可能要独立页面
-              default: WorldContent
+              default: WorldCommon
             },
-            meta: { title: '世界观', subtitle: '关键词' }
+            meta: { title: '世界观', subtitle: '关键词', key: 'keywords' }
           },
           {
             path: 'character',

@@ -127,13 +127,21 @@ const menuList = [
     }
   }
 ]
+
+function getMenuList() {
+  if (props.page.action === 'summary') {
+    return menuList.slice(0, 1)
+  }
+  return props.allowAddChild
+    ? menuList
+    : menuList.filter((item) => item.value !== 'newChild')
+}
+
 function showContextmenu(e: MouseEvent) {
   isContextMenu.value = true
   const { clientX, clientY } = e
   contextView.showContextMenu({
-    menuList: props.allowAddChild
-      ? menuList
-      : menuList.filter((item) => item.value !== 'newChild'),
+    menuList: getMenuList(),
     position: { left: clientX, top: clientY },
     callback: (item: CtxMenu.Item | null) => {
       isContextMenu.value = false

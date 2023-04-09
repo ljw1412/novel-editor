@@ -65,6 +65,9 @@ function handlePageDelete(page: Page, list: Page[]) {
   const index = list.indexOf(page)
   if (~index) list.splice(index, 1)
   editorStore.saveWorldPaneData(page.action)
+  if (page.isSelected) {
+    $router.replace({ name: 'EditorWorld' })
+  }
 }
 
 function handlePageClick(page: Page, parentPage?: Page) {
