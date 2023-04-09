@@ -5,6 +5,7 @@ import $API from '/@/apis'
 import { useProjectStore, useEditorStore, useConfigStore } from '/@/stores'
 import Page, { PageObject } from '/@/classes/Page'
 import { Notification } from '@arco-design/web-vue'
+import { toTitleCase } from '/@/utils/string'
 import PageItem from '../components/PageItem.vue'
 
 const $router = useRouter()
@@ -20,23 +21,8 @@ const allPageList = computed(() => {
   return [list, list.map((page) => page.children || []).flat()].flat()
 })
 
-function getPane(key: Editor.World.PaneType) {
-  return editorStore.world.panes[key] || { list: [] }
-}
-
-function getPaneData(key: string) {
-  return getPane(key as Editor.World.PaneType).list
-}
-
 function getProjectPath() {
   return projectStore.project.path
-}
-
-async function savePaneData(action: string) {
-  const path = getProjectPath()
-  const list = getPaneData(action)
-  const data = list.map((item) => item.toObject())
-  await $API.Electron.project.saveData(`world.${action}`, data, path)
 }
 
 function handeCollapseChange([activeKey]: (string | number)[]) {
@@ -56,11 +42,11 @@ function handlePageTextChange(page: Page) {
   page.isEdit = false
   if (isAdding.value) {
     if (!page.title.trim()) {
-      const list = getPaneData(page.action)
+      const list = editorStore.getWorldPaneData(page.action)
       list.pop()
     } else {
       handlePageClick(page)
-      savePaneData(page.action)
+      editorStore.saveWorldPaneData(page.action)
     }
     isAdding.value = false
   }
@@ -80,7 +66,7 @@ function handlePageChildTextChange(page: Page, parentPage: Page) {
       parentPage.children.pop()
     } else {
       handlePageClick(page)
-      savePaneData(page.action)
+      editorStore.saveWorldPaneData(page.action)
     }
     isAdding.value = false
   }
@@ -94,7 +80,7 @@ function handlePageClick(page: Page, parentPage?: Page) {
   page.isSelected = true
   editorStore.switchPage('world', page, parentPage)
   const route = {
-    name: 'WorldTimeline',
+    name: `World${toTitleCase(page.action)}`,
     query: { mode: parentPage ? 'child' : 'root' }
   }
   $router.replace(route)
@@ -123,7 +109,7 @@ async function loadData() {
   const { world } = await $API.Electron.project.getManyData(names, path)
   Object.keys(world).forEach((key) => {
     const data = world[key].map((page: PageObject) => Page.create(page))
-    const list = getPaneData(key)
+    const list = editorStore.getWorldPaneData(key)
     if (Array.isArray(list)) {
       list.length = 0
       list.push(...data)

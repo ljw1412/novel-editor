@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   purge: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
+  important: '#app',
   content: [],
   theme: {
     spacing: {
@@ -73,7 +74,7 @@ module.exports = {
         'color-3': 'var(--color-bg-3)',
         'color-4': 'var(--color-bg-4)',
         'color-common': 'var(--app-color-common)',
-        app: 'var(--app-color-bg)'
+        'color-app': 'var(--app-color-bg)'
       }
     }
   },

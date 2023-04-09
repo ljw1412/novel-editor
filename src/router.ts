@@ -78,13 +78,33 @@ const routes = [
             meta: { title: '世界观' }
           },
           {
+            path: 'world/summary',
+            name: 'WorldSummary',
+            components: {
+              sidebar: WorldSidebar,
+              // TODO: 可能要独立页面
+              default: WorldContent
+            },
+            meta: { title: '世界观', subtitle: '简介' }
+          },
+          {
             path: 'world/timeline',
             name: 'WorldTimeline',
             components: {
               sidebar: WorldSidebar,
               default: WorldTimeline
             },
-            meta: { title: '世界观 > 时间线' }
+            meta: { title: '世界观', subtitle: '时间线' }
+          },
+          {
+            path: 'world/keywords',
+            name: 'WorldKeywords',
+            components: {
+              sidebar: WorldSidebar,
+              // TODO: 可能要独立页面
+              default: WorldContent
+            },
+            meta: { title: '世界观', subtitle: '关键词' }
           },
           {
             path: 'character',

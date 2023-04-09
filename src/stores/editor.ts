@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import type { RouteLocationRaw } from 'vue-router'
 import { only } from '../utils/object'
+import { useProjectStore } from './project'
+import $API from '/@/apis'
 import Page from '/@/classes/Page'
 
 type ModuleData = null | { page: Page; parentPage?: Page }
@@ -94,7 +96,23 @@ export const useEditorStore = defineStore('EditorStore', {
     },
 
     getActionRoute(action: Editor.SidebarActions) {
-      return this[action].currentRoute || this[action].route
+      const { data, currentRoute, route } = this[action]
+      return data && currentRoute ? currentRoute : route
+    },
+
+    getWorldPane(key: Editor.World.PaneType) {
+      return this.world.panes[key] || { list: [] }
+    },
+
+    getWorldPaneData(key: string) {
+      return this.getWorldPane(key as Editor.World.PaneType).list
+    },
+
+    async saveWorldPaneData(action: string) {
+      const path = useProjectStore().project.path
+      const list = this.getWorldPaneData(action)
+      const data = list.map((item) => item.toObject())
+      await $API.Electron.project.saveData(`world.${action}`, data, path)
     }
   }
 })

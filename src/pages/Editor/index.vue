@@ -122,7 +122,7 @@ window.addEventListener('unload', updateState)
           <div class="part-content flex-grow h-0">
             <router-view name="sidebar" v-slot="{ Component, route }">
               <keep-alive>
-                <component :is="Component" :key="route.name" />
+                <component :is="Component" />
               </keep-alive>
             </router-view>
           </div>
@@ -130,7 +130,7 @@ window.addEventListener('unload', updateState)
       </section>
     </a-resize-box>
     <!-- 主体 -->
-    <main class="editor-content relative h-full flex-grow overflow-y-auto">
+    <main class="editor-content relative h-full flex-grow">
       <router-view></router-view>
     </main>
   </div>
@@ -166,7 +166,37 @@ window.addEventListener('unload', updateState)
       background-color: var(--editor-sidebar-actions-bg);
     }
 
+    .action-item {
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 3px;
+        height: 100%;
+        background-color: var(--app-color-common);
+        opacity: 0;
+      }
+
+      &.active {
+        opacity: 1 !important;
+        color: var(--app-color-common);
+
+        &::before {
+          opacity: 1;
+        }
+      }
+
+      &:active::before {
+        opacity: 0.5;
+      }
+    }
+
     .part {
+    }
+
+    .part-title {
+      border-bottom: 1px solid var(--color-border);
     }
 
     .arco-collapse {
@@ -227,34 +257,19 @@ window.addEventListener('unload', updateState)
     }
   }
 
-  .action-item {
-    &::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 3px;
-      height: 100%;
-      background-color: var(--app-color-common);
-      opacity: 0;
+  .editor-content {
+    .arco-timeline-item-dot-line {
+      border-color: currentColor;
+      opacity: 0.3;
     }
 
-    &.active {
-      opacity: 1;
-      color: var(--app-color-common);
-
-      &::before {
-        opacity: 1;
+    .arco-textarea-wrapper {
+      background-color: initial;
+      textarea {
+        resize: none;
+        padding: 4px 4px;
       }
     }
-
-    &:active::before {
-      opacity: 0.5;
-    }
-  }
-
-  .part-title {
-    border-bottom: 1px solid var(--color-border);
   }
 }
 </style>
