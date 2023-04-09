@@ -15,3 +15,7 @@ declare interface Window {
     versions: Readonly<NodeJS.ProcessVersions>
   }>
 }
+
+interface MouseEvent {
+  path: HTMLElement[]
+}

@@ -35,42 +35,44 @@ function handlePageContentChange() {
         </a-breadcrumb-item>
       </a-breadcrumb>
     </header>
-    <main v-if="page" class="overflow-y-auto flex-grow h-0 px-6">
-      <a-typography-title
-        class="mt-2 mb-1 pl-1"
-        style="background-color: var(--editor-bg)"
-      >
-        {{ page.title }}
-      </a-typography-title>
-      <template v-if="$route.query.mode === 'child'">
-        <a-textarea
-          v-model="page.content"
-          :auto-size="{ minRows: 24 }"
-          placeholder="请记录这个时间点发生的关键事件"
-          @change="handlePageContentChange"
-        ></a-textarea>
-      </template>
-      <a-timeline v-else-if="$route.query.mode === 'root'" class="px-5">
-        <a-timeline-item
-          v-for="child of page.children"
-          dot-color="var(--app-color-common)"
+    <a-scrollbar outer-class="flex-grow h-0" class="h-full overflow-auto px-6">
+      <main v-if="page">
+        <a-typography-title
+          class="mt-2 mb-1 pl-1"
+          style="background-color: var(--editor-bg)"
         >
-          <a-typography-paragraph
-            type="secondary"
-            class="mb-1 pl-1 text-md sticky top-0 z-10"
-            style="background-color: var(--editor-bg)"
-          >
-            {{ child.title }}
-          </a-typography-paragraph>
+          {{ page.title }}
+        </a-typography-title>
+        <template v-if="$route.query.mode === 'child'">
           <a-textarea
-            v-model="child.content"
-            :auto-size="{ minRows: 2 }"
-            placeholder="请记录这个时间点发生的关键"
+            v-model="page.content"
+            :auto-size="{ minRows: 24 }"
+            placeholder="请记录这个时间点发生的关键事件"
             @change="handlePageContentChange"
           ></a-textarea>
-        </a-timeline-item>
-      </a-timeline>
-    </main>
+        </template>
+        <a-timeline v-else-if="$route.query.mode === 'root'" class="px-5">
+          <a-timeline-item
+            v-for="child of page.children"
+            dot-color="var(--app-color-common)"
+          >
+            <a-typography-paragraph
+              type="secondary"
+              class="mb-1 pl-1 text-md sticky top-0 z-10"
+              style="background-color: var(--editor-bg)"
+            >
+              {{ child.title }}
+            </a-typography-paragraph>
+            <a-textarea
+              v-model="child.content"
+              :auto-size="{ minRows: 2 }"
+              placeholder="请记录这个时间点发生的关键"
+              @change="handlePageContentChange"
+            ></a-textarea>
+          </a-timeline-item>
+        </a-timeline>
+      </main>
+    </a-scrollbar>
   </div>
 </template>
 

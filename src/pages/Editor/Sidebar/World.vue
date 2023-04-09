@@ -38,17 +38,19 @@ function addPage(key: string, list: Page[]) {
   list.push(page)
 }
 
-function handlePageTextChange(page: Page) {
+function handlePageTextChange(page: Page, list: Page[], parentPage?: Page) {
   page.isEdit = false
   if (isAdding.value) {
     if (!page.title.trim()) {
-      const list = editorStore.getWorldPaneData(page.action)
       list.pop()
     } else {
       handlePageClick(page)
       editorStore.saveWorldPaneData(page.action)
     }
     isAdding.value = false
+  } else {
+    handlePageClick(page, parentPage)
+    editorStore.saveWorldPaneData(page.action)
   }
 }
 
@@ -59,17 +61,10 @@ function handlePageCancel(page: Page, list: Page[]) {
   }
 }
 
-function handlePageChildTextChange(page: Page, parentPage: Page) {
-  page.isEdit = false
-  if (isAdding.value) {
-    if (!page.title.trim()) {
-      parentPage.children.pop()
-    } else {
-      handlePageClick(page)
-      editorStore.saveWorldPaneData(page.action)
-    }
-    isAdding.value = false
-  }
+function handlePageDelete(page: Page, list: Page[]) {
+  const index = list.indexOf(page)
+  if (~index) list.splice(index, 1)
+  editorStore.saveWorldPaneData(page.action)
 }
 
 function handlePageClick(page: Page, parentPage?: Page) {
@@ -153,10 +148,11 @@ loadData()
             :allow-add-child="item.allowAddChild"
             :is-adding="isAdding"
             :placeholder="item.placeholder"
-            @text-change="handlePageTextChange"
+            @text-change="handlePageTextChange(page, item.list)"
             @cancel="handlePageCancel(page, item.list)"
             @add-child="addPage(item.key, page.children)"
             @page-click="handlePageClick(page)"
+            @delete="handlePageDelete(page, item.list)"
           >
             <template #children>
               <PageItem
@@ -165,9 +161,10 @@ loadData()
                 :placeholder="item.childPlaceholder"
                 :is-edit="sPage.isEdit"
                 is-child
-                @text-change="handlePageChildTextChange(sPage, page)"
+                @text-change="handlePageTextChange(sPage, page.children, page)"
                 @cancel="handlePageCancel(sPage, page.children)"
                 @page-click="handlePageClick(sPage, page)"
+                @delete="handlePageDelete(sPage, page.children)"
               ></PageItem>
             </template>
           </PageItem>

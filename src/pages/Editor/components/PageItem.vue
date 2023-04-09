@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, watch, PropType, nextTick, computed } from 'vue'
 import Page from '/@/classes/Page'
-import type { InputInstance } from '@arco-design/web-vue'
+import { InputInstance, Modal } from '@arco-design/web-vue'
 import { useFocus } from '@vueuse/core'
+import { useContextViewStore } from '/@/stores'
 
 const props = defineProps({
   isEdit: Boolean,
@@ -12,7 +13,13 @@ const props = defineProps({
   placeholder: String,
   page: { type: Object as PropType<Page>, default: () => ({}) }
 })
-const $emit = defineEmits(['page-click', 'text-change', 'cancel', 'add-child'])
+const $emit = defineEmits([
+  'page-click',
+  'text-change',
+  'cancel',
+  'add-child',
+  'delete'
+])
 const pageItemEl = ref<HTMLElement>()
 const inputRef = ref<InputInstance>()
 const inputText = ref('')
@@ -23,7 +30,11 @@ const isChildSelected = computed(() => {
 })
 const pageItemClass = computed(() => {
   const classList: (string | Record<string, boolean>)[] = [
-    { active: props.page.isSelected, focus: isItemFocus.value }
+    {
+      active: props.page.isSelected,
+      focus: isItemFocus.value,
+      'context-menu': isContextMenu.value
+    }
   ]
   if (props.isChild) {
     classList.push(props.isEdit ? 'pl-7' : 'pl-8')
@@ -68,6 +79,71 @@ function handleAddSubPage() {
   $emit('add-child', props.page)
 }
 
+function handlePageClick() {
+  $emit('page-click', props.page)
+}
+
+const isContextMenu = ref(false)
+const contextView = useContextViewStore()
+const menuList = [
+  {
+    label: '打开',
+    value: 'open',
+    fn: handlePageClick
+  },
+  {
+    label: '新建子项',
+    value: 'newChild',
+    icon: 'icon-drive-file',
+    iconColor: 'rgb(var(--green-5))',
+    fn: handleAddSubPage
+  },
+  {
+    label: '重命名',
+    value: 'rename',
+    icon: 'icon-pen-fill',
+    iconColor: 'rgb(var(--blue-5))',
+    fn: () => {
+      props.page.isEdit = true
+    }
+  },
+  {
+    label: '删除',
+    value: 'delete',
+    icon: 'icon-delete',
+    iconColor: 'rgb(var(--red-5))',
+    fn: () => {
+      Modal.confirm({
+        title: `删除确认`,
+        content: `是否确认要删除“${props.page.title}”？`,
+        width: '300px',
+        alignCenter: true,
+        modalStyle: { 'text-align': 'center' },
+        okButtonProps: { status: 'danger' },
+        onOk: () => {
+          $emit('delete', props.page)
+        }
+      })
+    }
+  }
+]
+function showContextmenu(e: MouseEvent) {
+  isContextMenu.value = true
+  const { clientX, clientY } = e
+  contextView.showContextMenu({
+    menuList: props.allowAddChild
+      ? menuList
+      : menuList.filter((item) => item.value !== 'newChild'),
+    position: { left: clientX, top: clientY },
+    callback: (item: CtxMenu.Item | null) => {
+      isContextMenu.value = false
+      if (item !== null && item.fn) {
+        item.fn()
+      }
+    }
+  })
+}
+
 watch(
   () => props.isEdit,
   (v) => {
@@ -92,7 +168,8 @@ watch(
       class="page-item h-6 pr-2 cursor-pointer flex items-center"
       :class="pageItemClass"
       :tabindex="page.isSelected ? 0 : -1"
-      @click="$emit('page-click', page)"
+      @contextmenu="showContextmenu"
+      @click="handlePageClick"
     >
       <a-input
         v-if="isEdit"
@@ -101,6 +178,7 @@ watch(
         ref="inputRef"
         class="px-[7px]"
         :placeholder="placeholder"
+        @contextmenu.stop
         @focus="handleInputFocus"
         @blur="handleInputBlur"
         @keydown.esc="handleEscapeKeydown"
@@ -111,7 +189,7 @@ watch(
         <div
           v-if="allowAddChild"
           v-show="!isAdding"
-          class="text-btn w-5 h-5 layout-center rounded flex-shrink-0"
+          class="text-btn w-5 h-5 mr-3 layout-center rounded flex-shrink-0"
           @click.stop="handleAddSubPage"
         >
           <icon-plus />
@@ -133,6 +211,12 @@ watch(
   .page-item {
     &:hover {
       background-color: rgba(var(--app-color-common-rgb), 0.06);
+    }
+
+    &:focus,
+    &.context-menu {
+      outline: 1px solid var(--app-color-common);
+      outline-offset: -1px;
     }
 
     &:active {

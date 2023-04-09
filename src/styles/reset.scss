@@ -25,6 +25,25 @@ body,
 }
 
 body {
+  overflow: hidden;
   font-family: PingFang SC, HarmonyOS Sans, Helvetica Neue, Microsoft YaHei,
     sans-serif !important;
+}
+
+.arco-scrollbar {
+  .arco-scrollbar-thumb-direction-vertical {
+    width: 100%;
+  }
+
+  .arco-scrollbar-thumb-bar {
+    width: 100% !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  &:hover {
+    .arco-scrollbar-thumb {
+      opacity: 0.5 !important;
+    }
+  }
 }

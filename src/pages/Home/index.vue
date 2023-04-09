@@ -1,6 +1,14 @@
 <script setup lang="ts" name="AppHome">
+import { useProjectStore } from '/@/stores'
+
 const APP_TITLE = import.meta.env.VITE_APP_TITLE
 const APP_BELONG_TO = import.meta.env.VITE_APP_BELONG_TO
+
+const projectStore = useProjectStore()
+
+if (projectStore.isProjectLoaded) {
+  projectStore.clearProject()
+}
 </script>
 
 <template>

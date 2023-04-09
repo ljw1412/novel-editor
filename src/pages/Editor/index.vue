@@ -5,6 +5,7 @@ import { useConfigStore, useEditorStore } from '/@/stores'
 
 const configStore = useConfigStore()
 const editorStore = useEditorStore()
+
 const $route = useRoute()
 const $router = useRouter()
 
@@ -237,13 +238,6 @@ window.addEventListener('unload', updateState)
         }
         &.arco-collapse-item-content-expend {
           height: 100% !important;
-        }
-      }
-
-      .page-item {
-        &:focus {
-          outline: 1px solid var(--app-color-common);
-          outline-offset: -1px;
         }
       }
 

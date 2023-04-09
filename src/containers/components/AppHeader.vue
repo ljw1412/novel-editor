@@ -145,6 +145,7 @@ function handleMenuSelect(value?: string | number | Record<string, any>) {
   z-index: var(--app-header-z-index);
   opacity: var(--app-header-opacity);
   user-select: none;
+  z-index: 2000;
 
   .actions {
     .action-btn {
