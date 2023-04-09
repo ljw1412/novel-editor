@@ -45,7 +45,7 @@ async function create() {
     const prj = await $API.Electron.project.createProject(toRaw(project))
     prjStore.addRecentProject(only(prj, 'title path') as Editor.RecentRecord)
     prjStore.setCurrentProject(prj)
-    $router.push({ name: 'AppEditor', query: { path: prj.path } })
+    $router.push({ name: 'AppEditor' })
   } catch (error: any) {}
 }
 

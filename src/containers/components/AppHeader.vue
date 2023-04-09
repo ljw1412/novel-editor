@@ -2,13 +2,14 @@
 import { computed, reactive, ComputedRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AppControls from './AppControls.vue'
-import { useConfigStore, useProjectStore } from '/@/stores'
+import { useConfigStore, useEditorStore, useProjectStore } from '/@/stores'
 import $API from '/@/apis'
 
 const $route = useRoute()
 const $router = useRouter()
 const configStore = useConfigStore()
 const projectStore = useProjectStore()
+const editorStore = useEditorStore()
 
 const title = computed(() => {
   const routeTitle = $route.meta.title || ''
@@ -49,6 +50,7 @@ const menu = reactive<AppHeaderMenuItem[]>([
         ),
         fn: () => {
           projectStore.clearProject()
+          editorStore.$reset()
           $router.push({ name: 'HomeWelcome' })
         }
       }

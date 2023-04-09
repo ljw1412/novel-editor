@@ -27,7 +27,7 @@ async function openProject(item: Editor.RecentRecord) {
   try {
     const project = await $API.Electron.project.openProject(item.path)
     projectStore.setCurrentProject(project)
-    $router.push({ name: 'AppEditor', query: { path: item.path } })
+    $router.push({ name: 'AppEditor' })
   } catch (error: any) {
     console.log('openProject', error)
     if (error.data.isRemoved) {

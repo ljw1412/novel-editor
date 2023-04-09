@@ -1,43 +1,27 @@
 <script setup lang="ts" name="AppEditor">
 import { ref, computed, onUnmounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useConfigStore, useProjectStore } from '/@/stores'
-import $API from '/@/apis'
-import * as logger from '/@/utils/logger'
+import { RouteLocationRaw, useRoute, useRouter } from 'vue-router'
+import { useConfigStore, useEditorStore } from '/@/stores'
 
-const projectStore = useProjectStore()
 const configStore = useConfigStore()
+const editorStore = useEditorStore()
 const $route = useRoute()
 const $router = useRouter()
-if (!projectStore.isProjectLoaded && $route.query.path) {
-  logger.warning('项目重加载', $route.query.path)
-  ;(async () => {
-    try {
-      const path = $route.query.path as string
-      const project = await $API.Electron.project.openProject(path)
-      projectStore.setCurrentProject(project)
-    } catch (error) {}
-  })()
-}
 
-const actions = [
-  { name: 'EditorBookshelf', label: '小说', icon: 'icon-bookmark' },
-  { name: 'EditorWorld', label: '世界观', icon: 'icon-common' },
-  { name: 'EditorCharacter', label: '人物', icon: 'icon-user-group' },
-  { name: 'EditorInfo', label: '基础信息', icon: 'icon-info-circle' }
-]
+const actions = editorStore.actions
 const isCollapsed = ref(configStore.sidebar.isCollapsed || false)
 const asideWidth = ref(configStore.sidebar.width || 300)
-const currentTab = ref(configStore.sidebar.tab || actions[0].name)
+const currentTab = ref(configStore.sidebar.tab as Editor.SidebarActions)
 const isSideResizing = ref(false)
-if (!actions.map((i) => i.name).includes(currentTab.value)) {
-  currentTab.value = actions[0].name
+if (!actions.map((i) => i.key).includes(currentTab.value)) {
+  currentTab.value = actions[0].key
 }
-$router.replace({ name: currentTab.value, query: $route.query })
+$router.replace(editorStore.getActionRoute(currentTab.value))
 
 const asideWidthComp = computed({
   get() {
-    return isCollapsed.value ? 56 : asideWidth.value
+    if (isCollapsed.value || asideWidth.value < 56) return 56
+    return asideWidth.value
   },
   set(v: number) {
     asideWidth.value = v
@@ -55,27 +39,32 @@ function resizeMoving({ width }: { width: number }) {
   }
   if (width >= 100 && width < 256) {
     isCollapsed.value = false
-    asideWidth.value = 256
+    asideWidthComp.value = 256
   }
 }
 
 function resizeMovingEnd() {
   isSideResizing.value = false
+  updateState()
 }
 
-function handleActionItemClick(item: { name: string }) {
-  if (currentTab.value === item.name) {
+function handleActionItemClick(item: {
+  key: Editor.SidebarActions
+  route: RouteLocationRaw
+}) {
+  if (currentTab.value === item.key) {
     isCollapsed.value = !isCollapsed.value
   } else {
-    currentTab.value = item.name
+    currentTab.value = item.key
     isCollapsed.value = false
-    $router.replace({ name: item.name, query: $route.query })
+    $router.replace(editorStore.getActionRoute(item.key))
   }
+  updateState()
 }
 
 function updateState() {
   configStore.sidebar.isCollapsed = isCollapsed.value
-  configStore.sidebar.width = asideWidth.value
+  configStore.sidebar.width = asideWidthComp.value
   configStore.sidebar.tab = currentTab.value
 }
 
@@ -97,7 +86,7 @@ window.addEventListener('unload', updateState)
       @moving-end="resizeMovingEnd"
     >
       <template #resize-trigger="{ direction }">
-        <div class="aside-resize-line h-full w-[3px] bg-color-common"></div>
+        <div class="aside-resize-line h-full w-[2px] bg-color-common"></div>
       </template>
       <section class="sidebar flex h-full flex-shrink-0 shadow-xl">
         <section class="actions w-[56px] h-full flex-shrink-0">
@@ -110,7 +99,7 @@ window.addEventListener('unload', updateState)
           >
             <div
               class="action-item relative layout-center w-[56px] h-[56px] cursor-pointer opacity-50 hover:opacity-100"
-              :class="{ active: !isCollapsed && item.name === currentTab }"
+              :class="{ active: !isCollapsed && item.key === currentTab }"
               @click="handleActionItemClick(item)"
             >
               <component
@@ -141,7 +130,7 @@ window.addEventListener('unload', updateState)
       </section>
     </a-resize-box>
     <!-- 主体 -->
-    <main class="editor h-full flex-grow overflow-auto">
+    <main class="editor-content relative h-full flex-grow overflow-y-auto">
       <router-view></router-view>
     </main>
   </div>

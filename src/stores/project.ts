@@ -4,7 +4,7 @@ import { useLocalStorage } from '@vueuse/core'
 
 export const useProjectStore = defineStore('ProjectStore', {
   state: () => {
-    const project = ref({} as Editor.Project)
+    const project = useLocalStorage('CURRENT_PROJECT', {} as Editor.Project)
     const recentList = useLocalStorage(
       'RECENT_PROJECT',
       [] as Editor.RecentRecord[]

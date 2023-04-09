@@ -8,13 +8,15 @@ import HomeWelcome from '/@/pages/Home/Welcome.vue'
 import HomeCreate from '/@/pages/Home/Create.vue'
 import HomeOpener from '/@/pages/Home/Opener.vue'
 import AppEditor from '/@/pages/Editor/index.vue'
-import EditorSidebarBookshelf from '/@/pages/Editor/Sidebar/Bookshelf.vue'
-import EditorBookshelf from '/@/pages/Editor/Content/Bookshelf.vue'
-import EditorSidebarCharacter from '/@/pages/Editor/Sidebar/Character.vue'
-import EditorCharacter from '/@/pages/Editor/Content/Character.vue'
-import EditorSidebarWorld from '/@/pages/Editor/Sidebar/World.vue'
-import EditorWorld from '/@/pages/Editor/Content/World.vue'
-import EditorSidebarInfo from '/@/pages/Editor/Sidebar/Info.vue'
+import EmptyContent from '/@/pages/Editor/Content/Empty.vue'
+import BookshelfSidebar from '/@/pages/Editor/Sidebar/Bookshelf.vue'
+import BookshelfContent from '/@/pages/Editor/Content/Bookshelf.vue'
+import CharacterSidebar from '/@/pages/Editor/Sidebar/Character.vue'
+import CharacterContent from '/@/pages/Editor/Content/Character.vue'
+import WorldSidebar from '/@/pages/Editor/Sidebar/World.vue'
+import WorldContent from '/@/pages/Editor/Content/World.vue'
+import WorldTimeline from './pages/Editor/Content/World/Timeline.vue'
+import InfoSidebar from '/@/pages/Editor/Sidebar/Info.vue'
 import EditorInfo from '/@/pages/Editor/Content/Info.vue'
 import AppSetting from '/@/pages/Setting/index.vue'
 
@@ -61,37 +63,46 @@ const routes = [
             path: 'bookshelf',
             name: 'EditorBookshelf',
             components: {
-              sidebar: EditorSidebarBookshelf,
-              default: EditorBookshelf
+              sidebar: BookshelfSidebar,
+              default: BookshelfContent
             },
             meta: { title: '小说' }
-          },
-          {
-            path: 'character',
-            name: 'EditorCharacter',
-            components: {
-              sidebar: EditorSidebarCharacter,
-              default: EditorCharacter
-            },
-            meta: { title: '角色' }
           },
           {
             path: 'world',
             name: 'EditorWorld',
             components: {
-              sidebar: EditorSidebarWorld,
-              default: EditorWorld
+              sidebar: WorldSidebar,
+              default: EmptyContent
             },
             meta: { title: '世界观' }
+          },
+          {
+            path: 'world/timeline',
+            name: 'WorldTimeline',
+            components: {
+              sidebar: WorldSidebar,
+              default: WorldTimeline
+            },
+            meta: { title: '世界观 > 时间线' }
+          },
+          {
+            path: 'character',
+            name: 'EditorCharacter',
+            components: {
+              sidebar: CharacterSidebar,
+              default: CharacterContent
+            },
+            meta: { title: '角色' }
           },
           {
             path: 'info',
             name: 'EditorInfo',
             components: {
-              sidebar: EditorSidebarInfo,
-              default: EditorInfo
+              sidebar: InfoSidebar,
+              default: EmptyContent
             },
-            meta: { title: '信息' }
+            meta: { title: '基础信息' }
           }
         ]
       }

@@ -6,8 +6,6 @@ type IpcListener = (
   payload?: Record<string, any>
 ) => void
 
-type SidebarActions = 'bookshelf' | 'character' | 'world' | 'info'
-
 declare interface Window {
   readonly bridge: Readonly<{
     electron: Readonly<{

@@ -10,31 +10,55 @@ const parentPage = computed(() => world.value.data?.parentPage)
 </script>
 
 <template>
-  <div class="editor-world relative p-3 min-h-full">
-    <div
-      v-if="!world.data || !page"
-      class="layout-center-p text-9xl select-none opacity-30"
-    >
-      世界观
-    </div>
-    <template v-else>
-      <div class="text-2xl" :class="parentPage ? 'mb-2' : 'mb-6'">
+  <div class="editor-world">
+    <template v-if="world.data && page">
+      <div
+        style="background-color: var(--editor-bg); z-index: 1000"
+        class="sticky top-0 text-2xl py-2 px-5"
+      >
         {{ (parentPage ? `${parentPage.title} - ` : '') + page.title }}
       </div>
-      <a-textarea
-        v-if="parentPage"
-        v-model="page.content"
-        :auto-size="{ minRows: 8 }"
-      ></a-textarea>
-      <div v-for="item of page.children" class="mb-4">
-        <div class="text-xl mb-2">{{ item.title }}</div>
-        <a-textarea v-model="item.content"></a-textarea>
+      <div class="px-4 mb-3">
+        <a-textarea
+          v-model="page.content"
+          :resize="false"
+          :auto-size="!parentPage"
+          :key="page.title"
+          placeholder="请输入"
+        ></a-textarea>
+      </div>
+      <div
+        v-for="(child, index) of page.children"
+        class="mb-4 px-3"
+        :style="{ 'z-index': index + 1 }"
+      >
+        <div
+          class="sticky top-[52px] z-10 text-xl mb-2 px-3"
+          style="background-color: var(--editor-bg)"
+        >
+          {{ child.title }}
+        </div>
+        <a-textarea
+          v-model="child.content"
+          auto-size
+          :key="child.title"
+          placeholder="请输入"
+        ></a-textarea>
       </div>
     </template>
+    <div v-else class="layout-center-p text-9xl select-none opacity-30">
+      世界观
+    </div>
   </div>
 </template>
 
 <style lang="scss">
 .editor-world {
+  .arco-textarea-wrapper {
+    background-color: initial;
+    textarea {
+      resize: none;
+    }
+  }
 }
 </style>
