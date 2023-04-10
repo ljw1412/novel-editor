@@ -53,7 +53,7 @@ watch(
   () => [projectDir.value, project.title],
   ([projectDir, title]) => {
     title = project.title.trim()
-    project.path = [projectDir, title || '{项目名称}', ''].join(sep.value)
+    project.path = [projectDir, title || '{项目名称}'].join(sep.value)
   }
 )
 
@@ -95,7 +95,7 @@ init()
         />
       </a-form-item>
       <a-form-item
-        label="保存位置"
+        label="文件夹"
         field="path"
         hide-asterisk
         :rules="[{ required: true, message: '请填写保存位置' }]"

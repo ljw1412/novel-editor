@@ -46,13 +46,18 @@ export async function openProject(dataPath: string) {
   const isExists = await storage.has(CONFIG_FILENAME, { dataPath })
   if (!isExists) {
     const error = new ApiError(
-      '路径不存在',
-      `此计算机上不存在路径“${dataPath}”。`,
+      '无效项目路径',
+      `项目配置文件(project.json)不存在于“${dataPath}”。`,
       { isRemoved: true }
     )
     throw error
   }
-  return storage.get(CONFIG_FILENAME, { dataPath })
+  const project = await storage.get(CONFIG_FILENAME, { dataPath })
+  if (project.path !== dataPath) {
+    project.path = dataPath
+    await storage.set(CONFIG_FILENAME, project, { dataPath })
+  }
+  return project
 }
 
 export function saveData(name: string, data: object, dataPath: string) {

@@ -1,10 +1,12 @@
 import { promisify } from 'util'
 import storage, { DataOptions } from 'electron-json-storage'
 
+type PromiseObject = Promise<Record<string, any>>
+
 interface StoragePromisified {
-  get: (key: string, options?: DataOptions) => Promise<object>
-  getMany: (keys: string[], options?: DataOptions) => Promise<object>
-  getAll: (options?: DataOptions) => Promise<object>
+  get: (key: string, options?: DataOptions) => PromiseObject
+  getMany: (keys: string[], options?: DataOptions) => PromiseObject
+  getAll: (options?: DataOptions) => PromiseObject
   set: (key: string, json: object, options?: DataOptions) => Promise<void>
   has: (key: string, options?: DataOptions) => Promise<boolean>
   keys: (options?: DataOptions) => Promise<string[]>

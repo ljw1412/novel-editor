@@ -1,3 +1,4 @@
+<!-- ! 未实现 = 自定义文件夹打开器 -->
 <script setup lang="ts" name="HomeOpener"></script>
 
 <template>

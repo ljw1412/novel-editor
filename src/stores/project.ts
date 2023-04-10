@@ -24,6 +24,10 @@ export const useProjectStore = defineStore('ProjectStore', {
      * @param project
      */
     addRecentProject(project: Editor.RecentRecord) {
+      const index = this.recentList.findIndex(
+        (item) => item.path === project.path
+      )
+      if (~index) this.recentList.splice(index, 1)
       this.recentList.unshift(project)
     },
     /**

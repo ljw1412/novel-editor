@@ -2,6 +2,7 @@
 import { useRouter } from 'vue-router'
 import $API from '/@/apis'
 import { useProjectStore } from '/@/stores'
+import { only } from '/@/utils/object'
 import { getPublicUrl } from '/@/utils/url'
 
 const $router = useRouter()
@@ -23,11 +24,28 @@ const linkList = [
   }
 ]
 
-async function openProject(item: Editor.RecentRecord) {
+async function openProject(path: string) {
+  const project = await $API.Electron.project.openProject(path)
+  projectStore.setCurrentProject(project)
+  projectStore.addRecentProject(
+    only(project, 'title path') as Editor.RecentRecord
+  )
+  $router.push({ name: 'AppEditor' })
+}
+
+async function openProjectDir() {
+  const { canceled, filePaths } = await $API.Electron.shell.selectDir()
+  if (!canceled && filePaths.length) {
+    try {
+      const path = filePaths[0]
+      await openProject(path)
+    } catch (error) {}
+  }
+}
+
+async function openRecentProject(item: Editor.RecentRecord) {
   try {
-    const project = await $API.Electron.project.openProject(item.path)
-    projectStore.setCurrentProject(project)
-    $router.push({ name: 'AppEditor' })
+    await openProject(item.path)
   } catch (error: any) {
     console.log('openProject', error)
     if (error.data.isRemoved) {
@@ -49,7 +67,7 @@ async function openProject(item: Editor.RecentRecord) {
           <icon-folder-add size="32" class="stroke-3 mr-2" />
           <span class="block self-end">新建项目...</span>
         </a-link>
-        <a-link @click="$router.push({ name: 'HomeOpener' })">
+        <a-link @click="openProjectDir">
           <icon-folder size="32" class="stroke-3 mr-2" />
           <span class="block self-end">打开项目...</span>
         </a-link>
@@ -63,7 +81,7 @@ async function openProject(item: Editor.RecentRecord) {
           >
             <a-link
               class="max-w-3/5 flex-shrink-0 truncate"
-              @click="openProject(item)"
+              @click="openRecentProject(item)"
             >
               {{ item.title }}
             </a-link>
