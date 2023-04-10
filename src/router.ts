@@ -60,6 +60,7 @@ const routes = [
         name: 'AppEditor',
         component: AppEditor,
         children: [
+          // 小说
           {
             path: 'bookshelf',
             name: 'EditorBookshelf',
@@ -69,6 +70,7 @@ const routes = [
             },
             meta: { title: '小说' }
           },
+          // 世界观
           {
             path: 'world',
             name: 'EditorWorld',
@@ -78,6 +80,7 @@ const routes = [
             },
             meta: { title: '世界观' }
           },
+          // 世界观 - 简介
           {
             path: 'world/summary',
             name: 'WorldSummary',
@@ -86,8 +89,14 @@ const routes = [
               // TODO: 可能要独立页面
               default: WorldCommon
             },
-            meta: { title: '世界观', subtitle: '简介', key: 'summary' }
+            meta: {
+              title: '世界观',
+              subtitle: '简介',
+              action: 'world',
+              key: 'summary'
+            }
           },
+          // 世界观 - 时间线
           {
             path: 'world/timeline',
             name: 'WorldTimeline',
@@ -95,8 +104,14 @@ const routes = [
               sidebar: WorldSidebar,
               default: WorldTimeline
             },
-            meta: { title: '世界观', subtitle: '时间线', key: 'timeline' }
+            meta: {
+              title: '世界观',
+              subtitle: '时间线',
+              action: 'world',
+              key: 'timeline'
+            }
           },
+          // 世界观 - 关键词
           {
             path: 'world/keywords',
             name: 'WorldKeywords',
@@ -105,8 +120,14 @@ const routes = [
               // TODO: 可能要独立页面
               default: WorldCommon
             },
-            meta: { title: '世界观', subtitle: '关键词', key: 'keywords' }
+            meta: {
+              title: '世界观',
+              subtitle: '关键词',
+              action: 'world',
+              key: 'keywords'
+            }
           },
+          // 人物
           {
             path: 'character',
             name: 'EditorCharacter',
@@ -116,6 +137,17 @@ const routes = [
             },
             meta: { title: '人物' }
           },
+          // 人物 - 关系图
+          {
+            path: 'character/relationships',
+            name: 'CharacterRelationships',
+            components: {
+              sidebar: CharacterSidebar,
+              default: CharacterRelationships
+            },
+            meta: { title: '人物', subtitle: '关系图', action: 'character' }
+          },
+          // 人物 - 编辑器
           {
             path: 'character/editor',
             name: 'CharacterEditor',
@@ -123,8 +155,9 @@ const routes = [
               sidebar: CharacterSidebar,
               default: CharacterEditor
             },
-            meta: { title: '人物', subtitle: '编辑器' }
+            meta: { title: '人物', action: 'character' }
           },
+          // 基础信息
           {
             path: 'info',
             name: 'EditorInfo',

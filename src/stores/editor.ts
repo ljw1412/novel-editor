@@ -106,16 +106,15 @@ export const useEditorStore = defineStore('EditorStore', {
       return data && currentRoute ? currentRoute : route
     },
 
-    async saveActionData(action: Editor.SidebarActions) {
+    async saveActionData(action: 'character') {
       const path = useProjectStore().project.path
       if (!this[action]) {
         logger.error('saveActionData', `action=${action}不存在`)
         return
       }
-      console.log('saveActionData', this[action].list)
-
-      const list = this[action].list.map((item: Page) => item.toObject())
-      return await $API.Electron.project.saveData(action, list, path)
+      const list = this[action].list
+      const data = list.map((item: Page) => item.toObject())
+      return await $API.Electron.project.saveData(action, data, path)
     },
 
     getWorldPane(key: Editor.World.PaneType) {

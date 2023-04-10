@@ -15,6 +15,19 @@ const editorStore = useEditorStore()
 const characterList = editorStore.character.list
 const isAdding = ref(false)
 
+function clearSelected() {
+  characterList.forEach((page) => {
+    page.isSelected = false
+  })
+}
+
+function handleHeaderBtnClick(action: string) {
+  if (action === 'relationships') {
+    clearSelected()
+    $router.replace({ name: 'CharacterRelationships' })
+  }
+}
+
 function addCharacter() {
   isAdding.value = true
   const page = new CharacterPage()
@@ -57,9 +70,7 @@ function handlePageDelete(page: CharacterPage) {
 
 function handlePageClick(page: CharacterPage) {
   if (page.isEdit) return
-  characterList.forEach((page) => {
-    page.isSelected = false
-  })
+  clearSelected()
   page.isSelected = true
   editorStore.switchPage(moduleName, page)
   const route = { name: `CharacterEditor` }
@@ -91,6 +102,19 @@ loadData()
 
 <template>
   <EditorSidebar class="shadow-xl" show-add-btn @add="addCharacter">
+    <template #extra>
+      <div
+        title="关系图"
+        class="text-btn h-5 px-1 layout-center rounded cursor-pointer"
+        :class="{
+          'bg-color-common text-color-white':
+            $route.name === 'CharacterRelationships'
+        }"
+        @click="handleHeaderBtnClick('relationships')"
+      >
+        <icon-branch />关系图
+      </div>
+    </template>
     <div class="sidebar-character">
       <CharacterItem
         v-for="character of characterList"

@@ -6,6 +6,7 @@ export interface CharacterPageObject extends PageObject {
   sex: string
   birthday: string
   info: Record<string, string>
+  relations: { target: string; relation: string }[]
 }
 
 export default class CharacterPage extends Page {
@@ -13,6 +14,7 @@ export default class CharacterPage extends Page {
   birthday = ''
   age = ''
   info: Record<string, string> = {}
+  relations: { target: string; relation: string }[] = []
 
   constructor(
     {
@@ -21,13 +23,15 @@ export default class CharacterPage extends Page {
       action = '',
       sex = '',
       birthday = '',
-      info = {}
+      info = {},
+      relations = []
     }: CharacterPageObject = {} as CharacterPageObject
   ) {
     super(title, content, action)
     this.sex = sex
     this.birthday = birthday
     this.info = info
+    this.relations = relations
   }
 
   static create(page: CharacterPageObject): CharacterPage {

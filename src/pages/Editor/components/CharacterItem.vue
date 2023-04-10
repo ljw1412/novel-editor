@@ -7,6 +7,7 @@ import CharacterPage from '/@/classes/CharacterPage'
 const props = defineProps({
   isAdding: Boolean,
   placeholder: String,
+  hideLabel: Boolean,
   character: { type: Object as PropType<CharacterPage>, default: () => ({}) }
 })
 const $emit = defineEmits(['page-click', 'text-change', 'cancel', 'delete'])
@@ -19,8 +20,8 @@ const isContextMenu = ref(false)
 const infoList = computed(() => {
   const { sex, age } = props.character
   return [
-    { label: '年龄', value: age },
-    { label: '性别', value: sex }
+    { label: '性别', value: sex },
+    { label: '年龄', value: age }
   ].filter((item) => item.value)
 })
 
@@ -99,12 +100,14 @@ watch(
       />
       <template v-else>
         <div class="name text-base">{{ character.title }}</div>
-        <div class="info text-sm text-color-3">
-          <a-space v-if="infoList.length" size="mini">
-            <span v-for="info of infoList" :key="info.label">
-              <span class="text-color-4">{{ info.label }}</span>
+        <div class="info text-sm text-color-2">
+          <a-space v-if="infoList.length" size="small">
+            <a-space v-for="info of infoList" :key="info.label" size="mini">
+              <span v-if="!hideLabel" class="text-color-3">
+                {{ info.label }}
+              </span>
               <span>{{ info.value }}</span>
-            </span>
+            </a-space>
           </a-space>
         </div>
       </template>
