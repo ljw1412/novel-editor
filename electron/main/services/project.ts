@@ -64,12 +64,20 @@ export function saveData(name: string, data: object, dataPath: string) {
   return storage.set(name, data, { dataPath })
 }
 
-export function getData(name: string, dataPath: string) {
-  return storage.get(name, { dataPath })
+export async function getData(name: string, dataPath: string) {
+  try {
+    return storage.get(name, { dataPath })
+  } catch (error) {
+    throw new ApiError('错误', '数据文件可能损坏，无法解析！')
+  }
 }
 
-export function getManyData(names: string[], dataPath: string) {
-  return storage.getMany(names, { dataPath })
+export async function getManyData(names: string[], dataPath: string) {
+  try {
+    return await storage.getMany(names, { dataPath })
+  } catch (error) {
+    throw new ApiError('错误', '部分数据文件可能损坏，无法解析！')
+  }
 }
 
 export async function hasNamesData(names: string[], dataPath: string) {

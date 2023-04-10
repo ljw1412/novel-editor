@@ -26,6 +26,7 @@ const linkList = [
 
 async function openProject(path: string) {
   const project = await $API.Electron.project.openProject(path)
+  if (!project.title) project.title = '(未设置标题)'
   projectStore.setCurrentProject(project)
   projectStore.addRecentProject(
     only(project, 'title path') as Editor.RecentRecord
