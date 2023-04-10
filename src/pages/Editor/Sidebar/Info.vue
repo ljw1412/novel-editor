@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useProjectStore } from '/@/stores'
 import { formatDate } from '/@/utils/date'
+import EditorSidebar from '../components/Sidebar.vue'
 
 const projectStore = useProjectStore()
 
@@ -22,18 +23,20 @@ const projectData = computed(() => {
 </script>
 
 <template>
-  <a-scrollbar
-    outer-class="sidebar-info h-full"
-    class="h-full overflow-auto py-2 px-3"
-  >
-    <a-descriptions
-      :data="projectData"
-      size="small"
-      layout="vertical"
-      :column="1"
-      :value-style="{ wordBreak: 'break-all', paddingRight: 0 }"
-    />
-  </a-scrollbar>
+  <EditorSidebar class="shadow-xl">
+    <a-scrollbar
+      outer-class="sidebar-info h-full"
+      class="h-full overflow-auto py-2 px-3"
+    >
+      <a-descriptions
+        :data="projectData"
+        size="small"
+        layout="vertical"
+        :column="1"
+        :value-style="{ wordBreak: 'break-all', paddingRight: 0 }"
+      />
+    </a-scrollbar>
+  </EditorSidebar>
 </template>
 
 <style lang="scss"></style>

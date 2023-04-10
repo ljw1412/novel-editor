@@ -10,14 +10,15 @@ import HomeOpener from '/@/pages/Home/Opener.vue'
 import AppEditor from '/@/pages/Editor/index.vue'
 import EmptyContent from '/@/pages/Editor/Content/Empty.vue'
 import BookshelfSidebar from '/@/pages/Editor/Sidebar/Bookshelf.vue'
-import BookshelfContent from '/@/pages/Editor/Content/Bookshelf.vue'
+import BookshelfContent from '/@/pages/Editor/Content/Bookshelf/Bookshelf.vue'
 import CharacterSidebar from '/@/pages/Editor/Sidebar/Character.vue'
-import CharacterContent from '/@/pages/Editor/Content/Character.vue'
+import CharacterEditor from '/@/pages/Editor/Content/Character/Editor.vue'
+import CharacterRelationships from '/@/pages/Editor/Content/Character/Relationships.vue'
 import WorldSidebar from '/@/pages/Editor/Sidebar/World.vue'
 import WorldCommon from '/@/pages/Editor/Content/World/Common.vue'
 import WorldTimeline from './pages/Editor/Content/World/Timeline.vue'
 import InfoSidebar from '/@/pages/Editor/Sidebar/Info.vue'
-import EditorInfo from '/@/pages/Editor/Content/Info.vue'
+import EditorInfo from './pages/Editor/Content/Info/Info.vue'
 import AppSetting from '/@/pages/Setting/index.vue'
 
 const routes = [
@@ -64,7 +65,7 @@ const routes = [
             name: 'EditorBookshelf',
             components: {
               sidebar: BookshelfSidebar,
-              default: BookshelfContent
+              default: EmptyContent
             },
             meta: { title: '小说' }
           },
@@ -111,9 +112,18 @@ const routes = [
             name: 'EditorCharacter',
             components: {
               sidebar: CharacterSidebar,
-              default: CharacterContent
+              default: EmptyContent
             },
-            meta: { title: '角色' }
+            meta: { title: '人物' }
+          },
+          {
+            path: 'character/editor',
+            name: 'CharacterEditor',
+            components: {
+              sidebar: CharacterSidebar,
+              default: CharacterEditor
+            },
+            meta: { title: '人物', subtitle: '编辑器' }
           },
           {
             path: 'info',

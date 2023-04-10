@@ -47,7 +47,8 @@ export const project = {
     return ipcInvoke<Editor.Project>(this.channel, 'openProject', { path })
   },
 
-  initData(names: string[], path: string) {
+  initData(names: string | string[], path: string) {
+    if (typeof names === 'string') names = [names]
     return ipcInvoke(this.channel, 'initData', { names, path })
   },
 
@@ -69,6 +70,10 @@ export const project = {
 
   getManyData(names: string[], path: string) {
     return ipcInvoke(this.channel, 'getManyData', { names, path })
+  },
+
+  hasData(name: string, path: string) {
+    return ipcInvoke(this.channel, 'hasData', { name, path })
   },
 
   hasNamesData(names: string[], path: string) {

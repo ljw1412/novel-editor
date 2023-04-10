@@ -1,7 +1,11 @@
-<script setup lang="ts" name="SidebarBookshelf"></script>
+<script setup lang="ts" name="SidebarBookshelf">
+import EditorSidebar from '../components/Sidebar.vue'
+</script>
 
 <template>
-  <div class="sidebar-bookshelf"></div>
+  <EditorSidebar class="shadow-xl">
+    <div class="sidebar-bookshelf"></div>
+  </EditorSidebar>
 </template>
 
 <style lang="scss"></style>

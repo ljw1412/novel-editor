@@ -168,7 +168,7 @@ watch(
 
 <template>
   <div
-    class="editor-page-item"
+    class="page-item-wrap"
     :class="{ active: page.isSelected, 'child-selected': isChildSelected }"
   >
     <div
@@ -197,7 +197,8 @@ watch(
         <div
           v-if="allowAddChild"
           v-show="!isAdding"
-          class="text-btn w-5 h-5 mr-3 layout-center rounded flex-shrink-0"
+          class="text-btn w-5 h-5 mr-3 layout-center rounded flex-shrink-0 cursor-pointer"
+          title="添加子项"
           @click.stop="handleAddSubPage"
         >
           <icon-plus />
@@ -215,7 +216,7 @@ watch(
 </template>
 
 <style lang="scss">
-.editor-page-item {
+.page-item-wrap {
   .page-item {
     &:hover {
       background-color: rgba(var(--app-color-common-rgb), 0.06);

@@ -9,10 +9,12 @@ export function getDefaultPrejectDir() {
 
 const INIT_FILE_MAP = {
   'world.summary': [
-    { title: '故事背景', content: '', action: 'summary', children: [] }
+    { title: '故事背景', content: '', action: 'summary' },
+    { title: '注意事项', content: '', action: 'summary' }
   ],
   'world.timeline': [],
-  'world.keywords': []
+  'world.keywords': [],
+  character: []
 }
 
 export async function initProjectData(dataPath: string, names?: string[]) {
@@ -78,6 +80,10 @@ export async function getManyData(names: string[], dataPath: string) {
   } catch (error) {
     throw new ApiError('错误', '部分数据文件可能损坏，无法解析！')
   }
+}
+
+export async function hasData(name: string, dataPath: string) {
+  return storage.has(name, { dataPath })
 }
 
 export async function hasNamesData(names: string[], dataPath: string) {

@@ -6,6 +6,7 @@ import { useProjectStore, useEditorStore, useConfigStore } from '/@/stores'
 import Page, { PageObject } from '/@/classes/Page'
 import { Notification } from '@arco-design/web-vue'
 import { toTitleCase } from '/@/utils/string'
+import EditorSidebar from '../components/Sidebar.vue'
 import PageItem from '../components/PageItem.vue'
 
 const $router = useRouter()
@@ -21,10 +22,6 @@ const allPageList = computed(() => {
   return [list, list.map((page) => page.children || []).flat()].flat()
 })
 
-function getProjectPath() {
-  return projectStore.project.path
-}
-
 function handeCollapseChange([activeKey]: (string | number)[]) {
   configStore.sidebar['tab.world'] = activeKey as string
 }
@@ -38,20 +35,24 @@ function addPage(key: string, list: Page[]) {
   list.push(page)
 }
 
-function handlePageTextChange(page: Page, list: Page[], parentPage?: Page) {
-  page.isEdit = false
+async function handlePageTextChange(
+  page: Page,
+  list: Page[],
+  parentPage?: Page
+) {
   if (isAdding.value) {
     if (!page.title.trim()) {
       list.pop()
     } else {
+      await editorStore.saveWorldPaneData(page.action)
       handlePageClick(page)
-      editorStore.saveWorldPaneData(page.action)
     }
     isAdding.value = false
   } else {
+    await editorStore.saveWorldPaneData(page.action)
     handlePageClick(page, parentPage)
-    editorStore.saveWorldPaneData(page.action)
   }
+  page.isEdit = false
 }
 
 function handlePageCancel(page: Page, list: Page[]) {
@@ -87,7 +88,7 @@ function handlePageClick(page: Page, parentPage?: Page) {
 
 async function loadData() {
   const names = paneList.map((item) => `world.${item.key}`)
-  const path = getProjectPath()
+  const path = projectStore.getProjectPath()
   const existsData = await $API.Electron.project.hasNamesData(names, path)
   const notExistsNames = Object.keys(existsData).filter(
     (key) => !existsData[key]
@@ -119,62 +120,67 @@ loadData()
 </script>
 
 <template>
-  <div class="sidebar-world h-full">
-    <a-collapse
-      v-model:active-key="activeKey"
-      :bordered="false"
-      accordion
-      class="flex flex-col h-full"
-      @change="handeCollapseChange"
-    >
-      <a-collapse-item
-        v-for="item of paneList"
-        :header="item.title"
-        :key="item.key"
-        :disabled="isAdding"
+  <EditorSidebar class="shadow-xl">
+    <div class="sidebar-world h-full">
+      <a-collapse
+        v-model:active-key="activeKey"
+        :bordered="false"
+        accordion
+        class="flex flex-col h-full"
+        @change="handeCollapseChange"
       >
-        <template #extra>
-          <div
-            v-if="item.allowAdd"
-            v-show="!isAdding"
-            class="text-btn w-5 h-5 layout-center rounded"
-            @click.stop="addPage(item.key, item.list)"
-          >
-            <icon-plus />
-          </div>
-        </template>
-        <a-scrollbar outer-class="h-full" class="h-full overflow-auto">
-          <PageItem
-            v-for="page of item.list"
-            :page="page"
-            :is-edit="page.isEdit"
-            :allow-add-child="item.allowAddChild"
-            :is-adding="isAdding"
-            :placeholder="item.placeholder"
-            @text-change="handlePageTextChange(page, item.list)"
-            @cancel="handlePageCancel(page, item.list)"
-            @add-child="addPage(item.key, page.children)"
-            @page-click="handlePageClick(page)"
-            @delete="handlePageDelete(page, item.list)"
-          >
-            <template #children>
-              <PageItem
-                v-for="sPage of page.children"
-                :page="sPage"
-                :placeholder="item.childPlaceholder"
-                :is-edit="sPage.isEdit"
-                is-child
-                @text-change="handlePageTextChange(sPage, page.children, page)"
-                @cancel="handlePageCancel(sPage, page.children)"
-                @page-click="handlePageClick(sPage, page)"
-                @delete="handlePageDelete(sPage, page.children)"
-              ></PageItem>
-            </template>
-          </PageItem>
-        </a-scrollbar>
-      </a-collapse-item>
-    </a-collapse>
-  </div>
+        <a-collapse-item
+          v-for="item of paneList"
+          :header="item.title"
+          :key="item.key"
+          :disabled="isAdding"
+        >
+          <template #extra>
+            <div
+              v-if="item.allowAdd"
+              v-show="!isAdding"
+              title="添加时间"
+              class="text-btn w-5 h-5 layout-center rounded cursor-pointer"
+              @click.stop="addPage(item.key, item.list)"
+            >
+              <icon-plus />
+            </div>
+          </template>
+          <a-scrollbar outer-class="h-full" class="h-full overflow-auto">
+            <PageItem
+              v-for="page of item.list"
+              :page="page"
+              :is-edit="page.isEdit"
+              :allow-add-child="item.allowAddChild"
+              :is-adding="isAdding"
+              :placeholder="item.placeholder"
+              @text-change="handlePageTextChange(page, item.list)"
+              @cancel="handlePageCancel(page, item.list)"
+              @add-child="addPage(item.key, page.children)"
+              @page-click="handlePageClick(page)"
+              @delete="handlePageDelete(page, item.list)"
+            >
+              <template #children>
+                <PageItem
+                  v-for="sPage of page.children"
+                  :page="sPage"
+                  :placeholder="item.childPlaceholder"
+                  :is-edit="sPage.isEdit"
+                  is-child
+                  @text-change="
+                    handlePageTextChange(sPage, page.children, page)
+                  "
+                  @cancel="handlePageCancel(sPage, page.children)"
+                  @page-click="handlePageClick(sPage, page)"
+                  @delete="handlePageDelete(sPage, page.children)"
+                ></PageItem>
+              </template>
+            </PageItem>
+          </a-scrollbar>
+        </a-collapse-item>
+      </a-collapse>
+    </div>
+  </EditorSidebar>
 </template>
 
 <style lang="scss">

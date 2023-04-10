@@ -19,7 +19,7 @@ body {
   /* 编辑页面 */
   --editor-bg: var(--app-color-bg);
   --editor-sidebar-bg: #f7fcff;
-  --editor-sidebar-actions-bg: #f7f7f5;
+  --editor-activitybar-bg: #f7f7f5;
 }
 
 body[arco-theme='dark'] {
@@ -35,7 +35,7 @@ body[arco-theme='dark'] {
   /* 编辑页面 */
   --editor-bg: #212121;
   --editor-sidebar-bg: #252526;
-  --editor-sidebar-actions-bg: #333333;
+  --editor-activitybar-bg: #333333;
 }
 
 .text-color-black {

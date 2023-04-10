@@ -2,7 +2,7 @@ export interface PageObject {
   title: string
   content: string
   action: string
-  children: PageObject[]
+  children?: PageObject[]
 }
 
 export default class Page {
@@ -31,12 +31,16 @@ export default class Page {
     )
   }
 
-  toObject(): PageObject {
-    return {
+  toObject() {
+    const obj: PageObject = {
       title: this.title,
       content: this.content,
-      action: this.action,
-      children: this.children.map((child) => child.toObject())
+      action: this.action
     }
+    const children = this.children.map((child) => child.toObject())
+    if (children.length) {
+      obj.children = children
+    }
+    return obj
   }
 }

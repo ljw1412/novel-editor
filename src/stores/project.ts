@@ -19,6 +19,9 @@ export const useProjectStore = defineStore('ProjectStore', {
   },
 
   actions: {
+    getProjectPath() {
+      return this.project.path
+    },
     /**
      * 添加项目到最近打开的项目列表
      * @param project

@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia'
 import type { RouteLocationRaw } from 'vue-router'
+import * as logger from '/@/utils/logger'
 import { only } from '../utils/object'
 import { useProjectStore } from './project'
 import $API from '/@/apis'
 import Page from '/@/classes/Page'
+import CharacterPage from '/@/classes/CharacterPage'
 
-type ModuleData = null | { page: Page; parentPage?: Page }
 interface PaneItem {
   key: string
   title: string
@@ -23,16 +24,16 @@ export const useEditorStore = defineStore('EditorStore', {
       label: '小说',
       icon: 'icon-bookmark',
       route: { name: 'EditorBookshelf' },
-      currentRoute: null as null | RouteLocationRaw,
-      data: null as ModuleData
+      currentRoute: null as RouteLocationRaw | null,
+      data: null as { page: Page; parentPage?: Page } | null
     },
     world: {
       key: 'world',
       label: '世界观',
       icon: 'icon-common',
       route: { name: 'EditorWorld' },
-      currentRoute: null as null | RouteLocationRaw,
-      data: null as ModuleData,
+      currentRoute: null as RouteLocationRaw | null,
+      data: null as { page: Page; parentPage?: Page } | null,
       panes: {
         summary: {
           key: 'summary',
@@ -65,16 +66,17 @@ export const useEditorStore = defineStore('EditorStore', {
       label: '人物',
       icon: 'icon-user-group',
       route: { name: 'EditorCharacter' },
-      currentRoute: null as null | RouteLocationRaw,
-      data: null as ModuleData
+      currentRoute: null as RouteLocationRaw | null,
+      data: null as { page: CharacterPage } | null,
+      list: [] as CharacterPage[]
     },
     info: {
       key: 'info',
       label: '基础信息',
       icon: 'icon-info-circle',
       route: { name: 'EditorInfo' },
-      currentRoute: null as null | RouteLocationRaw,
-      data: null as ModuleData
+      currentRoute: null as RouteLocationRaw | null,
+      data: null as { page: Page; parentPage?: Page } | null
     }
   }),
 
@@ -95,9 +97,25 @@ export const useEditorStore = defineStore('EditorStore', {
       this[action].data = { page, parentPage }
     },
 
+    getAction(action: Editor.SidebarActions) {
+      return this[action] || ({} as Record<string, any>)
+    },
+
     getActionRoute(action: Editor.SidebarActions) {
       const { data, currentRoute, route } = this[action]
       return data && currentRoute ? currentRoute : route
+    },
+
+    async saveActionData(action: Editor.SidebarActions) {
+      const path = useProjectStore().project.path
+      if (!this[action]) {
+        logger.error('saveActionData', `action=${action}不存在`)
+        return
+      }
+      console.log('saveActionData', this[action].list)
+
+      const list = this[action].list.map((item: Page) => item.toObject())
+      return await $API.Electron.project.saveData(action, list, path)
     },
 
     getWorldPane(key: Editor.World.PaneType) {
@@ -112,7 +130,7 @@ export const useEditorStore = defineStore('EditorStore', {
       const path = useProjectStore().project.path
       const list = this.getWorldPaneData(action)
       const data = list.map((item) => item.toObject())
-      await $API.Electron.project.saveData(`world.${action}`, data, path)
+      return await $API.Electron.project.saveData(`world.${action}`, data, path)
     }
   }
 })

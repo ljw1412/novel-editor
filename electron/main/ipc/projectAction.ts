@@ -57,6 +57,13 @@ const handle = createHandle(channel, {
     })
   },
 
+  async hasData(e, win, payload) {
+    const { name, path } = payload
+    return handleWrap(() => {
+      return ProjectService.hasData(name, path)
+    })
+  },
+
   async hasNamesData(e, win, payload) {
     const { names, path } = payload
     return handleWrap(() => {
