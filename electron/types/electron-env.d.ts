@@ -11,6 +11,14 @@ declare namespace NodeJS {
   }
 }
 
+declare namespace Electron {
+  interface BrowserWindow {
+    name?: string
+    isPreset?: boolean
+    isAppQuitting?: boolean
+  }
+}
+
 type IpcListener = (
   event: Electron.IpcMainEvent,
   action: string,

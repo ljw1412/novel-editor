@@ -17,6 +17,10 @@ const listener = createListener(channel, {
       presetWin = winService.createPresetWindow(name)
       if (!presetWin) {
         console.error(`[预制窗体${name}]创建失败，请检查！`)
+      } else {
+        presetWin.once('ready-to-show', () => {
+          presetWin.show()
+        })
       }
     }
   }
@@ -39,13 +43,13 @@ const handle: IpcInvokeListener = createHandle(channel, {
   },
   close: (e, win, payload) => {
     const { who } = payload
-    if (who === 'main') {
-      const allWindows = BrowserWindow.getAllWindows()
-      allWindows.reverse().forEach((win) => {
-        win.close()
-      })
-      return
-    }
+    // if (who === 'main') {
+    //   const allWindows = BrowserWindow.getAllWindows()
+    //   allWindows.reverse().forEach((win) => {
+    //     win.close()
+    //   })
+    //   return
+    // }
     if (win.isPreset) {
       return win.hide()
     }

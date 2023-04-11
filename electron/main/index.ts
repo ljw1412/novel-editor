@@ -57,6 +57,15 @@ function createWindow() {
     win?.webContents.send('main-process-message', new Date().toLocaleString())
   })
 
+  win.on('close', (e) => {
+    const allWindows = BrowserWindow.getAllWindows()
+    allWindows.forEach((winItem) => {
+      if (winItem === win) return
+      winItem.isAppQuitting = true
+      winItem.close()
+    })
+  })
+
   // win.webContents.on('will-navigate', (event, url) => { }) #344
   return win
 }

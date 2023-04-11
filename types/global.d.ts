@@ -1,10 +1,3 @@
-declare namespace Electron {
-  interface BrowserWindow {
-    name?: string
-    isPreset?: boolean
-  }
-}
-
 interface WindowConfig {
   url: string
   // 静默启动

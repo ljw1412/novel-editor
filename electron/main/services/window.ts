@@ -197,7 +197,7 @@ interface PresetWindow {
 
 const presetWindows = [
   {
-    name: '首选项',
+    name: '设置',
     config: { url: getVuePageUrl('/setting') },
     options: {
       width: 720,
@@ -219,6 +219,12 @@ export function createPresetWindow(name: string) {
   const win = createWindow(config, options)
   win.name = name
   win.isPreset = true
+  win.on('close', (e) => {
+    if (!win.isAppQuitting) {
+      e.preventDefault()
+      win.hide()
+    }
+  })
   return win
 }
 
