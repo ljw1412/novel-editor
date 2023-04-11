@@ -50,6 +50,8 @@ export const useConfigStore = defineStore('configStore', {
      * @param theme
      */
     switchTheme(theme: string) {
+      if (this.theme.now === theme) return
+      this.theme.before = this.theme.now
       this.theme.now = theme
       this.flushBodyTheme()
     },

@@ -1,6 +1,7 @@
-import { app, BrowserWindow, shell, nativeTheme } from 'electron'
+import { app, BrowserWindow, protocol, nativeTheme } from 'electron'
 import { release } from 'node:os'
 import { join } from 'node:path'
+import URL from 'node:url'
 import './env'
 import IpcLoader from './ipc'
 import windowListener from './listeners/windowListener'
@@ -92,6 +93,21 @@ app.whenReady().then(() => {
   windowOpenHandler(win)
   IpcLoader.bind()
   const presetWindows = initPresetWindows()
+})
+
+app.whenReady().then(() => {
+  const success = protocol.registerFileProtocol(
+    'novel-editor',
+    (request, callback) => {
+      const filePath = URL.fileURLToPath(
+        'file://' + request.url.slice('novel-editor://'.length)
+      )
+      callback(filePath)
+    }
+  )
+  if (!success) {
+    console.error('Failed to register protocol')
+  }
 })
 
 app.on('window-all-closed', () => {

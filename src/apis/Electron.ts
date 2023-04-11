@@ -58,7 +58,10 @@ export const project = {
 
   createChapter() {},
 
-  uploadImage() {},
+  // 不支持传递Blob类型
+  saveImage(data: string, name: string, path: string) {
+    return ipcInvoke(this.channel, 'saveImage', { data, name, path })
+  },
 
   saveData(name: string, data: object, path: string) {
     return ipcInvoke(this.channel, 'saveData', { name, data, path })

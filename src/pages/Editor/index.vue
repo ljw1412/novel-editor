@@ -182,14 +182,6 @@ window.addEventListener('unload', updateState)
       border-color: currentColor;
       opacity: 0.3;
     }
-
-    .arco-textarea-wrapper {
-      background-color: initial;
-      textarea {
-        resize: none;
-        padding: 4px 4px;
-      }
-    }
   }
 }
 </style>

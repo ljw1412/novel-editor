@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import * as logger from '/@/utils/logger'
+import { useProjectStore } from '/@/stores'
 
 import ContainerMain from '/@/containers/Main.vue'
 import ContainerSeparate from '/@/containers/Separate.vue'
@@ -227,6 +228,15 @@ window.$router = router
 export default router
 
 router.beforeEach((to, from, next) => {
+  const projectStore = useProjectStore()
+  // 项目未加载，却进入编辑页面
+  if (
+    !projectStore.isProjectLoaded &&
+    to.matched.some((item) => item.name === 'AppEditor')
+  ) {
+    return next({ name: 'HomeWelcome', replace: true })
+  }
+
   next()
 })
 

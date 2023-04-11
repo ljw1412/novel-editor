@@ -1,3 +1,5 @@
+import fsp from 'node:fs/promises'
+import { join, relative } from 'node:path'
 import storage from '../utils/storage'
 import ApiError from '/@/classes/ApiError'
 
@@ -92,4 +94,13 @@ export async function hasNamesData(names: string[], dataPath: string) {
     obj[key] = keys.includes(key)
     return obj
   }, {})
+}
+
+export async function saveImage(data: string, name: string, dataPath: string) {
+  const imageDir = join(dataPath, 'images')
+  await fsp.mkdir(imageDir, { recursive: true })
+  const imagePath = join(imageDir, name)
+  const [, base64Data] = data.split('base64,')
+  await fsp.writeFile(imagePath, new Buffer(base64Data, 'base64'))
+  return relative(dataPath, imagePath)
 }

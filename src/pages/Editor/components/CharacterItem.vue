@@ -2,6 +2,7 @@
 import { computed, nextTick, PropType, ref, watch } from 'vue'
 import { InputInstance } from '@arco-design/web-vue'
 import { useFocus } from '@vueuse/core'
+import { useProjectStore } from '/@/stores'
 import CharacterPage from '/@/classes/CharacterPage'
 
 const props = defineProps({
@@ -11,6 +12,7 @@ const props = defineProps({
   character: { type: Object as PropType<CharacterPage>, default: () => ({}) }
 })
 const $emit = defineEmits(['page-click', 'text-change', 'cancel', 'delete'])
+const projectStore = useProjectStore()
 const itemEl = ref<HTMLElement>()
 const inputRef = ref<InputInstance>()
 const inputText = ref('')
@@ -83,7 +85,12 @@ watch(
     @click="handlePageClick"
   >
     <div class="avatar w-[50px] flex-shrink-0 layout-center">
-      <a-avatar :size="40" shape="square"></a-avatar>
+      <a-avatar :size="40" shape="square">
+        <img
+          v-if="character.avatar"
+          :src="projectStore.getLocalUrl(character.avatar)"
+        />
+      </a-avatar>
     </div>
     <div class="flex-grow ml-1">
       <a-input

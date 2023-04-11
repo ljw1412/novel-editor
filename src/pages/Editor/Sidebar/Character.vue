@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import $API from '/@/apis'
 import { useEditorStore, useProjectStore } from '/@/stores'
 import { Notification } from '@arco-design/web-vue'
-import CharacterPage from '/@/classes/CharacterPage'
+import CharacterPage, { CharacterPageObject } from '/@/classes/CharacterPage'
 import EditorSidebar from '../components/Sidebar.vue'
 import CharacterItem from '../components/CharacterItem.vue'
 
@@ -92,7 +92,8 @@ async function loadData() {
       closable: true
     })
   }
-  const data = await $API.Electron.project.getData(moduleName, path)
+  let data = await $API.Electron.project.getData(moduleName, path)
+  data = data.map((page: CharacterPageObject) => CharacterPage.create(page))
   characterList.length = 0
   characterList.push(...data)
 }
@@ -107,8 +108,7 @@ loadData()
         title="关系图"
         class="text-btn h-5 px-1 layout-center rounded cursor-pointer"
         :class="{
-          'bg-color-common text-color-white':
-            $route.name === 'CharacterRelationships'
+          'bg-color-common text-white': $route.name === 'CharacterRelationships'
         }"
         @click="handleHeaderBtnClick('relationships')"
       >

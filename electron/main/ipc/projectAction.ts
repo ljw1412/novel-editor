@@ -75,7 +75,12 @@ const handle = createHandle(channel, {
 
   async createChapter(e, win, payload) {},
 
-  async uploadImage(e, win, payload) {}
+  async saveImage(e, win, payload) {
+    const { data, name, path } = payload
+    return handleWrap(() => {
+      return ProjectService.saveImage(data, name, path)
+    })
+  }
 })
 
 function bind() {

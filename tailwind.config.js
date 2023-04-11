@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   purge: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
-  important: '#app',
+  important: true,
   content: [],
   theme: {
     spacing: {
@@ -26,6 +26,7 @@ module.exports = {
       full: '9999px'
     },
     fontSize: {
+      none: '0',
       xs: '12px',
       sm: '13px',
       base: '14px',

@@ -1,4 +1,3 @@
-import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { useLocalStorage } from '@vueuse/core'
 
@@ -21,6 +20,14 @@ export const useProjectStore = defineStore('ProjectStore', {
   actions: {
     getProjectPath() {
       return this.project.path
+    },
+
+    getLocalUrl(path: string, addUnix = true) {
+      if (path.startsWith('http')) return path
+      const prjDir = this.getProjectPath()
+      if (!path.startsWith('\\') && !prjDir.endsWith('\\')) path = '\\' + path
+      const suffix = addUnix ? `?${+new Date()}` : ''
+      return `novel-editor:///${prjDir}${path}${suffix}`.replace(/\\/g, '/')
     },
     /**
      * 添加项目到最近打开的项目列表
