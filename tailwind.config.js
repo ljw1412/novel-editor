@@ -61,18 +61,24 @@ module.exports = {
       },
 
       textColor: {
+        white: '#ffffff',
+        black: '#000000',
         'color-0': 'var(--color-text-0)',
         'color-1': 'var(--color-text-1)',
         'color-2': 'var(--color-text-2)',
         'color-3': 'var(--color-text-3)',
         'color-4': 'var(--color-text-4)',
+        'color-theme': 'var(--app-theme)',
         'color-common': 'var(--app-color-common)'
       },
       backgroundColor: {
+        white: '#ffffff',
+        black: '#000000',
         'color-1': 'var(--color-bg-1)',
         'color-2': 'var(--color-bg-2)',
         'color-3': 'var(--color-bg-3)',
         'color-4': 'var(--color-bg-4)',
+        'color-theme': 'var(--app-theme)',
         'color-common': 'var(--app-color-common)',
         'color-app': 'var(--app-color-bg)'
       }

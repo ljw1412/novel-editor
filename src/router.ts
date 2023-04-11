@@ -20,6 +20,8 @@ import WorldTimeline from './pages/Editor/Content/World/Timeline.vue'
 import InfoSidebar from '/@/pages/Editor/Sidebar/Info.vue'
 import EditorInfo from './pages/Editor/Content/Info/Info.vue'
 import AppSetting from '/@/pages/Setting/index.vue'
+import SettingTheme from '/@/pages/Setting/Theme.vue'
+import SettingRegular from '/@/pages/Setting/Regular.vue'
 
 const routes = [
   { path: '/', redirect: { name: 'HomeWelcome' } },
@@ -179,23 +181,38 @@ const routes = [
     component: ContainerSeparate,
     meta: { separate: true, isWebView: true }
   },
-  // 带标题栏的独立页面
+  //? 带标题栏的独立页面
   {
     path: '/view',
     name: 'AppView',
     component: ContainerSeparate,
     meta: { separate: true },
+    children: []
+  },
+  //? 自定义标题栏的独立界面
+  // 设置页面
+  {
+    path: '/setting',
+    name: 'AppSetting',
+    component: AppSetting,
+    meta: {
+      title: '设置',
+      minimizable: false,
+      hideIcon: true,
+      maximizable: false
+    },
     children: [
       {
-        path: '/setting',
-        name: 'AppSetting',
-        component: AppSetting,
-        meta: {
-          title: '首选项',
-          minimizable: false,
-          hideIcon: true,
-          maximizable: false
-        }
+        path: 'regular',
+        name: 'SettingRegular',
+        component: SettingRegular,
+        meta: { title: '常规' }
+      },
+      {
+        path: 'theme',
+        name: 'SettingTheme',
+        component: SettingTheme,
+        meta: { title: '主题' }
       }
     ]
   }

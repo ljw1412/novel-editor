@@ -35,9 +35,9 @@ const menu = reactive<AppHeaderMenuItem[]>([
     active: false,
     children: [
       {
-        label: '首选项',
+        label: '设置',
         fn: () => {
-          $API.Electron.win.openPresetWindow('首选项')
+          $API.Electron.win.openPresetWindow('设置')
         }
       },
       {
