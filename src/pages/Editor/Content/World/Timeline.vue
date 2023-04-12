@@ -29,10 +29,7 @@ function handlePageContentChange() {
         ></a-textarea>
       </template>
       <a-timeline v-else-if="$route.query.mode === 'root'" class="px-5">
-        <a-timeline-item
-          v-for="child of page.children"
-          dot-color="var(--app-color-common)"
-        >
+        <a-timeline-item v-for="child of page.children">
           <a-typography-paragraph
             type="secondary"
             class="mb-1 pl-1 text-md sticky top-0 z-10"

@@ -1,53 +1,42 @@
 :root {
-  --skin-cyan: #00bcd4;
-  --skin-cyan-light: #e8fffb;
-  --skin-cyan-rgb: 0, 189, 214;
   --skin-blue: #2196f3;
-  --skin-blue-light: #e8f3ff;
-  --skin-blue-rgb: 33, 150, 243;
-  --skin-red: #f44336;
-  --skin-red-light: #fef6f5;
-  --skin-red-rgb: 244, 67, 54;
-  --skin-orange: #eb9a18;
-  --skin-orange-light: #fff7e8;
-  --skin-orange-rgb: 235, 154, 24;
-  --skin-pink: #fb7299;
-  --skin-pink-light: #fff8fa;
-  --skin-pink-rgb: 251, 114, 153;
   --skin-dark: #3c3c3c;
-  --skin-dark-rgb: 60, 60, 60;
+  --skin-cyan: #00bcd4;
+  --skin-red: #f44336;
+  --skin-orange: #eb9a18;
+  --skin-pink: #fb7299;
   --skin-green: #4caf50;
-  --skin-green-light: #f6fbf6;
-  --skin-green-rgb: 76, 175, 80;
   --skin-teal: #009688;
-  --skin-teal-light: #f2faf9;
-  --skin-teal-rgb: 0, 150, 136;
   --skin-brown: #795548;
-  --skin-brown-light: #f8f7f6;
-  --skin-brown-rgb: 121, 85, 72;
   --skin-purple: #673ab7;
-  --skin-purple-light: #f7f5fb;
-  --skin-purple-rgb: 103, 58, 183;
   --skin-indigo: #3f51b5;
-  --skin-indigo-light: #f5f6fb;
-  --skin-indigo-rgb: 63, 81, 181;
   --skin-blue-grey: #607d8b;
-  --skin-blue-grey-light: #f7f9f9;
-  --skin-blue-rgb-grey: 96, 125, 139;
   --white-rgb: 255, 255, 255;
   --black-rgb: 0, 0, 0;
 }
 
 body {
+  // 主题色替换
+  --primary-1: 232, 248, 255;
+  --primary-2: 191, 233, 253;
+  --primary-3: 150, 215, 250;
+  --primary-4: 110, 195, 248;
+  --primary-5: 71, 173, 245;
+  --primary-6: 33, 150, 243;
+  --primary-7: 21, 114, 201;
+  --primary-8: 11, 83, 160;
+  --primary-9: 4, 55, 118;
+  --primary-10: 0, 32, 77;
+
   --color-text-0: #000000;
 
-  --app-theme: var(--skin-blue);
-  --app-theme-rgb: var(--skin-blue-rgb);
+  --app-theme: rgb(var(--primary-6));
+  --app-theme-rgb: var(--primary-6);
   --app-color-common: var(--app-theme);
   --app-color-common-rgb: var(--app-theme-rgb);
-
-  --app-color-bg: var(--skin-blue-light);
+  --app-color-bg: rgb(var(--primary-1));
   --app-color-text: var(--color-text-1);
+
   // 应用侧边栏颜色
   --app-sidebar-bg: rgba(255, 255, 255, 0.5);
   /* 编辑页面 */
@@ -57,14 +46,26 @@ body {
 }
 
 body[arco-theme='dark'] {
+  // 主题色替换
+  --primary-1: 255, 251, 232;
+  --primary-2: 255, 251, 232;
+  --primary-3: 244, 221, 151;
+  --primary-4: 239, 203, 113;
+  --primary-5: 232, 184, 79;
+  --primary-6: 228, 163, 41;
+  --primary-7: 190, 127, 26;
+  --primary-8: 152, 95, 14;
+  --primary-9: 114, 65, 5;
+  --primary-10: 77, 40, 0;
+
   --color-text-0: #ffffff;
 
-  --app-theme: var(--skin-dark);
-  --app-theme-rgb: var(--skin-dark-rgb);
+  --app-theme: #3c3c3c;
+  --app-theme-rgb: 60, 60, 60;
   --app-color-common: #e4a329;
   --app-color-common-rgb: 228, 163, 41;
+  --app-color-bg: #2a2a2b;
 
-  --app-color-bg: var(--color-bg-3);
   // 应用侧边栏颜色
   --app-sidebar-bg: #252526;
   /* 编辑页面 */
@@ -73,61 +74,131 @@ body[arco-theme='dark'] {
 }
 
 body[arco-theme='cyan'] {
-  --app-theme: var(--skin-cyan);
-  --app-theme-rgb: var(--skin-cyan-rgb);
-  --app-color-bg: var(--skin-cyan-light);
+  --primary-1: 232, 255, 254;
+  --primary-2: 179, 246, 245;
+  --primary-3: 130, 236, 238;
+  --primary-4: 83, 222, 229;
+  --primary-5: 40, 206, 221;
+  --primary-6: 0, 188, 212;
+  --primary-7: 0, 151, 178;
+  --primary-8: 0, 118, 144;
+  --primary-9: 0, 86, 110;
+  --primary-10: 0, 57, 77;
 }
 
 body[arco-theme='teal'] {
-  --app-theme: var(--skin-teal);
-  --app-theme-rgb: var(--skin-teal-rgb);
-  --app-color-bg: var(--skin-teal-light);
+  --primary-1: 232, 255, 249;
+  --primary-2: 170, 234, 219;
+  --primary-3: 116, 213, 194;
+  --primary-4: 70, 192, 172;
+  --primary-5: 31, 171, 152;
+  --primary-6: 0, 150, 136;
+  --primary-7: 0, 132, 123;
+  --primary-8: 0, 113, 109;
+  --primary-9: 0, 95, 95;
+  --primary-10: 0, 74, 77;
 }
 
 body[arco-theme='red'] {
-  --app-theme: var(--skin-red);
-  --app-theme-rgb: var(--skin-red-rgb);
-  --app-color-bg: var(--skin-red-light);
+  --primary-1: 255, 237, 232;
+  --primary-2: 253, 207, 195;
+  --primary-3: 251, 174, 159;
+  --primary-4: 248, 140, 123;
+  --primary-5: 246, 104, 88;
+  --primary-6: 244, 67, 54;
+  --primary-7: 202, 39, 34;
+  --primary-8: 160, 18, 18;
+  --primary-9: 118, 7, 10;
+  --primary-10: 77, 0, 5;
 }
 
 body[arco-theme='orange'] {
-  --app-theme: var(--skin-orange);
-  --app-theme-rgb: var(--skin-orange-rgb);
-  --app-color-bg: var(--skin-orange-light);
+  --primary-1: 255, 250, 232;
+  --primary-2: 251, 235, 188;
+  --primary-3: 247, 218, 145;
+  --primary-4: 243, 199, 103;
+  --primary-5: 239, 177, 63;
+  --primary-6: 235, 154, 24;
+  --primary-7: 195, 120, 15;
+  --primary-8: 156, 89, 8;
+  --primary-9: 116, 61, 3;
+  --primary-10: 77, 37, 0;
 }
 
 body[arco-theme='pink'] {
-  --app-theme: var(--skin-pink);
-  --app-theme-rgb: var(--skin-pink-rgb);
-  --app-color-bg: var(--skin-pink-light);
+  --primary-1: 255, 232, 235;
+  --primary-2: 254, 208, 215;
+  --primary-3: 253, 184, 197;
+  --primary-4: 253, 161, 181;
+  --primary-5: 252, 137, 166;
+  --primary-6: 251, 114, 153;
+  --primary-7: 207, 71, 114;
+  --primary-8: 164, 37, 81;
+  --primary-9: 120, 14, 54;
+  --primary-10: 77, 0, 32;
 }
 
 body[arco-theme='green'] {
-  --app-theme: var(--skin-green);
-  --app-theme-rgb: var(--skin-green-rgb);
-  --app-color-bg: var(--skin-green-light);
+  --primary-1: 235, 255, 232;
+  --primary-2: 199, 239, 195;
+  --primary-3: 165, 223, 160;
+  --primary-4: 132, 207, 129;
+  --primary-5: 101, 191, 101;
+  --primary-6: 76, 175, 80;
+  --primary-7: 49, 150, 56;
+  --primary-8: 27, 126, 37;
+  --primary-9: 11, 101, 23;
+  --primary-10: 0, 77, 13;
 }
 
 body[arco-theme='brown'] {
-  --app-theme: var(--skin-brown);
-  --app-theme-rgb: var(--skin-brown-rgb);
-  --app-color-bg: var(--skin-brown-light);
+  --primary-1: 255, 242, 232;
+  --primary-2: 228, 207, 193;
+  --primary-3: 201, 174, 158;
+  --primary-4: 175, 142, 126;
+  --primary-5: 148, 112, 97;
+  --primary-6: 121, 85, 72;
+  --primary-7: 110, 63, 49;
+  --primary-8: 99, 43, 29;
+  --primary-9: 88, 25, 13;
+  --primary-10: 77, 10, 0;
 }
 
 body[arco-theme='purple'] {
-  --app-theme: var(--skin-purple);
-  --app-theme-rgb: var(--skin-purple-rgb);
-  --app-color-bg: var(--skin-purple-light);
+  --primary-1: 244, 232, 255;
+  --primary-2: 216, 190, 241;
+  --primary-3: 187, 152, 226;
+  --primary-4: 158, 117, 212;
+  --primary-5: 131, 86, 197;
+  --primary-6: 103, 58, 183;
+  --primary-7: 77, 37, 156;
+  --primary-8: 53, 21, 130;
+  --primary-9: 33, 8, 103;
+  --primary-10: 18, 0, 77;
 }
 
 body[arco-theme='indigo'] {
-  --app-theme: var(--skin-indigo);
-  --app-theme-rgb: var(--skin-indigo-rgb);
-  --app-color-bg: var(--skin-indigo-light);
+  --primary-1: 232, 239, 255;
+  --primary-2: 192, 205, 240;
+  --primary-3: 154, 172, 225;
+  --primary-4: 121, 140, 211;
+  --primary-5: 90, 110, 196;
+  --primary-6: 63, 81, 181;
+  --primary-7: 40, 54, 155;
+  --primary-8: 22, 31, 129;
+  --primary-9: 9, 14, 103;
+  --primary-10: 0, 1, 77;
 }
 
 body[arco-theme='blue-grey'] {
-  --app-theme: var(--skin-blue-grey);
-  --app-theme-rgb: var(--skin-blue-rgb-grey);
-  --app-color-bg: var(--skin-blue-grey-light);
+  --primary-1: 232, 251, 255;
+  --primary-2: 201, 226, 232;
+  --primary-3: 172, 200, 209;
+  --primary-4: 144, 174, 185;
+  --primary-5: 119, 149, 162;
+  --primary-6: 96, 125, 139;
+  --primary-7: 64, 102, 123;
+  --primary-8: 37, 80, 108;
+  --primary-9: 16, 59, 92;
+  --primary-10: 0, 41, 77;
 }

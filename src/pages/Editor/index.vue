@@ -81,6 +81,7 @@ window.addEventListener('unload', updateState)
         v-for="item of actions"
         :key="item.label"
         :content="item.label"
+        content-class="select-none"
         position="right"
         mini
       >
@@ -181,6 +182,17 @@ window.addEventListener('unload', updateState)
     .arco-timeline-item-dot-line {
       border-color: currentColor;
       opacity: 0.3;
+    }
+  }
+}
+
+body:not([arco-theme='dark']) {
+  .app-editor {
+    .editor-content {
+      --color-fill-1: rgba(255, 255, 255, 0.3);
+      --color-fill-2: rgba(255, 255, 255, 0.4);
+      --color-fill-3: rgba(255, 255, 255, 0.5);
+      --color-fill-4: rgba(255, 255, 255, 0.6);
     }
   }
 }
