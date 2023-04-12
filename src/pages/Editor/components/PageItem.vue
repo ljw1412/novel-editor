@@ -98,8 +98,8 @@ function handlePressEnter() {
 }
 
 function handleAddSubPage() {
-  _collapsed.value = !isCollapsed.value
-  $emit('update-collapsed', !isCollapsed.value)
+  _collapsed.value = false
+  $emit('update-collapsed', false)
   $emit('add-child', props.page)
 }
 
@@ -273,19 +273,8 @@ watch(
 <style lang="scss">
 .page-item-wrap {
   .page-item {
-    .btn-collapse {
-      left: -32px;
-    }
-
-    .btn-child-add {
-      opacity: 0;
-    }
-
     &:hover {
       background-color: rgba(var(--app-color-common-rgb), 0.06);
-      .btn-child-add {
-        opacity: 1;
-      }
     }
 
     &:focus,
@@ -317,6 +306,14 @@ watch(
     }
   }
 
+  .btn-collapse {
+    left: -32px;
+  }
+
+  .btn-child-add {
+    opacity: 0;
+  }
+
   &.collapsable {
     > .children::before {
       left: 18px;
@@ -326,6 +323,13 @@ watch(
   &.child-selected > .children::before,
   &.active > .children::before {
     opacity: 0.2 !important;
+  }
+
+  &:hover,
+  &:focus-within {
+    .btn-child-add {
+      opacity: 1;
+    }
   }
 }
 </style>

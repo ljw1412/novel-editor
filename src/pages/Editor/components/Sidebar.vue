@@ -88,7 +88,8 @@ const $route = useRoute()
       opacity: 0;
     }
 
-    &:hover {
+    &:hover,
+    &:focus-within {
       .btn-add {
         opacity: 1;
       }
