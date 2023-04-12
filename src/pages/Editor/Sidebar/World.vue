@@ -131,7 +131,7 @@ loadData()
       >
         <a-collapse-item
           v-for="item of paneList"
-          :header="item.title"
+          :header="`${item.title} / ${item.key}`"
           :key="item.key"
           :disabled="isAdding"
         >
@@ -139,8 +139,8 @@ loadData()
             <div
               v-if="item.allowAdd"
               v-show="!isAdding"
-              title="添加时间"
-              class="text-btn w-5 h-5 layout-center rounded cursor-pointer"
+              :title="`添加${item.title}`"
+              class="btn-add text-btn w-5 h-5 layout-center rounded cursor-pointer"
               @click.stop="addPage(item.key, item.list)"
             >
               <icon-plus />
@@ -151,9 +151,11 @@ loadData()
               v-for="page of item.list"
               :page="page"
               :is-edit="page.isEdit"
-              :allow-add-child="item.allowAddChild"
               :is-adding="isAdding"
               :placeholder="item.placeholder"
+              :allow-add-child="item.allowAddChild"
+              :allow-collapse="item.key === 'timeline'"
+              collapse-mode="button"
               @text-change="handlePageTextChange(page, item.list)"
               @cancel="handlePageCancel(page, item.list)"
               @add-child="addPage(item.key, page.children)"
@@ -185,5 +187,10 @@ loadData()
 
 <style lang="scss">
 .sidebar-world {
+  &:hover {
+    .page-item-wrap .children::before {
+      opacity: 0.1;
+    }
+  }
 }
 </style>

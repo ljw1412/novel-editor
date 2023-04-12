@@ -6,11 +6,28 @@ import { useFocus } from '@vueuse/core'
 import { useContextViewStore } from '/@/stores'
 
 const props = defineProps({
+  // 是否在编辑状态
   isEdit: Boolean,
+  // 是否为子项
   isChild: Boolean,
-  allowAddChild: Boolean,
+  // 是否在添加状态
   isAdding: Boolean,
+  // 是否允许添加子项
+  allowAddChild: Boolean,
+  // 是否允许折叠
+  allowCollapse: Boolean,
+  // 是否折叠状态
+  collapsed: { type: Boolean, default: undefined },
+  // 默认折叠状态
+  defaultCollapsed: { type: Boolean, default: true },
+  // 触发折叠的行为模式：按钮 整行
+  collapseMode: {
+    type: String as PropType<'button' | 'line'>,
+    default: 'line'
+  },
+  // 编辑时的输入框占位符
   placeholder: String,
+  // 页面数据
   page: { type: Object as PropType<Page>, default: () => ({}) }
 })
 const $emit = defineEmits([
@@ -18,9 +35,14 @@ const $emit = defineEmits([
   'text-change',
   'cancel',
   'add-child',
-  'delete'
+  'delete',
+  'update-collapsed'
 ])
 const pageItemEl = ref<HTMLElement>()
+const _collapsed = ref(props.allowCollapse && props.defaultCollapsed)
+const isCollapsed = computed(() => {
+  return props.collapsed ?? _collapsed.value
+})
 const inputRef = ref<InputInstance>()
 const inputText = ref('')
 const isInputFocus = ref(false)
@@ -76,11 +98,24 @@ function handlePressEnter() {
 }
 
 function handleAddSubPage() {
+  _collapsed.value = !isCollapsed.value
+  $emit('update-collapsed', !isCollapsed.value)
   $emit('add-child', props.page)
 }
 
 function handlePageClick() {
   $emit('page-click', props.page)
+  if (props.allowCollapse && props.collapseMode === 'line') {
+    _collapsed.value = !isCollapsed.value
+    $emit('update-collapsed', !isCollapsed.value)
+  }
+}
+
+function handleCollapseBtnClick() {
+  if (props.allowCollapse && props.collapseMode === 'button') {
+    _collapsed.value = !isCollapsed.value
+    $emit('update-collapsed', !isCollapsed.value)
+  }
 }
 
 const isContextMenu = ref(false)
@@ -169,7 +204,12 @@ watch(
 <template>
   <div
     class="page-item-wrap"
-    :class="{ active: page.isSelected, 'child-selected': isChildSelected }"
+    :class="{
+      active: page.isSelected,
+      'child-selected': isChildSelected,
+      collapsable: allowCollapse,
+      collapsed: isCollapsed
+    }"
   >
     <div
       ref="pageItemEl"
@@ -192,12 +232,26 @@ watch(
         @keydown.esc="handleEscapeKeydown"
         @press-enter="handlePressEnter"
       />
-      <div v-else class="layout-lr leading-6 w-full" :title="page.title">
+      <div
+        v-else
+        class="relative layout-lr w-full leading-6"
+        :title="page.title"
+      >
+        <div
+          v-if="allowCollapse"
+          class="btn-collapse absolute layout-center h-6 w-6"
+          @click.stop="handleCollapseBtnClick"
+        >
+          <component
+            :is="isCollapsed ? 'icon-right' : 'icon-down'"
+            :size="16"
+          />
+        </div>
         <span class="truncate">{{ page.title }}</span>
         <div
           v-if="allowAddChild"
           v-show="!isAdding"
-          class="text-btn w-5 h-5 mr-3 layout-center rounded flex-shrink-0 cursor-pointer"
+          class="btn-child-add text-btn w-5 h-5 mr-3 layout-center rounded flex-shrink-0 cursor-pointer"
           title="添加子项"
           @click.stop="handleAddSubPage"
         >
@@ -208,6 +262,7 @@ watch(
 
     <div
       v-if="!isChild && page.children && page.children.length"
+      v-show="!isCollapsed"
       class="children relative"
     >
       <slot name="children"></slot>
@@ -218,8 +273,19 @@ watch(
 <style lang="scss">
 .page-item-wrap {
   .page-item {
+    .btn-collapse {
+      left: -32px;
+    }
+
+    .btn-child-add {
+      opacity: 0;
+    }
+
     &:hover {
       background-color: rgba(var(--app-color-common-rgb), 0.06);
+      .btn-child-add {
+        opacity: 1;
+      }
     }
 
     &:focus,
@@ -251,9 +317,15 @@ watch(
     }
   }
 
+  &.collapsable {
+    > .children::before {
+      left: 18px;
+    }
+  }
+
   &.child-selected > .children::before,
   &.active > .children::before {
-    opacity: 0.15;
+    opacity: 0.2 !important;
   }
 }
 </style>

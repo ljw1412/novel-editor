@@ -37,14 +37,14 @@ export const useEditorStore = defineStore('EditorStore', {
       panes: {
         summary: {
           key: 'summary',
-          title: '简介 / summary',
+          title: '简介',
           list: [] as Page[],
           allowAdd: false,
           allowAddChild: false
         },
         timeline: {
           key: 'timeline',
-          title: '时间线 / timeline',
+          title: '时间线',
           list: [] as Page[],
           placeholder: '输入历法名称，如：公元、宇宙历',
           childPlaceholder: '请输入年份',
@@ -53,7 +53,7 @@ export const useEditorStore = defineStore('EditorStore', {
         },
         keywords: {
           key: 'keywords',
-          title: '关键词 / keywords',
+          title: '关键词',
           list: [] as Page[],
           placeholder: '输入关键词名称',
           allowAdd: true,

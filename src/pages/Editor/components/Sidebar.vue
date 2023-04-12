@@ -57,8 +57,13 @@ const $route = useRoute()
       padding-top: 4px;
       padding-bottom: 4px;
       padding-right: 4px;
+      padding-left: 24px;
       min-height: 34px;
       background-color: var(--color-bg-4);
+
+      .arco-icon-hover {
+        left: 6px;
+      }
 
       &:focus {
         outline: 1px solid var(--app-color-common);
@@ -79,7 +84,15 @@ const $route = useRoute()
       }
     }
 
+    .btn-add {
+      opacity: 0;
+    }
+
     &:hover {
+      .btn-add {
+        opacity: 1;
+      }
+
       .editor-page-item {
         .children::before {
           opacity: 0.15;
