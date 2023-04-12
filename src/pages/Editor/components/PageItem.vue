@@ -239,7 +239,7 @@ watch(
       >
         <div
           v-if="allowCollapse"
-          class="btn-collapse absolute layout-center h-6 w-6"
+          class="btn-collapse absolute layout-center h-5 w-5 rounded"
           @click.stop="handleCollapseBtnClick"
         >
           <component
@@ -273,6 +273,8 @@ watch(
 <style lang="scss">
 .page-item-wrap {
   .page-item {
+    transition: background-color 0.15s, outline 0.15s;
+
     &:hover {
       background-color: rgba(var(--app-color-common-rgb), 0.06);
     }
@@ -307,7 +309,7 @@ watch(
   }
 
   .btn-collapse {
-    left: -32px;
+    left: -28px;
   }
 
   .btn-child-add {
@@ -315,6 +317,17 @@ watch(
   }
 
   &.collapsable {
+    .btn-collapse {
+      transition: background-color 0.15s;
+
+      &:hover {
+        background-color: rgba(var(--app-color-common-rgb), 0.12);
+      }
+      &:active {
+        background-color: rgba(var(--app-color-common-rgb), 0.24);
+      }
+    }
+
     > .children::before {
       left: 18px;
     }

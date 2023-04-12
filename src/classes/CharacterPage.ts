@@ -7,12 +7,17 @@ export interface CharacterRelation {
   relation: string
 }
 
+export interface CharacterExtraInfo {
+  key: string
+  value: string
+}
+
 export interface CharacterExtraData {
   content: string
   image?: string
   avatar?: string
   age?: string
-  info?: { key: string; value: string }[]
+  info?: CharacterExtraInfo[]
   relations?: CharacterRelation[]
 }
 
@@ -33,8 +38,8 @@ export default class CharacterPage extends Page {
   sex = ''
   birthday = ''
   age = ''
-  info: { key: string; value: string }[] = []
-  relations: { target: string; relation: string }[] = []
+  info: CharacterExtraInfo[] = []
+  relations: CharacterRelation[] = []
   timeline: CharacterTimeline[] = []
 
   constructor(

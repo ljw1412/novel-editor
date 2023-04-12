@@ -3,10 +3,14 @@ import { computed, PropType, ref } from 'vue'
 import { Modal, Notification } from '@arco-design/web-vue'
 import { CharacterTimeline } from '/@/classes/CharacterPage'
 import { useEditorStore } from '/@/stores'
+import ExtraInfo from './ExtraInfo.vue'
+import Fgimage from './Fgimage.vue'
 
 const props = defineProps({
+  title: { type: String, default: '' },
   timeline: { type: Array as PropType<CharacterTimeline[]>, default: () => [] }
 })
+const $emit = defineEmits(['item-image-change', 'item-image-removed'])
 
 const editorStore = useEditorStore()
 const worldTimeline = editorStore.getWorldPaneData('timeline')
@@ -27,6 +31,7 @@ const treeData = computed(() => {
     }
   })
 })
+const tab = ref('')
 const isDisplayNameDialog = ref(false)
 const timePointName = ref('')
 
@@ -103,16 +108,47 @@ function removeTimeline(name: string | number) {
         </a-button>
       </template>
       <a-tab-pane
-        v-for="(item, index) of timeline"
-        :key="item.name"
-        :title="item.name"
+        v-for="(point, index) of timeline"
+        :key="point.name"
+        :title="point.name"
       >
-        {{ item }}
+        <div class="flex px-4 pb-4">
+          <Fgimage
+            :data="point.data"
+            :title="`${title}_${point.name}`"
+            width="320px"
+            class="mr-2 flex-shrink-0"
+            @change="$emit('item-image-change')"
+            @removed="$emit('item-image-removed')"
+          />
+
+          <a-space direction="vertical" fill class="flex-grow">
+            <ExtraInfo :list="point.data.info">
+              <template #prepend>
+                <a-grid-item>
+                  <a-input
+                    v-model="point.data.age"
+                    placeholder="此时间点的人物年龄"
+                  >
+                    <template #prefix>年龄</template>
+                    <template #suffix>岁</template>
+                  </a-input>
+                </a-grid-item>
+              </template>
+            </ExtraInfo>
+
+            <a-textarea
+              v-model="point.data.content"
+              placeholder="请输入这个时间点的人物描述和设定"
+              :auto-size="{ minRows: 6, maxRows: 6 }"
+            ></a-textarea>
+          </a-space>
+        </div>
       </a-tab-pane>
     </a-tabs>
 
-    <!-- <div>这个时间点的立绘和照片上传</div>
-    <div>人物关系</div> -->
+    <!-- <div>人物关系</div> -->
+
     <a-modal
       v-model:visible="isDisplayNameDialog"
       :on-before-ok="addTimeline"

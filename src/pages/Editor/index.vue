@@ -1,10 +1,12 @@
 <script setup lang="ts" name="AppEditor">
 import { ref, computed, onUnmounted } from 'vue'
 import { RouteLocationRaw, useRoute, useRouter } from 'vue-router'
-import { useConfigStore, useEditorStore } from '/@/stores'
+import { useConfigStore, useDialogStore, useEditorStore } from '/@/stores'
+import ImageCropperDialog from '/@/components/ImageCropperDialog.vue'
 
 const configStore = useConfigStore()
 const editorStore = useEditorStore()
+const dialogStore = useDialogStore()
 
 const $route = useRoute()
 const $router = useRouter()
@@ -125,6 +127,14 @@ window.addEventListener('unload', updateState)
     <main class="editor-content relative h-full flex-grow">
       <router-view></router-view>
     </main>
+    <!-- 全局弹窗 -->
+    <ImageCropperDialog
+      v-model:visiable="dialogStore.cropper.isDisplay"
+      :image="dialogStore.cropper.image"
+      v-bind="dialogStore.cropperOptions"
+      @success="dialogStore.cropper.callback"
+    >
+    </ImageCropperDialog>
   </div>
 </template>
 
@@ -182,6 +192,9 @@ window.addEventListener('unload', updateState)
   }
 
   .editor-content {
+    margin: 0 auto;
+    max-width: 1200px;
+
     input::placeholder,
     textarea::placeholder {
       opacity: 0.7;
