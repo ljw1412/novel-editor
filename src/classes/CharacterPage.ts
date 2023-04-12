@@ -12,7 +12,7 @@ export interface CharacterExtraData {
   image?: string
   avatar?: string
   age?: string
-  info?: Record<string, string>
+  info?: { key: string; value: string }[]
   relations?: CharacterRelation[]
 }
 
@@ -33,7 +33,7 @@ export default class CharacterPage extends Page {
   sex = ''
   birthday = ''
   age = ''
-  info: Record<string, string> = {}
+  info: { key: string; value: string }[] = []
   relations: { target: string; relation: string }[] = []
   timeline: CharacterTimeline[] = []
 
@@ -46,7 +46,7 @@ export default class CharacterPage extends Page {
       action = '',
       sex = '',
       birthday = '',
-      info = {},
+      info = [],
       relations = [],
       timeline = []
     }: CharacterPageObject = {} as CharacterPageObject

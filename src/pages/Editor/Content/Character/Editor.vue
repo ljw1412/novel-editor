@@ -1,6 +1,10 @@
 <script setup lang="ts" name="CharacterEditor">
 import { ref, reactive, computed, watch } from 'vue'
-import { useFileSystemAccess } from '@vueuse/core'
+import {
+  useDebounceFn,
+  useEventListener,
+  useFileSystemAccess
+} from '@vueuse/core'
 import $API from '/@/apis'
 import { useEditorStore, useProjectStore } from '/@/stores'
 import ContentContainer from '../../components/ContentContainer.vue'
@@ -23,13 +27,33 @@ const cropper = reactive({
   ratio: [1, 1]
 })
 
+const saveState = ref({ status: '', icon: '', message: '' })
+
+const clearSaveMsg = useDebounceFn(() => {
+  saveState.value = { status: '', icon: '', message: '' }
+}, 3000)
+async function save() {
+  saveState.value = {
+    status: 'saving',
+    icon: 'icon-loading',
+    message: '保存中…'
+  }
+  await editorStore.saveActionData('character')
+  saveState.value = {
+    status: 'success',
+    icon: 'icon-check',
+    message: '保存成功'
+  }
+  clearSaveMsg()
+}
+
 function removeImage(size: 'sprite' | 'avatar', page: CharacterPage) {
   if (size === 'sprite') {
     page.image = ''
   } else {
     page.avatar = ''
   }
-  editorStore.saveActionData('character')
+  save()
 }
 
 async function handleImageClick(size: 'sprite' | 'avatar') {
@@ -70,18 +94,54 @@ async function handleCropSuccess(
   } else {
     page.image = filepath
   }
-  editorStore.saveActionData('character')
+  save()
 }
 
-function handleTimelineAdd() {}
+function appInfo(page: CharacterPage) {
+  if (!page.info || !Array.isArray(page.info)) {
+    page.info = []
+  }
+  page.info.push({ key: '', value: '' })
+}
 
-function handleTimelineDelete(key: string | number) {}
+function removeInfo(item: { key: string; value: string }, page: CharacterPage) {
+  const index = page.info.indexOf(item)
+  if (~index) {
+    page.info.splice(index, 1)
+  }
+}
+
+function addTimeline(page: CharacterPage) {}
+
+function removeTimeline(key: string | number, page: CharacterPage) {}
+
+useEventListener('keydown', (e) => {
+  const keyCode = e.keyCode || e.which || e.charCode
+  const ctrlKey = e.ctrlKey || e.metaKey
+  if (ctrlKey && keyCode == 83) {
+    e.preventDefault()
+    save()
+  }
+  return false
+})
 </script>
 
 <template>
   <ContentContainer class="character-editor">
+    <template #extra>
+      <div
+        v-if="saveState.status"
+        :class="{
+          'text-red-500': saveState.status === 'error',
+          'text-green-500': saveState.status === 'success'
+        }"
+      >
+        <component v-if="saveState.icon" :is="saveState.icon" />
+        <span class="ml-2">{{ saveState.message }}</span>
+      </div>
+    </template>
     <template #default="{ page }">
-      <div class="flex item-start pt-4">
+      <div class="flex items-start pt-4">
         <div class="flex-shrink-0 flex w-[320px] mr-2 select-none">
           <acg-ratio-div
             :ratio="[3, 4]"
@@ -95,7 +155,7 @@ function handleTimelineDelete(key: string | number) {}
             />
             <div class="label layout-center-p">人物图</div>
             <div
-              class="action-view absolute top-0 left-0 layout-center flex-col w-full h-full"
+              class="action-view absolute top-0 left-0 layout-center flex-col w-full h-full text-white"
             >
               <a-button
                 v-if="page.image"
@@ -150,46 +210,69 @@ function handleTimelineDelete(key: string | number) {}
         </div>
         <a-space direction="vertical" fill class="flex-grow">
           <a-input v-model="page.title" placeholder="姓名" class="name-input" />
-          <div class="birthday">
-            <a-space>
-              <a-select
-                v-model="page.sex"
-                allow-create
-                allow-clear
-                placeholder="未设置性别"
-                class="w-[160px]"
-                :trigger-props="{ autoFitPopupMinWidth: true }"
-              >
-                <template #prefix>性别</template>
-                <a-option>男</a-option>
-                <a-option>女</a-option>
-                <template #footer>
-                  <div class="text-center text-color-2">或手动输入</div>
-                </template>
-              </a-select>
+          <a-space>
+            <a-select
+              v-model="page.sex"
+              allow-create
+              allow-clear
+              placeholder="未设置性别"
+              class="w-[160px]"
+              :trigger-props="{ autoFitPopupMinWidth: true }"
+            >
+              <template #prefix>性别</template>
+              <a-option>男</a-option>
+              <a-option>女</a-option>
+              <template #footer>
+                <div class="text-center text-color-2">或手动输入</div>
+              </template>
+            </a-select>
 
-              <a-input
-                v-model="page.age"
-                placeholder="年龄"
-                size="large"
-                class="w-[110px]"
-              >
-                <template #prefix>年龄</template>
-              </a-input>
-              <a-input
-                v-model="page.birthday"
-                placeholder="生日"
-                size="large"
-                class="w-[200px]"
-              >
-                <template #prefix>生日</template>
-              </a-input>
-            </a-space>
-          </div>
+            <a-input v-model="page.age" placeholder="年龄" class="w-[140px]">
+              <template #prefix>年龄</template>
+              <template #suffix>岁</template>
+            </a-input>
+            <a-input
+              v-model="page.birthday"
+              placeholder="生日"
+              class="w-[200px]"
+            >
+              <template #prefix>生日</template>
+            </a-input>
+          </a-space>
 
-          <a-grid :cols="3">
+          <a-grid
+            :cols="{ xl: 2, xxl: 4 }"
+            :row-gap="8"
+            :col-gap="8"
+            class="more-info-grid max-w-[1200px]"
+          >
+            <a-grid-item v-for="item of page.info">
+              <a-input-group class="flex">
+                <a-input
+                  v-model="item.key"
+                  placeholder="属性名"
+                  style="flex: 1 1 0%"
+                  class="info-name"
+                />
+                <a-input
+                  v-model="item.value"
+                  placeholder="属性值"
+                  style="flex: 2 1 0%"
+                  class="info-value"
+                />
+                <a-button
+                  status="danger"
+                  type="text"
+                  @click="removeInfo(item, page)"
+                >
+                  <template #icon><icon-delete :size="16" /></template>
+                </a-button>
+              </a-input-group>
+            </a-grid-item>
             <a-grid-item>
-              <a-button long>追加信息</a-button>
+              <a-button long type="dashed" @click="appInfo(page)">
+                <icon-plus />追加信息
+              </a-button>
             </a-grid-item>
           </a-grid>
 
@@ -210,8 +293,8 @@ function handleTimelineDelete(key: string | number) {}
         editable
         show-add-button
         auto-switch
-        @add="handleTimelineAdd"
-        @delete="handleTimelineDelete"
+        @add="addTimeline(page)"
+        @delete="removeTimeline($event, page)"
       >
         <template #extra></template>
       </a-tabs>
@@ -241,20 +324,24 @@ function handleTimelineDelete(key: string | number) {}
 .character-editor {
   line-height: 1;
 
-  input.arco-input {
-    font-size: inherit !important;
-    line-height: inherit !important;
-  }
-
   .name-input {
     // height: 42px;
     font-size: 28px;
+
+    > .arco-input {
+      font-size: inherit !important;
+      line-height: inherit !important;
+    }
   }
 
-  .sex {
-  }
-
-  .birthday {
+  .more-info-grid {
+    .info-name {
+      input {
+        &:not(:focus) {
+          color: var(--color-text-2);
+        }
+      }
+    }
   }
 
   .sprite,
@@ -280,8 +367,6 @@ function handleTimelineDelete(key: string | number) {}
     }
 
     &:hover {
-      // background-color: var(--color-fill-3);
-
       .action-view {
         opacity: 1;
         background-color: rgba(0, 0, 0, 0.5);

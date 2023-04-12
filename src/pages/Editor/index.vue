@@ -179,6 +179,12 @@ window.addEventListener('unload', updateState)
   }
 
   .editor-content {
+    input::placeholder,
+    textarea::placeholder {
+      opacity: 0.7;
+      font-weight: 400;
+    }
+
     .arco-timeline-item-dot-line {
       border-color: currentColor;
       opacity: 0.3;
@@ -191,8 +197,8 @@ body:not([arco-theme='dark']) {
     .editor-content {
       --color-fill-1: rgba(255, 255, 255, 0.3);
       --color-fill-2: rgba(255, 255, 255, 0.4);
-      --color-fill-3: rgba(255, 255, 255, 0.5);
-      --color-fill-4: rgba(255, 255, 255, 0.6);
+      --color-fill-3: rgba(255, 255, 255, 0.6);
+      --color-fill-4: rgba(255, 255, 255, 0.7);
     }
   }
 }
