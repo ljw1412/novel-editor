@@ -1,5 +1,5 @@
 <script setup lang="ts" name="CharacterEditor">
-import { ref, reactive, computed, watch } from 'vue'
+import { ref, reactive } from 'vue'
 import {
   useDebounceFn,
   useEventListener,
@@ -7,9 +7,10 @@ import {
 } from '@vueuse/core'
 import $API from '/@/apis'
 import { useEditorStore, useProjectStore } from '/@/stores'
-import ContentContainer from '../../components/ContentContainer.vue'
-import ImageCropperDialog from '/@/components/ImageCropperDialog.vue'
 import CharacterPage from '/@/classes/CharacterPage'
+import ContentContainer from '../../components/ContentContainer.vue'
+import CharacterTimeline from './components/Timeline.vue'
+import ImageCropperDialog from '/@/components/ImageCropperDialog.vue'
 
 const editorStore = useEditorStore()
 const projectStore = useProjectStore()
@@ -110,10 +111,6 @@ function removeInfo(item: { key: string; value: string }, page: CharacterPage) {
     page.info.splice(index, 1)
   }
 }
-
-function addTimeline(page: CharacterPage) {}
-
-function removeTimeline(key: string | number, page: CharacterPage) {}
 
 useEventListener('keydown', (e) => {
   const keyCode = e.keyCode || e.which || e.charCode
@@ -278,29 +275,13 @@ useEventListener('keydown', (e) => {
 
           <a-textarea
             v-model="page.content"
-            placeholder="请人物描述"
+            placeholder="请输入人物描述"
             :auto-size="{ minRows: 6, maxRows: 6 }"
           ></a-textarea>
         </a-space>
       </div>
 
-      <h5 class="mt-6">
-        <span>时间线</span>
-        <span class="text-sm text-color-2">（上述信息默认为故事初始时点）</span>
-      </h5>
-      <a-tabs
-        type="card"
-        editable
-        show-add-button
-        auto-switch
-        @add="addTimeline(page)"
-        @delete="removeTimeline($event, page)"
-      >
-        <template #extra></template>
-      </a-tabs>
-
-      <div>这个时间点的立绘和照片上传</div>
-      <div>人物关系</div>
+      <CharacterTimeline :timeline="page.timeline"></CharacterTimeline>
 
       <ImageCropperDialog
         v-model:visiable="cropper.isDisplay"

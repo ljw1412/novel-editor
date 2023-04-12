@@ -17,7 +17,7 @@ export interface CharacterExtraData {
 }
 
 export interface CharacterTimeline {
-  time: string
+  name: string
   data: CharacterExtraData
 }
 
@@ -39,12 +39,13 @@ export default class CharacterPage extends Page {
 
   constructor(
     {
-      image = '',
-      avatar = '',
       title = '',
       content = '',
       action = '',
+      image = '',
+      avatar = '',
       sex = '',
+      age = '',
       birthday = '',
       info = [],
       relations = [],
@@ -52,12 +53,13 @@ export default class CharacterPage extends Page {
     }: CharacterPageObject = {} as CharacterPageObject
   ) {
     super(title, content, action)
+    this.image = image
+    this.avatar = avatar
     this.sex = sex
+    this.age = age
     this.birthday = birthday
     this.info = info
     this.relations = relations
-    this.image = image
-    this.avatar = avatar
     this.timeline = timeline
   }
 
