@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia'
 import type { RouteLocationRaw } from 'vue-router'
 import * as logger from '/@/utils/logger'
-import { only } from '../utils/object'
-import { useProjectStore } from './project'
 import $API from '/@/apis'
-import Page from '/@/classes/Page'
-import CharacterPage from '/@/classes/CharacterPage'
+import Page, { PageObject } from '/@/classes/Page'
+import CharacterPage, { CharacterPageObject } from '/@/classes/CharacterPage'
+import { useProjectStore } from './index'
+import { Notification } from '@arco-design/web-vue'
+import { only } from '../utils/object'
 
 interface PaneItem {
   key: string
@@ -81,6 +82,10 @@ export const useEditorStore = defineStore('EditorStore', {
   }),
 
   getters: {
+    project() {
+      return useProjectStore().project
+    },
+
     actions(state) {
       return Object.values(
         only(state, ['bookshelf', 'world', 'character', 'info'])
@@ -93,10 +98,6 @@ export const useEditorStore = defineStore('EditorStore', {
   },
 
   actions: {
-    switchPage(action: Editor.SidebarActions, page: Page, parentPage?: Page) {
-      this[action].data = { page, parentPage }
-    },
-
     getAction(action: Editor.SidebarActions) {
       return this[action] || ({} as Record<string, any>)
     },
@@ -104,6 +105,12 @@ export const useEditorStore = defineStore('EditorStore', {
     getActionRoute(action: Editor.SidebarActions) {
       const { data, currentRoute, route } = this[action]
       return data && currentRoute ? currentRoute : route
+    },
+
+    getWorldPaneData(key: Editor.World.PaneType | string) {
+      const pane = this.world.panes[key as Editor.World.PaneType]
+      const { list = [] } = pane
+      return list
     },
 
     async saveActionData(action: 'character') {
@@ -117,19 +124,70 @@ export const useEditorStore = defineStore('EditorStore', {
       return await $API.Electron.project.saveData(action, data, path)
     },
 
-    getWorldPane(key: Editor.World.PaneType) {
-      return this.world.panes[key] || { list: [] }
-    },
-
-    getWorldPaneData(key: string) {
-      return this.getWorldPane(key as Editor.World.PaneType).list
-    },
-
     async saveWorldPaneData(action: string) {
-      const path = useProjectStore().project.path
+      const path = this.project.path
       const list = this.getWorldPaneData(action)
       const data = list.map((item) => item.toObject())
       return await $API.Electron.project.saveData(`world.${action}`, data, path)
+    },
+
+    async loadBookshelfData() {},
+
+    async loadCharacterData() {
+      const moduleName = 'character'
+      const path = this.project.path
+      const exists = await $API.Electron.project.hasData(moduleName, path)
+      if (!exists) {
+        logger.warning('缺失的数据文件：', moduleName)
+        await $API.Electron.project.initData(moduleName, path)
+        Notification.info({
+          title: '角色数据文件不完整，现已修改。',
+          content: moduleName,
+          position: 'bottomRight',
+          duration: 10 * 1000,
+          closable: true
+        })
+      }
+      let data = await $API.Electron.project.getData(moduleName, path)
+      data = data.map((page: CharacterPageObject) => CharacterPage.create(page))
+      const characterList = this.character.list
+      characterList.length = 0
+      characterList.push(...data)
+    },
+
+    async loadWorldData() {
+      const names = this.worldPaneList.map((item) => `world.${item.key}`)
+      const path = this.project.path
+      const existsData = await $API.Electron.project.hasNamesData(names, path)
+      const notExistsNames = Object.keys(existsData).filter(
+        (key) => !existsData[key]
+      )
+      if (notExistsNames.length) {
+        logger.warning('缺失的数据文件：', notExistsNames)
+        await $API.Electron.project.initData(notExistsNames, path)
+        Notification.info({
+          title: '世界观数据文件不完整，现已修改。',
+          content: notExistsNames.join('\n'),
+          position: 'bottomRight',
+          duration: 10 * 1000,
+          closable: true
+        })
+      }
+      const { world } = await $API.Electron.project.getManyData(names, path)
+      Object.keys(world).forEach((key) => {
+        const data = world[key].map((page: PageObject) => Page.create(page))
+        const list = this.getWorldPaneData(key)
+        if (Array.isArray(list)) {
+          list.length = 0
+          list.push(...data)
+        }
+      })
+    },
+
+    async loadInfoData() {},
+
+    switchPage(action: Editor.SidebarActions, page: Page, parentPage?: Page) {
+      this.getAction(action).data = { page, parentPage }
     }
   }
 })

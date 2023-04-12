@@ -48,10 +48,10 @@ const menu = reactive<AppHeaderMenuItem[]>([
         disabled: computed(
           () => !projectStore.isProjectLoaded && $route.name !== 'AppEditor'
         ),
-        fn: () => {
+        fn: async () => {
+          await $router.push({ name: 'HomeWelcome' })
           projectStore.clearProject()
           editorStore.$reset()
-          $router.push({ name: 'HomeWelcome' })
         }
       }
     ]

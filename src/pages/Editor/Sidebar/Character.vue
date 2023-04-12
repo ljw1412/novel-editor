@@ -1,10 +1,8 @@
 <script setup lang="ts" name="SidebarCharacter">
-import { reactive, ref } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import $API from '/@/apis'
 import { useEditorStore, useProjectStore } from '/@/stores'
-import { Notification } from '@arco-design/web-vue'
-import CharacterPage, { CharacterPageObject } from '/@/classes/CharacterPage'
+import CharacterPage from '/@/classes/CharacterPage'
 import EditorSidebar from '../components/Sidebar.vue'
 import CharacterItem from '../components/CharacterItem.vue'
 
@@ -77,28 +75,6 @@ function handlePageClick(page: CharacterPage) {
   $router.replace(route)
   editorStore.character.route = route
 }
-
-async function loadData() {
-  const path = projectStore.getProjectPath()
-  const exists = await $API.Electron.project.hasData(moduleName, path)
-  if (!exists) {
-    console.log('缺失的数据文件：', moduleName)
-    await $API.Electron.project.initData(moduleName, path)
-    Notification.info({
-      title: '角色数据文件不完整，现已修改。',
-      content: moduleName,
-      position: 'bottomRight',
-      duration: 10 * 1000,
-      closable: true
-    })
-  }
-  let data = await $API.Electron.project.getData(moduleName, path)
-  data = data.map((page: CharacterPageObject) => CharacterPage.create(page))
-  characterList.length = 0
-  characterList.push(...data)
-}
-
-loadData()
 </script>
 
 <template>

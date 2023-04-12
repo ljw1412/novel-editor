@@ -1,10 +1,8 @@
 <script setup lang="ts" name="SidebarWorld">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import $API from '/@/apis'
 import { useProjectStore, useEditorStore, useConfigStore } from '/@/stores'
-import Page, { PageObject } from '/@/classes/Page'
-import { Notification } from '@arco-design/web-vue'
+import Page from '/@/classes/Page'
 import { toTitleCase } from '/@/utils/string'
 import EditorSidebar from '../components/Sidebar.vue'
 import PageItem from '../components/PageItem.vue'
@@ -85,38 +83,6 @@ function handlePageClick(page: Page, parentPage?: Page) {
   $router.replace(route)
   editorStore.world.route = route
 }
-
-async function loadData() {
-  const names = paneList.map((item) => `world.${item.key}`)
-  const path = projectStore.getProjectPath()
-  const existsData = await $API.Electron.project.hasNamesData(names, path)
-  const notExistsNames = Object.keys(existsData).filter(
-    (key) => !existsData[key]
-  )
-  if (notExistsNames.length) {
-    console.log('缺失的数据文件：', notExistsNames)
-    await $API.Electron.project.initData(notExistsNames, path)
-    Notification.info({
-      title: '世界观数据文件不完整，现已修改。',
-      content: notExistsNames.join('\n'),
-      position: 'bottomRight',
-      duration: 10 * 1000,
-      closable: true
-    })
-  }
-
-  const { world } = await $API.Electron.project.getManyData(names, path)
-  Object.keys(world).forEach((key) => {
-    const data = world[key].map((page: PageObject) => Page.create(page))
-    const list = editorStore.getWorldPaneData(key)
-    if (Array.isArray(list)) {
-      list.length = 0
-      list.push(...data)
-    }
-  })
-}
-
-loadData()
 </script>
 
 <template>

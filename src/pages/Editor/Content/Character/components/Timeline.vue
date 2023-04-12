@@ -1,17 +1,37 @@
 <script setup lang="ts" name="CharacterTimeline">
-import { PropType, ref } from 'vue'
+import { computed, PropType, ref } from 'vue'
 import { Modal, Notification } from '@arco-design/web-vue'
 import { CharacterTimeline } from '/@/classes/CharacterPage'
+import { useEditorStore } from '/@/stores'
 
 const props = defineProps({
   timeline: { type: Array as PropType<CharacterTimeline[]>, default: () => [] }
 })
 
+const editorStore = useEditorStore()
+const worldTimeline = editorStore.getWorldPaneData('timeline')
+const treeData = computed(() => {
+  return worldTimeline.map((item) => {
+    return {
+      key: item.title,
+      title: item.title,
+      disabled: true,
+      children: item.children.map((child) => {
+        const name = item.title + child.title
+        return {
+          key: name,
+          title: name,
+          disabled: props.timeline.some((item) => item.name === name)
+        }
+      })
+    }
+  })
+})
 const isDisplayNameDialog = ref(false)
-const inputText = ref('')
+const timePointName = ref('')
 
 function showInputDialog() {
-  inputText.value = ''
+  timePointName.value = ''
   isDisplayNameDialog.value = true
 }
 
@@ -30,7 +50,7 @@ function createTimePoint(name: string) {
 }
 
 function addTimeline() {
-  const name = inputText.value.trim()
+  const name = timePointName.value.trim()
   if (name) {
     if (props.timeline.some((item) => item.name === name)) {
       Notification.warning({
@@ -99,9 +119,14 @@ function removeTimeline(name: string | number) {
       simple
       title="创建时间点"
       width="400px"
-      :ok-button-props="{ disabled: !inputText.trim() }"
+      :ok-button-props="{ disabled: !timePointName.trim() }"
     >
-      <a-input v-model="inputText" placeholder="请输入时间点的名称" />
+      <a-tree-select
+        v-model="timePointName"
+        :data="treeData"
+        placeholder="请选择已创建的时间点"
+      ></a-tree-select>
+      <!-- <a-input v-model="timePointName" placeholder="请输入时间点的名称" /> -->
     </a-modal>
   </div>
 </template>

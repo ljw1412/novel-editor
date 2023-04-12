@@ -69,6 +69,9 @@ function updateState() {
   configStore.sidebar.tab = currentTab.value
 }
 
+editorStore.loadWorldData()
+editorStore.loadCharacterData()
+
 onUnmounted(updateState)
 window.addEventListener('unload', updateState)
 </script>

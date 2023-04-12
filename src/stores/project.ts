@@ -25,6 +25,7 @@ export const useProjectStore = defineStore('ProjectStore', {
     getLocalUrl(path: string, addUnix = true) {
       if (path.startsWith('http')) return path
       const prjDir = this.getProjectPath()
+      if (!prjDir) return path
       if (!path.startsWith('\\') && !prjDir.endsWith('\\')) path = '\\' + path
       const suffix = addUnix ? `?${+new Date()}` : ''
       return `novel-editor:///${prjDir}${path}${suffix}`.replace(/\\/g, '/')
