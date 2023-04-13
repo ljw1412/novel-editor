@@ -82,6 +82,7 @@ async function cropperSprite(spritePath?: string) {
       <img
         v-if="data.image"
         :src="projectStore.getLocalUrl(data.image, true)"
+        loading="lazy"
         class="object-contain"
       />
       <div class="label layout-center-p">人物图</div>
@@ -108,13 +109,44 @@ async function cropperSprite(spritePath?: string) {
       <img
         v-if="data.avatar"
         :src="projectStore.getLocalUrl(data.avatar, true)"
+        loading="lazy"
         class="object-contain"
       />
       <div class="label layout-center-p">头像</div>
-      <div class="action-view absolute top-0 left-0 w-full h-full">
-        <a-space size="mini" class="layout-center-p">
+      <div
+        class="action-view absolute top-0 left-0 w-full h-full cursor-pointer grid grid-cols-2 grid-rows-2 text-white"
+      >
+        <div
+          v-if="data.image"
+          class="w-full h-full layout-center hover:bg-white hover:bg-opacity-50 active:bg-opacity-70"
+          :class="{ 'row-span-2': !data.avatar }"
+          title="裁剪人物图"
+          @click="cropperSprite(data.image)"
+        >
+          <icon-scissor :size="24" />
+        </div>
+        <div
+          v-if="data.avatar"
+          class="w-full h-full layout-center hover:bg-red-500 hover:bg-opacity-50 active:bg-opacity-70"
+          title="清除图片"
+          @click.stop="removeImage('avatar')"
+        >
+          <icon-delete :size="24" />
+        </div>
+        <div
+          class="w-full h-full layout-center hover:bg-color-common hover:bg-opacity-50 active:bg-opacity-70"
+          :class="{
+            'row-span-2': !data.avatar,
+            'col-span-2': !data.image || data.avatar
+          }"
+          title="上传图片"
+          @click="handleImageClick('avatar')"
+        >
+          <icon-upload :size="24" />
+        </div>
+        <!-- <a-space size="mini" class="layout-center-p">
           <a-button
-            v-if="data.image"
+        
             title="裁剪人物图"
             size="small"
             @click="cropperSprite(data.image)"
@@ -129,7 +161,7 @@ async function cropperSprite(spritePath?: string) {
             <template #icon><icon-upload :size="18" /></template>
           </a-button>
           <a-button
-            v-if="data.avatar"
+          
             title="清除图片"
             size="small"
             status="danger"
@@ -137,7 +169,7 @@ async function cropperSprite(spritePath?: string) {
           >
             <template #icon><icon-delete :size="18" /></template>
           </a-button>
-        </a-space>
+        </a-space> -->
       </div>
     </acg-ratio-div>
   </div>

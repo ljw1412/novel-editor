@@ -42,8 +42,11 @@ const breadcrumbData = computed(() => {
       </a-breadcrumb>
       <slot name="extra"></slot>
     </header>
-    <a-scrollbar outer-class="flex-grow h-0" class="h-full overflow-auto px-6">
-      <main v-if="action.data && action.data.page">
+    <a-scrollbar
+      outer-class="flex-grow h-0 w-full"
+      class="h-full overflow-y-auto"
+    >
+      <main v-if="action.data && action.data.page" class="w-full px-6">
         <slot :page="action.data.page as MixedPage"></slot>
       </main>
     </a-scrollbar>

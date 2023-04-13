@@ -124,8 +124,12 @@ window.addEventListener('unload', updateState)
       </router-view>
     </a-resize-box>
     <!-- 主体 -->
-    <main class="editor-content relative h-full flex-grow">
-      <router-view></router-view>
+    <main
+      class="editor-content relative h-full max-w-[1200px] mx-auto flex-grow overflow-hidden"
+    >
+      <router-view v-slot="{ Component, route }">
+        <component :is="Component" :key="route.fullPath" />
+      </router-view>
     </main>
     <!-- 全局弹窗 -->
     <ImageCropperDialog
@@ -192,9 +196,6 @@ window.addEventListener('unload', updateState)
   }
 
   .editor-content {
-    margin: 0 auto;
-    max-width: 1200px;
-
     input::placeholder,
     textarea::placeholder {
       opacity: 0.7;

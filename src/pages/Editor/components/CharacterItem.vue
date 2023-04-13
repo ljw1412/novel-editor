@@ -89,6 +89,7 @@ watch(
         <img
           v-if="character.avatar"
           :src="projectStore.getLocalUrl(character.avatar)"
+          loading="lazy"
         />
       </a-avatar>
     </div>

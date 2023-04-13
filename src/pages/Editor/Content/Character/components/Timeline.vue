@@ -1,31 +1,54 @@
 <script setup lang="ts" name="CharacterTimeline">
 import { computed, PropType, ref } from 'vue'
 import { Modal, Notification } from '@arco-design/web-vue'
-import { CharacterTimeline } from '/@/classes/CharacterPage'
+import CharacterPage, { CharacterTimeline } from '/@/classes/CharacterPage'
 import { useEditorStore } from '/@/stores'
 import ExtraInfo from './ExtraInfo.vue'
 import Fgimage from './Fgimage.vue'
 
 const props = defineProps({
-  title: { type: String, default: '' },
-  timeline: { type: Array as PropType<CharacterTimeline[]>, default: () => [] }
+  character: { type: Object as PropType<CharacterPage>, default: () => ({}) }
 })
 const $emit = defineEmits(['item-image-change', 'item-image-removed'])
+
+type MixedTimelineItem = CharacterTimeline & {
+  default?: boolean
+  data: { timepoint?: string }
+}
+
+const timeline = computed(() => props.character.timeline || [])
+const defaultTimepoint = computed(() => ({
+  name: '初登场',
+  bind: '',
+  default: true,
+  data: props.character
+}))
+const timelineList = computed<MixedTimelineItem[]>(() => [
+  defaultTimepoint.value,
+  ...(timeline.value || [])
+])
 
 const editorStore = useEditorStore()
 const worldTimeline = editorStore.getWorldPaneData('timeline')
 const treeData = computed(() => {
+  const { name } = defaultTimepoint.value
   return worldTimeline.map((item) => {
     return {
       key: item.title,
       title: item.title,
+      markerTitle: item.title,
       disabled: true,
       children: item.children.map((child) => {
-        const name = item.title + child.title
+        const key = item.title + child.title
+        const title = item.title + child.title
+        const marker = props.character.timepoint === key ? `(${name})` : ''
         return {
-          key: name,
-          title: name,
-          disabled: props.timeline.some((item) => item.name === name)
+          key,
+          title,
+          markerTitle: title + marker,
+          disabled: timeline.value.some(
+            (item) => item.bind === key || key === props.character.timepoint
+          )
         }
       })
     }
@@ -43,6 +66,7 @@ function showInputDialog() {
 function createTimePoint(name: string) {
   return {
     name,
+    bind: name,
     data: {
       content: '',
       image: '',
@@ -56,8 +80,10 @@ function createTimePoint(name: string) {
 
 function addTimeline() {
   const name = timePointName.value.trim()
+  console.log(name)
+
   if (name) {
-    if (props.timeline.some((item) => item.name === name)) {
+    if (timeline.value.some((item) => item.name === name)) {
       Notification.warning({
         title: `无法添加时间点“${name}”`,
         content: '已经存在同名的时间点',
@@ -67,38 +93,39 @@ function addTimeline() {
       })
       return false
     }
-    props.timeline.push(createTimePoint(name))
+    const timepoint = createTimePoint(name)
+    timeline.value.push(timepoint)
+    tab.value = timepoint.bind
     return true
   }
   return false
 }
 
-function removeTimeline(name: string | number) {
-  Modal.confirm({
-    title: '删除时间点',
-    content: `确认删除时间点“${name}”吗？`,
-    modalStyle: { 'text-align': 'center' },
-    onOk: () => {
-      const index = props.timeline.findIndex((item) => item.name === name)
-      if (~index) props.timeline.splice(index, 1)
-    }
-  })
+function removeTimeline(key: string | number) {
+  const timepoint = timeline.value.find((item) => item.bind === key)
+  if (timepoint) {
+    Modal.confirm({
+      title: '删除时间点',
+      content: `确认删除时间点“${timepoint.name}”吗？`,
+      modalStyle: { 'text-align': 'center' },
+      onOk: () => {
+        const index = timeline.value.indexOf(timepoint)
+        if (~index) timeline.value.splice(index, 1)
+      }
+    })
+  }
 }
 </script>
 
 <template>
-  <div class="character-timeline">
-    <h5 class="mt-6 mb-2">
-      <span>时间线</span>
-      <span class="text-sm text-color-2">（上述信息默认为故事初始时点）</span>
-    </h5>
+  <div class="character-timeline w-full mt-5">
     <a-tabs
+      v-model:active-key="tab"
       editable
       show-add-button
-      auto-switch
+      lazy-load
       type="card"
       size="large"
-      :hide-content="!timeline.length"
       @add="showInputDialog"
       @delete="removeTimeline"
     >
@@ -108,39 +135,49 @@ function removeTimeline(name: string | number) {
         </a-button>
       </template>
       <a-tab-pane
-        v-for="(point, index) of timeline"
-        :key="point.name"
+        v-for="(point, index) of timelineList"
+        :key="point.bind"
         :title="point.name"
+        :closable="!point.default"
       >
-        <div class="flex px-4 pb-4">
+        <div class="flex box-border px-4 pb-4">
           <Fgimage
             :data="point.data"
-            :title="`${title}_${point.name}`"
-            width="320px"
+            :title="`${character.title}_${point.bind}`"
+            width="308px"
             class="mr-2 flex-shrink-0"
             @change="$emit('item-image-change')"
             @removed="$emit('item-image-removed')"
           />
 
-          <a-space direction="vertical" fill class="flex-grow">
-            <ExtraInfo :list="point.data.info">
-              <template #prepend>
-                <a-grid-item>
-                  <a-input
-                    v-model="point.data.age"
-                    placeholder="此时间点的人物年龄"
-                  >
-                    <template #prefix>年龄</template>
-                    <template #suffix>岁</template>
-                  </a-input>
-                </a-grid-item>
-              </template>
-            </ExtraInfo>
+          <a-space direction="vertical" fill class="flex-grow w-0">
+            <a-space>
+              <a-tree-select
+                v-if="point.default"
+                v-model="point.data.timepoint"
+                allow-clear
+                placeholder="绑定初登场时间点"
+                :data="treeData"
+              >
+                <template #prefix>时间点</template>
+              </a-tree-select>
+
+              <a-input
+                v-model="point.data.age"
+                placeholder="(选填)"
+                class="w-[130px]"
+              >
+                <template #prefix>年龄</template>
+                <template #suffix>岁</template>
+              </a-input>
+            </a-space>
+
+            <ExtraInfo :list="point.data.info"></ExtraInfo>
 
             <a-textarea
               v-model="point.data.content"
+              :auto-size="{ minRows: 8 }"
               placeholder="请输入这个时间点的人物描述和设定"
-              :auto-size="{ minRows: 6, maxRows: 6 }"
             ></a-textarea>
           </a-space>
         </div>
@@ -151,15 +188,16 @@ function removeTimeline(name: string | number) {
 
     <a-modal
       v-model:visible="isDisplayNameDialog"
-      :on-before-ok="addTimeline"
       simple
       title="创建时间点"
       width="400px"
       :ok-button-props="{ disabled: !timePointName.trim() }"
+      :on-before-ok="addTimeline"
     >
       <a-tree-select
         v-model="timePointName"
         :data="treeData"
+        :field-names="{ title: 'markerTitle' }"
         placeholder="请选择已创建的时间点"
       ></a-tree-select>
       <!-- <a-input v-model="timePointName" placeholder="请输入时间点的名称" /> -->

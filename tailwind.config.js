@@ -79,8 +79,9 @@ module.exports = {
         'color-2': 'var(--color-bg-2)',
         'color-3': 'var(--color-bg-3)',
         'color-4': 'var(--color-bg-4)',
-        'color-theme': 'var(--app-theme)',
-        'color-common': 'var(--app-color-common)',
+        'color-theme': 'rgba(var(--app-theme-rgb), var(--tw-bg-opacity))',
+        'color-common':
+          'rgba(var(--app-color-common-rgb), var(--tw-bg-opacity))',
         'color-app': 'var(--app-color-bg)'
       }
     }

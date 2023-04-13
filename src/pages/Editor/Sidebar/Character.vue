@@ -62,7 +62,7 @@ function handlePageDelete(page: CharacterPage) {
   if (~index) characterList.splice(index, 1)
   editorStore.saveActionData(moduleName)
   if (page.isSelected) {
-    $router.replace({ name: 'EditorWorld' })
+    $router.replace({ name: 'EditorCharacter' })
   }
 }
 
@@ -71,7 +71,7 @@ function handlePageClick(page: CharacterPage) {
   clearSelected()
   page.isSelected = true
   editorStore.switchPage(moduleName, page)
-  const route = { name: `CharacterEditor` }
+  const route = { name: `CharacterEditor`, query: { name: page.title } }
   $router.replace(route)
   editorStore.character.route = route
 }

@@ -23,12 +23,15 @@ export interface CharacterExtraData {
 
 export interface CharacterTimeline {
   name: string
+  //TODO: 绑定的时间点id
+  bind: string
   data: CharacterExtraData
 }
 
 export interface CharacterPageObject extends PageObject, CharacterExtraData {
   sex: string
   birthday: string
+  timepoint: string
   timeline: CharacterTimeline[]
 }
 
@@ -38,6 +41,7 @@ export default class CharacterPage extends Page {
   sex = ''
   birthday = ''
   age = ''
+  timepoint = ''
   info: CharacterExtraInfo[] = []
   relations: CharacterRelation[] = []
   timeline: CharacterTimeline[] = []
@@ -50,8 +54,9 @@ export default class CharacterPage extends Page {
       image = '',
       avatar = '',
       sex = '',
-      age = '',
       birthday = '',
+      age = '',
+      timepoint = '',
       info = [],
       relations = [],
       timeline = []
@@ -61,8 +66,9 @@ export default class CharacterPage extends Page {
     this.image = image
     this.avatar = avatar
     this.sex = sex
-    this.age = age
     this.birthday = birthday
+    this.age = age
+    this.timepoint = timepoint
     this.info = info
     this.relations = relations
     this.timeline = timeline
