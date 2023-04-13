@@ -144,32 +144,6 @@ async function cropperSprite(spritePath?: string) {
         >
           <icon-upload :size="24" />
         </div>
-        <!-- <a-space size="mini" class="layout-center-p">
-          <a-button
-        
-            title="裁剪人物图"
-            size="small"
-            @click="cropperSprite(data.image)"
-          >
-            <template #icon><icon-scissor :size="18" /></template>
-          </a-button>
-          <a-button
-            title="上传图片"
-            size="small"
-            @click="handleImageClick('avatar')"
-          >
-            <template #icon><icon-upload :size="18" /></template>
-          </a-button>
-          <a-button
-          
-            title="清除图片"
-            size="small"
-            status="danger"
-            @click.stop="removeImage('avatar')"
-          >
-            <template #icon><icon-delete :size="18" /></template>
-          </a-button>
-        </a-space> -->
       </div>
     </acg-ratio-div>
   </div>

@@ -200,7 +200,6 @@ function removeTimeline(key: string | number) {
         :field-names="{ title: 'markerTitle' }"
         placeholder="请选择已创建的时间点"
       ></a-tree-select>
-      <!-- <a-input v-model="timePointName" placeholder="请输入时间点的名称" /> -->
     </a-modal>
   </div>
 </template>
