@@ -3,9 +3,7 @@ import { ref, reactive } from 'vue'
 import { useDebounceFn, useEventListener } from '@vueuse/core'
 import { useEditorStore } from '/@/stores'
 import ContentContainer from '../../components/ContentContainer.vue'
-import ExtraInfo from './components/ExtraInfo.vue'
 import CharacterTimeline from './components/Timeline.vue'
-import Fgimage from './components/Fgimage.vue'
 
 const editorStore = useEditorStore()
 
@@ -91,11 +89,10 @@ useEventListener('keydown', (e) => {
 
 <style lang="scss">
 .character-editor {
-  line-height: 1;
-
   .name-input {
     // height: 42px;
     font-size: 28px;
+    line-height: 1;
 
     > .arco-input {
       font-size: inherit !important;

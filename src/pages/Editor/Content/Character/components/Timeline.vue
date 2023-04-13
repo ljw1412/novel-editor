@@ -4,7 +4,8 @@ import { Modal, Notification } from '@arco-design/web-vue'
 import CharacterPage, { CharacterTimeline } from '/@/classes/CharacterPage'
 import { useEditorStore } from '/@/stores'
 import ExtraInfo from './ExtraInfo.vue'
-import Fgimage from './Fgimage.vue'
+import CharacterFgimage from './Fgimage.vue'
+import CharacterRelations from './Relations.vue'
 
 const props = defineProps({
   character: { type: Object as PropType<CharacterPage>, default: () => ({}) }
@@ -140,15 +141,25 @@ function removeTimeline(key: string | number) {
         :title="point.name"
         :closable="!point.default"
       >
-        <div class="flex box-border px-4 pb-4">
-          <Fgimage
-            :data="point.data"
-            :title="`${character.title}_${point.bind}`"
-            width="308px"
-            class="mr-2 flex-shrink-0"
-            @change="$emit('item-image-change')"
-            @removed="$emit('item-image-removed')"
-          />
+        <div class="flex items-start px-4 pb-4">
+          <div class="flex-shrink-0 w-[308px] mr-2">
+            <CharacterFgimage
+              :data="point.data"
+              :title="
+                point.bind
+                  ? `${character.title}_${point.bind}`
+                  : character.title
+              "
+              @change="$emit('item-image-change')"
+              @removed="$emit('item-image-removed')"
+            />
+
+            <CharacterRelations
+              :character="character"
+              :relations="point.data.relations"
+            >
+            </CharacterRelations>
+          </div>
 
           <a-space direction="vertical" fill class="flex-grow w-0">
             <a-space>
@@ -176,15 +187,13 @@ function removeTimeline(key: string | number) {
 
             <a-textarea
               v-model="point.data.content"
-              :auto-size="{ minRows: 8 }"
+              :auto-size="{ minRows: 10 }"
               placeholder="请输入这个时间点的人物描述和设定"
             ></a-textarea>
           </a-space>
         </div>
       </a-tab-pane>
     </a-tabs>
-
-    <!-- <div>人物关系</div> -->
 
     <a-modal
       v-model:visible="isDisplayNameDialog"
