@@ -1,9 +1,11 @@
 <script setup lang="ts" name="AppSetting">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import $API from '/@/apis'
 
 const $route = useRoute()
 const $router = useRouter()
+const config = ref({})
 
 const tabList = [
   { title: '常规', name: 'SettingRegular' },
@@ -21,6 +23,9 @@ if (!toTab || tabList.map((t) => t.name).includes(toTab)) {
   toTab = tabList[0].name
 }
 $router.replace({ name: toTab })
+;(async () => {
+  config.value = await $API.Electron.config.getConfig()
+})()
 </script>
 
 <template>
@@ -62,7 +67,7 @@ $router.replace({ name: toTab })
           outer-class="h-full w-full"
           class="h-full overflow-auto p-3"
         >
-          <component :is="Component"></component>
+          <component :is="Component" :config="config"></component>
         </a-scrollbar>
       </router-view>
     </main>
@@ -71,6 +76,7 @@ $router.replace({ name: toTab })
 
 <style lang="scss">
 .app-setting {
+  border: 1px solid rgba(var(--app-theme-rgb), var(--app-border-opacity));
   aside {
     background-color: var(--app-sidebar-bg);
   }

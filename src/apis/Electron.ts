@@ -2,6 +2,18 @@ import type { RouteLocationRaw } from 'vue-router'
 import { ipcInvoke, ipcSend } from '/@/utils/ipc'
 import * as logger from '/@/utils/logger'
 
+export const config = {
+  channel: 'config',
+
+  async getConfig() {
+    return ipcInvoke<string>(this.channel, 'getConfig')
+  },
+
+  async setOption(key: string, value: any) {
+    return ipcInvoke<string>(this.channel, 'setOption', { key, value })
+  }
+}
+
 export const shell = {
   channel: 'shell',
   /**

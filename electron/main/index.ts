@@ -7,6 +7,9 @@ import IpcLoader from './ipc'
 import windowListener from './listeners/windowListener'
 import windowOpenHandler from './listeners/windowOpenHandler'
 import { getVuePageUrl, initPresetWindows } from './services/window'
+import * as AppConfig from './services/config'
+
+AppConfig.init()
 
 // Disable GPU Acceleration for Windows 7
 if (release().startsWith('6.1')) app.disableHardwareAcceleration()
