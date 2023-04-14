@@ -106,12 +106,12 @@ function handleAddSubPage() {
 }
 
 function handlePageClick() {
-  $emit('page-click', props.page)
   if (props.allowCollapse && props.collapseMode === 'line') {
     _collapsed.value = !isCollapsed.value
     $emit('update-collapsed', !isCollapsed.value)
     $emit('update:collapsed', !isCollapsed.value)
   }
+  if (!props.page.isSelected) $emit('page-click', props.page)
 }
 
 function handleCollapseBtnClick() {

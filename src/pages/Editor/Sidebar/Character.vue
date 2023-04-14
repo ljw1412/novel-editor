@@ -1,12 +1,13 @@
 <script setup lang="ts" name="SidebarCharacter">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useEditorStore, useProjectStore } from '/@/stores'
 import CharacterPage from '/@/classes/CharacterPage'
 import EditorSidebar from '../components/Sidebar.vue'
 import CharacterItem from '../components/CharacterItem.vue'
 
 const moduleName = 'character'
+const $route = useRoute()
 const $router = useRouter()
 const projectStore = useProjectStore()
 const editorStore = useEditorStore()
@@ -20,7 +21,7 @@ function clearSelected() {
 }
 
 function handleHeaderBtnClick(action: string) {
-  if (action === 'relationships') {
+  if (action === 'relationships' && $route.name !== 'CharacterRelationships') {
     clearSelected()
     $router.replace({ name: 'CharacterRelationships' })
   }
@@ -84,7 +85,7 @@ function handlePageClick(page: CharacterPage) {
         title="关系图"
         class="text-btn-common h-5 px-1 layout-center rounded cursor-pointer focus-outline"
         :class="{
-          'active text-white': $route.name === 'CharacterRelat    ionships'
+          'active text-white': $route.name === 'CharacterRelationships'
         }"
         tabindex="9"
         @click="handleHeaderBtnClick('relationships')"

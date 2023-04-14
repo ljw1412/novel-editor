@@ -39,8 +39,13 @@ async function handleImageClick(size: 'sprite' | 'avatar') {
     await fs.open()
     if (fs.file.value) {
       cropper.image = URL.createObjectURL(fs.file.value)
-      cropper.options.enlarge = size === 'avatar' ? 1 : 2
-      cropper.options.fixedNumber = size === 'avatar' ? [1, 1] : [3, 4]
+      const fixedNumber = size === 'avatar' ? [1, 1] : [3, 4]
+      cropper.options = {
+        enlarge: size === 'avatar' ? 1 : 2,
+        fixedNumber,
+        autoCropWidth: 200 * fixedNumber[0],
+        autoCropHeight: 200 * fixedNumber[1]
+      }
       cropper.data = { size }
       cropper.callback = handleCropSuccess
       cropper.isDisplay = true
@@ -62,8 +67,12 @@ async function cropperSprite(spritePath?: string) {
   const url = projectStore.getLocalUrl(spritePath)
   cropper.image = url
   cropper.data = { size: 'avatar' }
-  cropper.options.enlarge = 1
-  cropper.options.fixedNumber = [1, 1]
+  cropper.options = {
+    enlarge: 1,
+    fixedNumber: [1, 1],
+    autoCropWidth: 200,
+    autoCropHeight: 200
+  }
   cropper.callback = handleCropSuccess
   cropper.isDisplay = true
 }

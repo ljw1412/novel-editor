@@ -55,7 +55,7 @@ function handlePressEnter() {
 }
 
 function handlePageClick() {
-  $emit('page-click', props.character)
+  if (!props.character.isSelected) $emit('page-click', props.character)
 }
 
 watch(
@@ -85,7 +85,7 @@ watch(
     @click="handlePageClick"
   >
     <div class="avatar w-[50px] flex-shrink-0 layout-center">
-      <a-avatar :size="40" shape="square">
+      <a-avatar :size="40" shape="square" :key="character.avatar">
         <img
           v-if="character.avatar"
           :src="projectStore.getLocalUrl(character.avatar)"

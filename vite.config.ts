@@ -125,6 +125,9 @@ export default defineConfig(({ command }) => {
             if (id.includes('@arco-design/web-vue')) {
               return 'arco-design-vue'
             }
+            if (id.includes('node_modules/d3')) {
+              return 'd3'
+            }
             if (id.includes('node_modules')) {
               return 'vendor'
             }
