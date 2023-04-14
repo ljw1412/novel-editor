@@ -12,6 +12,13 @@ export const shell = {
     return ipcInvoke<string>(this.channel, 'getSeparator')
   },
   /**
+   * 创建桌面快捷方式
+   * @returns
+   */
+  async createAppShortcutLink() {
+    return ipcInvoke<string>(this.channel, 'createAppShortcutLink')
+  },
+  /**
    * 选择文件夹
    * @param options
    * @returns
