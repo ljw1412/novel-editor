@@ -6,8 +6,10 @@ import ContentContainer from '../../components/ContentContainer.vue'
 const $route = useRoute()
 const editorStore = useEditorStore()
 
-function handlePageContentChange() {
-  editorStore.saveWorldPaneData($route.meta.key as string)
+async function save() {
+  editorStore.setState('loading', '保存中…', 0)
+  await editorStore.saveWorldPaneData($route.meta.key as string)
+  editorStore.setState('success', '保存成功')
 }
 </script>
 
@@ -24,7 +26,7 @@ function handlePageContentChange() {
         v-model="page.content"
         :auto-size="{ minRows: 24 }"
         placeholder="请输入内容"
-        @change="handlePageContentChange"
+        @change="save"
       ></a-textarea>
     </template>
   </ContentContainer>

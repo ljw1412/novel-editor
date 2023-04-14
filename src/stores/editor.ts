@@ -18,6 +18,29 @@ interface PaneItem {
   allowAddChild: boolean
 }
 
+const STATUS_DEFAULT_MAP = {
+  loading: {
+    status: 'loading',
+    icon: 'icon-loading',
+    color: 'text-yellow-500'
+  },
+  success: {
+    status: 'success',
+    icon: 'icon-check',
+    color: 'text-green-500'
+  },
+  error: {
+    status: 'error',
+    icon: 'icon-close',
+    color: 'text-red-500'
+  },
+  info: {
+    status: 'info',
+    icon: 'icon-info',
+    color: ''
+  }
+}
+
 export const useEditorStore = defineStore('EditorStore', {
   state: () => ({
     bookshelf: {
@@ -78,6 +101,13 @@ export const useEditorStore = defineStore('EditorStore', {
       route: { name: 'EditorInfo' },
       currentRoute: null as RouteLocationRaw | null,
       data: null as { page: Page; parentPage?: Page } | null
+    },
+    state: {
+      status: '',
+      icon: '',
+      color: '',
+      message: '',
+      timer: null as null | number
     }
   }),
 
@@ -188,6 +218,39 @@ export const useEditorStore = defineStore('EditorStore', {
 
     switchPage(action: Editor.SidebarActions, page: Page, parentPage?: Page) {
       this.getAction(action).data = { page, parentPage }
+    },
+
+    setState(
+      status: keyof typeof STATUS_DEFAULT_MAP,
+      message: string,
+      timeout = 3000
+    ) {
+      if (this.state.timer) {
+        window.clearTimeout(this.state.timer)
+        this.state.timer = null
+      }
+      Object.assign(this.state, { message }, STATUS_DEFAULT_MAP[status])
+      if (timeout > 0) {
+        this.state.timer = window.setTimeout(() => {
+          if (this.state.timer) window.clearTimeout(this.state.timer)
+          // Object.assign(this.state, {
+          //   status: '',
+          //   icon: '',
+          //   color: '',
+          //   message: '',
+          //   timer: null
+          // })
+          this.$patch({
+            state: {
+              status: '',
+              icon: '',
+              color: '',
+              message: '',
+              timer: null
+            }
+          })
+        }, timeout)
+      }
     }
   }
 })

@@ -6,8 +6,10 @@ import ContentContainer from '../../components/ContentContainer.vue'
 const $route = useRoute()
 const editorStore = useEditorStore()
 
-function handlePageContentChange() {
-  editorStore.saveWorldPaneData('timeline')
+async function save() {
+  editorStore.setState('loading', '保存中…', 0)
+  await editorStore.saveWorldPaneData('timeline')
+  editorStore.setState('success', '保存成功')
 }
 </script>
 
@@ -25,7 +27,7 @@ function handlePageContentChange() {
           v-model="page.content"
           :auto-size="{ minRows: 24 }"
           placeholder="请记录这个时间点发生的关键事件"
-          @change="handlePageContentChange"
+          @change="save"
         ></a-textarea>
       </template>
       <a-timeline v-else-if="$route.query.mode === 'root'" class="px-5">
@@ -41,7 +43,7 @@ function handlePageContentChange() {
             v-model="child.content"
             :auto-size="{ minRows: 2 }"
             placeholder="请记录这个时间点发生的关键"
-            @change="handlePageContentChange"
+            @change="save"
           ></a-textarea>
         </a-timeline-item>
       </a-timeline>

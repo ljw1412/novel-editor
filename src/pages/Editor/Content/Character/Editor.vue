@@ -1,30 +1,16 @@
 <script setup lang="ts" name="CharacterEditor">
 import { ref, reactive } from 'vue'
-import { useDebounceFn, useEventListener } from '@vueuse/core'
+import { useEventListener } from '@vueuse/core'
 import { useEditorStore } from '/@/stores'
 import ContentContainer from '../../components/ContentContainer.vue'
 import CharacterTimeline from './components/Timeline.vue'
 
 const editorStore = useEditorStore()
 
-const saveState = ref({ status: '', icon: '', message: '' })
-const clearSaveMsg = useDebounceFn(() => {
-  saveState.value = { status: '', icon: '', message: '' }
-}, 3000)
-
 async function save() {
-  saveState.value = {
-    status: 'saving',
-    icon: 'icon-loading',
-    message: '保存中…'
-  }
+  editorStore.setState('loading', '保存中…', 0)
   await editorStore.saveActionData('character')
-  saveState.value = {
-    status: 'success',
-    icon: 'icon-check',
-    message: '保存成功'
-  }
-  clearSaveMsg()
+  editorStore.setState('success', '保存成功')
 }
 
 useEventListener('keydown', (e) => {
@@ -40,18 +26,6 @@ useEventListener('keydown', (e) => {
 
 <template>
   <ContentContainer class="character-editor">
-    <template #extra>
-      <div
-        v-if="saveState.status"
-        :class="{
-          'text-red-500': saveState.status === 'error',
-          'text-green-500': saveState.status === 'success'
-        }"
-      >
-        <component v-if="saveState.icon" :is="saveState.icon" />
-        <span class="ml-2">{{ saveState.message }}</span>
-      </div>
-    </template>
     <template #default="{ page }">
       <a-space direction="vertical" fill class="pt-4">
         <a-input v-model="page.title" placeholder="姓名" class="name-input" />

@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import { useEditorStore } from '/@/stores'
 import Page from '/@/classes/Page'
 import CharacterPage from '/@/classes/CharacterPage'
+import EditorState from './EditorState.vue'
 
 type MixedPage = Page & CharacterPage
 
@@ -40,6 +41,7 @@ const breadcrumbData = computed(() => {
           {{ item }}
         </a-breadcrumb-item>
       </a-breadcrumb>
+      <EditorState></EditorState>
       <slot name="extra"></slot>
     </header>
     <a-scrollbar
