@@ -84,16 +84,20 @@ const $route = useRoute()
       }
     }
 
-    .btn-add,
-    .btn-collapse {
-      opacity: 0;
+    .arco-collapse-item-header-extra {
+      .btn-add,
+      .btn-collapse {
+        opacity: 0;
+      }
     }
 
     &:hover,
     &:focus-within {
-      .btn-add,
-      .btn-collapse {
-        opacity: 1;
+      .arco-collapse-item-header-extra {
+        .btn-add,
+        .btn-collapse {
+          opacity: 1;
+        }
       }
 
       .editor-page-item {
