@@ -219,7 +219,7 @@ watch(
       ref="pageItemEl"
       class="page-item h-6 pr-2 cursor-pointer flex items-center"
       :class="pageItemClass"
-      :tabindex="page.isSelected ? 0 : -1"
+      :tabindex="page.isSelected ? 10 : -1"
       @contextmenu="showContextmenu"
       @click="handlePageClick"
     >

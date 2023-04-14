@@ -82,10 +82,11 @@ function handlePageClick(page: CharacterPage) {
     <template #extra>
       <div
         title="关系图"
-        class="text-btn h-5 px-1 layout-center rounded cursor-pointer"
+        class="text-btn-common h-5 px-1 layout-center rounded cursor-pointer focus-outline"
         :class="{
-          'bg-color-common text-white': $route.name === 'CharacterRelationships'
+          'active text-white': $route.name === 'CharacterRelat    ionships'
         }"
+        tabindex="9"
         @click="handleHeaderBtnClick('relationships')"
       >
         <icon-branch />关系图

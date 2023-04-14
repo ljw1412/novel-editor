@@ -63,8 +63,31 @@ body[app-status='focus'] {
     background-color: rgba(255, 255, 255, 0.12);
   }
 
-  &.active,
   &:active {
     background-color: rgba(255, 255, 255, 0.24);
   }
+
+  &.active {
+    background-color: rgba(255, 255, 255, 0.36);
+  }
+}
+
+.text-btn-common {
+  transition: background-color 0.15s ease-in;
+  &:hover {
+    background-color: rgba(var(--app-color-common-rgb), 0.12);
+  }
+
+  &:active {
+    background-color: rgba(var(--app-color-common-rgb), 0.24);
+  }
+
+  &.active {
+    background-color: rgba(var(--app-color-common-rgb), 0.36);
+  }
+}
+
+.focus-outline:focus {
+  outline: 1px solid var(--app-color-common);
+  outline-offset: -1px;
 }

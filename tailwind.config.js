@@ -79,12 +79,23 @@ module.exports = {
         'color-2': 'var(--color-bg-2)',
         'color-3': 'var(--color-bg-3)',
         'color-4': 'var(--color-bg-4)',
-        'color-theme': 'rgba(var(--app-theme-rgb), var(--tw-bg-opacity))',
-        'color-common':
-          'rgba(var(--app-color-common-rgb), var(--tw-bg-opacity))',
+        'color-theme': opacityColor('var(--app-theme-rgb)'),
+        'color-common': opacityColor('var(--app-color-common-rgb)'),
         'color-app': 'var(--app-color-bg)'
       }
     }
   },
   plugins: []
+}
+
+function opacityColor(rgb: string) {
+  return ({ opacityVariable, opacityValue }) => {
+    if (opacityValue !== undefined) {
+      return `rgba(${rgb}, ${opacityValue})`
+    }
+    if (opacityVariable !== undefined) {
+      return `rgba(${rgb}, var(${opacityVariable}, 1))`
+    }
+    return `rgb(${rgb})`
+  }
 }

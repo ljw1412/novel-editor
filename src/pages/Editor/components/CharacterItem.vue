@@ -81,7 +81,7 @@ watch(
       focus: isItemFocus,
       'context-menu': isContextMenu
     }"
-    :tabindex="character.isSelected ? 0 : -1"
+    :tabindex="character.isSelected ? 10 : -1"
     @click="handlePageClick"
   >
     <div class="avatar w-[50px] flex-shrink-0 layout-center">
