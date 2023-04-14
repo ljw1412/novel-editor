@@ -1,5 +1,6 @@
 <script setup lang="ts" name="WorldTimeline">
 import { useRoute } from 'vue-router'
+import { useEventListener } from '@vueuse/core'
 import { useEditorStore } from '/@/stores'
 import ContentContainer from '../../components/ContentContainer.vue'
 
@@ -11,6 +12,16 @@ async function save() {
   await editorStore.saveWorldPaneData('timeline')
   editorStore.setState('success', '保存成功')
 }
+
+useEventListener('keydown', (e) => {
+  const keyCode = e.keyCode || e.which || e.charCode
+  const ctrlKey = e.ctrlKey || e.metaKey
+  if (ctrlKey && keyCode == 83) {
+    e.preventDefault()
+    save()
+  }
+  return false
+})
 </script>
 
 <template>

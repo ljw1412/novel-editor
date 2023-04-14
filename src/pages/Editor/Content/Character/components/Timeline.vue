@@ -126,14 +126,14 @@ function removeTimeline(key: string | number) {
       show-add-button
       lazy-load
       type="card"
-      size="large"
+      size="medium"
       @add="showInputDialog"
       @delete="removeTimeline"
     >
       <template #extra>
-        <a-button size="mini" title="排序">
+        <!-- <a-button size="mini" type="outline" title="排序">
           <template #icon><icon-sort /></template>
-        </a-button>
+        </a-button> -->
       </template>
       <a-tab-pane
         v-for="(point, index) of timelineList"
@@ -213,4 +213,21 @@ function removeTimeline(key: string | number) {
   </div>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+.character-timeline {
+  .arco-tabs-nav-type-card {
+    .arco-tabs-tab:hover {
+      background-color: rgba(var(--primary-6), 0.15);
+    }
+
+    .arco-tabs-tab-active,
+    .arco-tabs-tab-active:hover {
+      background-color: rgba(var(--primary-6), 0.02);
+      border-bottom-color: var(--app-color-bg);
+    }
+  }
+  .arco-tabs-content {
+    background-color: rgba(var(--primary-6), 0.02);
+  }
+}
+</style>
