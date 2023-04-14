@@ -13,7 +13,6 @@ const $route = useRoute()
     >
       <section>{{ $route.meta.title }}</section>
       <a-space size="mini">
-        <slot name="extra"></slot>
         <div
           v-if="showAddBtn"
           class="text-btn w-5 h-5 layout-center rounded cursor-pointer"
@@ -22,6 +21,7 @@ const $route = useRoute()
         >
           <icon-plus />
         </div>
+        <slot name="extra"></slot>
       </a-space>
     </header>
     <section class="sidebar-content flex-grow h-0">
@@ -84,13 +84,15 @@ const $route = useRoute()
       }
     }
 
-    .btn-add {
+    .btn-add,
+    .btn-collapse {
       opacity: 0;
     }
 
     &:hover,
     &:focus-within {
-      .btn-add {
+      .btn-add,
+      .btn-collapse {
         opacity: 1;
       }
 

@@ -24,6 +24,10 @@ function handeCollapseChange([activeKey]: (string | number)[]) {
   configStore.sidebar['tab.world'] = activeKey as string
 }
 
+function collapseAll() {
+  allPageList.value.forEach((page) => (page.isCollapsed = true))
+}
+
 function addPage(key: string, list: Page[]) {
   activeKey.value = [key]
   isAdding.value = true
@@ -102,15 +106,26 @@ function handlePageClick(page: Page, parentPage?: Page) {
           :disabled="isAdding"
         >
           <template #extra>
-            <div
-              v-if="item.allowAdd"
-              v-show="!isAdding"
-              :title="`添加${item.title}`"
-              class="btn-add text-btn w-5 h-5 layout-center rounded cursor-pointer"
-              @click.stop="addPage(item.key, item.list)"
-            >
-              <icon-plus />
-            </div>
+            <a-space size="mini" fill>
+              <div
+                v-if="item.allowAdd"
+                v-show="!isAdding"
+                :title="`添加${item.title}`"
+                class="btn-add text-btn w-5 h-5 layout-center rounded cursor-pointer"
+                @click.stop="addPage(item.key, item.list)"
+              >
+                <icon-plus />
+              </div>
+              <div
+                v-if="item.allowAddChild"
+                v-show="!isAdding"
+                class="btn-collapse text-btn w-5 h-5 layout-center rounded cursor-pointer"
+                title="折叠全部"
+                @click.stop="collapseAll"
+              >
+                <icon-folder-delete :size="16" />
+              </div>
+            </a-space>
           </template>
           <a-scrollbar outer-class="h-full" class="h-full overflow-auto">
             <PageItem
@@ -122,6 +137,7 @@ function handlePageClick(page: Page, parentPage?: Page) {
               :allow-add-child="item.allowAddChild"
               :allow-collapse="item.key === 'timeline'"
               collapse-mode="button"
+              v-model:collapsed="page.isCollapsed"
               @text-change="handlePageTextChange(page, item.list)"
               @cancel="handlePageCancel(page, item.list)"
               @add-child="addPage(item.key, page.children)"
@@ -154,6 +170,7 @@ function handlePageClick(page: Page, parentPage?: Page) {
 <style lang="scss">
 .sidebar-world {
   &:hover {
+    // 同族的引导线
     .page-item-wrap .children::before {
       opacity: 0.1;
     }

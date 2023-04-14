@@ -36,7 +36,8 @@ const $emit = defineEmits([
   'cancel',
   'add-child',
   'delete',
-  'update-collapsed'
+  'update-collapsed',
+  'update:collapsed'
 ])
 const pageItemEl = ref<HTMLElement>()
 const _collapsed = ref(props.allowCollapse && props.defaultCollapsed)
@@ -100,6 +101,7 @@ function handlePressEnter() {
 function handleAddSubPage() {
   _collapsed.value = false
   $emit('update-collapsed', false)
+  $emit('update:collapsed', false)
   $emit('add-child', props.page)
 }
 
@@ -108,6 +110,7 @@ function handlePageClick() {
   if (props.allowCollapse && props.collapseMode === 'line') {
     _collapsed.value = !isCollapsed.value
     $emit('update-collapsed', !isCollapsed.value)
+    $emit('update:collapsed', !isCollapsed.value)
   }
 }
 
@@ -115,6 +118,7 @@ function handleCollapseBtnClick() {
   if (props.allowCollapse && props.collapseMode === 'button') {
     _collapsed.value = !isCollapsed.value
     $emit('update-collapsed', !isCollapsed.value)
+    $emit('update:collapsed', !isCollapsed.value)
   }
 }
 
