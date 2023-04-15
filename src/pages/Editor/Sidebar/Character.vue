@@ -1,5 +1,5 @@
 <script setup lang="ts" name="SidebarCharacter">
-import { ref } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useEditorStore, useProjectStore } from '/@/stores'
 import CharacterPage from '/@/classes/CharacterPage'
@@ -11,11 +11,24 @@ const $route = useRoute()
 const $router = useRouter()
 const projectStore = useProjectStore()
 const editorStore = useEditorStore()
-const characterList = editorStore.character.list
+const characterList = computed({
+  get: () => editorStore.character.list,
+  set(value) {
+    editorStore.$patch({ character: { list: value } })
+    save()
+  }
+})
 const isAdding = ref(false)
+const isDrag = ref(false)
+
+async function save() {
+  editorStore.setState('loading', '保存中…', 0)
+  await editorStore.saveActionData('character')
+  editorStore.setState('success', '保存成功')
+}
 
 function clearSelected() {
-  characterList.forEach((page) => {
+  characterList.value.forEach((page) => {
     page.isSelected = false
   })
 }
@@ -32,13 +45,13 @@ function addCharacter() {
   const page = new CharacterPage()
   page.action = moduleName
   page.isEdit = true
-  characterList.push(page)
+  characterList.value.push(page)
 }
 
 async function handlePageTextChange(page: CharacterPage) {
   if (isAdding.value) {
     if (!page.title.trim()) {
-      characterList.pop()
+      characterList.value.pop()
     } else {
       await editorStore.saveActionData(moduleName)
       handlePageClick(page)
@@ -53,14 +66,14 @@ async function handlePageTextChange(page: CharacterPage) {
 
 function handlePageCancel(page: CharacterPage) {
   if (isAdding.value) {
-    characterList.pop()
+    characterList.value.pop()
     isAdding.value = false
   }
 }
 
 function handlePageDelete(page: CharacterPage) {
-  const index = characterList.indexOf(page)
-  if (~index) characterList.splice(index, 1)
+  const index = characterList.value.indexOf(page)
+  if (~index) characterList.value.splice(index, 1)
   // TODO: 人物关系的删除
   editorStore.saveActionData(moduleName)
   if (page.isSelected) {
@@ -76,6 +89,21 @@ function handlePageClick(page: CharacterPage) {
   const route = { name: `CharacterEditor`, query: { id: page.id } }
   $router.replace(route)
   editorStore.character.route = route
+}
+
+function handleDragStart(e: Event & { item: HTMLElement }) {
+  isDrag.value = true
+  nextTick(() => {
+    e.item.classList.add('ghost')
+  })
+}
+
+function handleDragMove(e: Event & { dragged: HTMLElement }) {
+  console.log(e)
+
+  setTimeout(() => {
+    e.dragged.classList.add('ghost')
+  }, 0)
 }
 </script>
 
@@ -94,16 +122,27 @@ function handlePageClick(page: CharacterPage) {
         <icon-branch />关系图
       </div>
     </template>
-    <div class="sidebar-character">
-      <CharacterItem
-        v-for="character of characterList"
-        :character="character"
-        @text-change="handlePageTextChange"
-        @cancel="handlePageCancel"
-        @page-click="handlePageClick"
-        @delete="handlePageDelete"
-      ></CharacterItem>
-    </div>
+
+    <draggable
+      v-model="characterList"
+      item-key="id"
+      group="character"
+      class="sidebar-character"
+      @start="handleDragStart"
+      @move="handleDragMove"
+      @end="isDrag = false"
+    >
+      <template #item="{ element: character }">
+        <CharacterItem
+          :character="character"
+          :class="{ dragging: isDrag }"
+          @text-change="handlePageTextChange"
+          @cancel="handlePageCancel"
+          @page-click="handlePageClick"
+          @delete="handlePageDelete"
+        ></CharacterItem>
+      </template>
+    </draggable>
   </EditorSidebar>
 </template>
 

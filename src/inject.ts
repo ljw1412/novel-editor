@@ -17,6 +17,7 @@ export default {
     app.use(ArcoVue).use(ArcoVueIcon)
     Notification._context = app._context
     Modal._context = app._context
+
     // 自定义全局组件
     components.forEach((component) => {
       app.component(component.name, component)

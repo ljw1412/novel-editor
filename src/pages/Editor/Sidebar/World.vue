@@ -1,5 +1,5 @@
 <script setup lang="ts" name="SidebarWorld">
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useProjectStore, useEditorStore, useConfigStore } from '/@/stores'
 import Page from '/@/classes/Page'
@@ -13,6 +13,8 @@ const projectStore = useProjectStore()
 const editorStore = useEditorStore()
 
 const isAdding = ref(false)
+const isDrag = ref(false)
+const isChildDrag = ref(false)
 const activeKey = ref([configStore.sidebar['tab.world'] || 'summary'])
 const paneList = editorStore.worldPaneList
 const allPageList = computed(() => {
@@ -26,6 +28,12 @@ function handeCollapseChange([activeKey]: (string | number)[]) {
 
 function collapseAll() {
   allPageList.value.forEach((page) => (page.isCollapsed = true))
+}
+
+async function save(action: string) {
+  editorStore.setState('loading', '保存中…', 0)
+  await editorStore.saveWorldPaneData(action)
+  editorStore.setState('success', '保存成功')
 }
 
 function addPage(key: string, list: Page[]) {
@@ -46,12 +54,12 @@ async function handlePageTextChange(
     if (!page.title.trim()) {
       list.pop()
     } else {
-      await editorStore.saveWorldPaneData(page.action)
+      await save(page.action)
       handlePageClick(page)
     }
     isAdding.value = false
   } else {
-    await editorStore.saveWorldPaneData(page.action)
+    await save(page.action)
     handlePageClick(page, parentPage)
   }
   page.isEdit = false
@@ -67,7 +75,7 @@ function handlePageCancel(page: Page, list: Page[]) {
 function handlePageDelete(page: Page, list: Page[]) {
   const index = list.indexOf(page)
   if (~index) list.splice(index, 1)
-  editorStore.saveWorldPaneData(page.action)
+  save(page.action)
   if (page.isSelected) {
     $router.replace({ name: 'EditorWorld' })
   }
@@ -86,6 +94,18 @@ function handlePageClick(page: Page, parentPage?: Page) {
   }
   $router.replace(route)
   editorStore.world.route = route
+}
+
+function handleDragStart(e: Event & { item: HTMLElement }) {
+  isDrag.value = true
+  console.log(e)
+  nextTick(() => {
+    e.item.classList.add('ghost')
+  })
+}
+
+function handleDragChange() {
+  if (activeKey.value[0]) save(activeKey.value[0])
 }
 </script>
 
@@ -128,38 +148,67 @@ function handlePageClick(page: Page, parentPage?: Page) {
             </a-space>
           </template>
           <a-scrollbar outer-class="h-full" class="h-full overflow-auto">
-            <PageItem
-              v-for="page of item.list"
-              :page="page"
-              :is-edit="page.isEdit"
-              :is-adding="isAdding"
-              :placeholder="item.placeholder"
-              :allow-add-child="item.allowAddChild"
-              :allow-collapse="item.key === 'timeline'"
-              collapse-mode="button"
-              v-model:collapsed="page.isCollapsed"
-              @text-change="handlePageTextChange(page, item.list)"
-              @cancel="handlePageCancel(page, item.list)"
-              @add-child="addPage(item.key, page.children)"
-              @page-click="handlePageClick(page)"
-              @delete="handlePageDelete(page, item.list)"
+            <draggable
+              v-model="item.list"
+              item-key="id"
+              group="year-group"
+              handle=".page-item"
+              filter=".children"
+              :disabled="item.key === 'summary'"
+              @start="handleDragStart"
+              @end="isDrag = false"
+              @change="handleDragChange"
             >
-              <template #children>
+              <template #item="{ element: page }">
                 <PageItem
-                  v-for="sPage of page.children"
-                  :page="sPage"
-                  :placeholder="item.childPlaceholder"
-                  :is-edit="sPage.isEdit"
-                  is-child
-                  @text-change="
-                    handlePageTextChange(sPage, page.children, page)
-                  "
-                  @cancel="handlePageCancel(sPage, page.children)"
-                  @page-click="handlePageClick(sPage, page)"
-                  @delete="handlePageDelete(sPage, page.children)"
-                ></PageItem>
+                  :page="page"
+                  :is-edit="page.isEdit"
+                  :is-adding="isAdding"
+                  :placeholder="item.placeholder"
+                  :allow-add-child="item.allowAddChild"
+                  :allow-collapse="item.key === 'timeline'"
+                  collapse-mode="button"
+                  :collapsed="isDrag || page.isCollapsed"
+                  :parent-class="{ dragging: isDrag }"
+                  @text-change="handlePageTextChange(page, item.list)"
+                  @cancel="handlePageCancel(page, item.list)"
+                  @add-child="addPage(item.key, page.children)"
+                  @page-click="handlePageClick(page)"
+                  @delete="handlePageDelete(page, item.list)"
+                  @update-collapsed="page.isCollapsed = $event"
+                >
+                  <template #children>
+                    <draggable
+                      v-model="page.children"
+                      item-key="id"
+                      group="year"
+                      ghost-class="ghost"
+                      handle=".page-item"
+                      filter=".children"
+                      @start="isChildDrag = true"
+                      @end="isChildDrag = false"
+                      @change="handleDragChange"
+                    >
+                      <template #item="{ element: sPage }">
+                        <PageItem
+                          is-child
+                          :page="sPage"
+                          :placeholder="item.childPlaceholder"
+                          :is-edit="sPage.isEdit"
+                          :parent-class="{ dragging: isChildDrag }"
+                          @text-change="
+                            handlePageTextChange(sPage, page.children, page)
+                          "
+                          @cancel="handlePageCancel(sPage, page.children)"
+                          @page-click="handlePageClick(sPage, page)"
+                          @delete="handlePageDelete(sPage, page.children)"
+                        ></PageItem>
+                      </template>
+                    </draggable>
+                  </template>
+                </PageItem>
               </template>
-            </PageItem>
+            </draggable>
           </a-scrollbar>
         </a-collapse-item>
       </a-collapse>

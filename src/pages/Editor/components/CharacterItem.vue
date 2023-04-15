@@ -169,23 +169,29 @@ watch(
 <style lang="scss">
 .character-item {
   line-height: 20px;
+  &:not(.dragging) {
+    &:hover {
+      background-color: rgba(var(--app-color-common-rgb), 0.06);
+    }
 
-  &:hover {
-    background-color: rgba(var(--app-color-common-rgb), 0.06);
+    &:focus,
+    &.context-menu {
+      outline: 1px solid var(--app-color-common);
+      outline-offset: -1px;
+    }
+
+    &:active {
+      background-color: rgba(var(--app-color-common-rgb), 0.12);
+    }
+
+    &.active {
+      background-color: rgba(var(--app-color-common-rgb), 0.36);
+    }
   }
 
-  &:focus,
-  &.context-menu {
+  &.ghost {
     outline: 1px solid var(--app-color-common);
     outline-offset: -1px;
-  }
-
-  &:active {
-    background-color: rgba(var(--app-color-common-rgb), 0.12);
-  }
-
-  &.active {
-    background-color: rgba(var(--app-color-common-rgb), 0.36);
   }
 
   .name {

@@ -28,7 +28,9 @@ const props = defineProps({
   // 编辑时的输入框占位符
   placeholder: String,
   // 页面数据
-  page: { type: Object as PropType<Page>, default: () => ({}) }
+  page: { type: Object as PropType<Page>, default: () => ({}) },
+  // 父节点的类
+  parentClass: [String, Object]
 })
 const $emit = defineEmits([
   'page-click',
@@ -53,6 +55,7 @@ const isChildSelected = computed(() => {
 })
 const pageItemClass = computed(() => {
   const classList: (string | Record<string, boolean>)[] = [
+    props.parentClass || {},
     {
       active: props.page.isSelected,
       focus: isItemFocus.value,
@@ -276,7 +279,7 @@ watch(
 
 <style lang="scss">
 .page-item-wrap {
-  .page-item {
+  .page-item:not(.dragging) {
     transition: background-color 0.15s, outline 0.15s;
 
     &:hover {
@@ -295,6 +298,13 @@ watch(
 
     &.active {
       background-color: rgba(var(--app-color-common-rgb), 0.36);
+    }
+  }
+
+  &.ghost {
+    .page-item {
+      outline: 1px solid var(--app-color-common);
+      outline-offset: -1px;
     }
   }
 
