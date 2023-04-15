@@ -30,23 +30,37 @@ const characterList = useEditorStore().character.list
 const links: { source: string; target: string; [K: string]: any }[] = []
 const nodes: Record<string, any> = {}
 const characterIds = characterList.map((item) => item.id)
+// 获取双向关系的角色对
+const a2bMap = characterList
+  .map((character) =>
+    character.relations.map((item) => [
+      character.id + '-' + item.target,
+      item.target + '-' + character.id
+    ])
+  )
+  .flat(2)
+  .reduce((obj, item) => {
+    obj[item] ?? (obj[item] = -1)
+    obj[item]++
+    return obj
+  }, {})
+
 characterList.forEach((character) => {
   nodes[character.id] = only(character, 'id avatar title timepoint')
-
   character.relations.forEach((item) => {
-    console.log(item.target, characterIds.includes(item.target))
-
     if (!item.target || !characterIds.includes(item.target)) return
+    const type = a2bMap[character.id + '-' + item.target]
+    a2bMap[item.target + '-' + character.id]++
     links.push({
       source: character.id,
       target: item.target,
-      type: 1,
+      type,
       relation: item.relation
     })
   })
 })
+console.log(a2bMap)
 
-//! https://blog.csdn.net/qq_39408204/article/details/103799835
 function draw() {
   const svg = select('#character-relationships')
     .attr('viewBox', [-400, -400, 800, 800])
@@ -66,12 +80,32 @@ function draw() {
   function ticked() {
     link
       .attr('x1', (d) => d.source.x)
-      .attr('y1', (d) => d.source.y)
+      .attr('y1', (d) => {
+        if (d.type === 1) return d.source.y + 20
+        if (d.type === 2) return d.source.y - 20
+        return d.source.y
+      })
       .attr('x2', (d) => d.target.x)
-      .attr('y2', (d) => d.target.y)
+      .attr('y2', (d) => {
+        if (d.type === 1) return d.target.y + 20
+        if (d.type === 2) return d.target.y - 20
+        return d.target.y
+      })
     edges_text
-      .attr('x', (d) => (d.source.x + d.target.x) / 2)
-      .attr('y', (d) => (d.target.y + d.source.y) / 2)
+      .attr('x', (d) => {
+        return (d.source.x + d.target.x) / 2
+      })
+      .attr('y', (d) => {
+        if (d.type === 1) return (d.target.y + d.source.y + 40) / 2
+        if (d.type === 2) return (d.target.y + d.source.y - 40) / 2
+        return (d.target.y + d.source.y) / 2
+      })
+      .attr('style', (d) => {
+        const angle =
+          (Math.atan2(d.source.y - d.target.y, d.source.x - d.target.x) * 180) /
+          Math.PI
+        return `transform: rotate(${angle}deg);transform-origin: center;transform-box: fill-box;`
+      })
     node.attr('cx', (d) => d.x).attr('cy', (d) => d.y)
     text.attr('x', (d) => d.x).attr('y', (d) => d.y)
     image.attr('transform', (d) => `translate(${d.x},${d.y})`)
@@ -110,7 +144,7 @@ function draw() {
     //.attr("markerUnits","strokeWidth")//设置为strokeWidth箭头会随着线的粗细发生变化
     .attr('markerUnits', 'userSpaceOnUse')
     .attr('viewBox', '0 -5 10 10') //坐标系的区域
-    .attr('refX', 59) //箭头坐标
+    .attr('refX', 80) //箭头坐标
     .attr('refY', 0)
     .attr('markerWidth', 8) //标识的大小
     .attr('markerHeight', 8)
@@ -118,17 +152,28 @@ function draw() {
     .attr('stroke-width', 2) //箭头宽度
     .append('path')
     .attr('d', 'M0,-5L10,0L0,5') //箭头的路径
-    .attr('fill', '#999') //箭头颜色
+    .attr('fill', 'var(--marker-color, #999)') //箭头颜色
 
   const link = svg
     .append('g')
-    .attr('stroke', '#999')
+    // .attr('stroke', '#999')
+
     .attr('stroke-opacity', 0.6)
     .attr('stroke-width', 1.5)
     .attr('stroke-linecap', 'round')
     .selectAll('line')
     .data(links)
     .join('line')
+    .attr('stroke', ({ type }) => {
+      if (type === 1) return 'orange'
+      if (type === 2) return 'green'
+      return '#999'
+    })
+    .style('--marker-color', ({ type }) => {
+      if (type === 1) return 'orange'
+      if (type === 2) return 'green'
+      return '#999'
+    })
     .attr('marker-end', function (d) {
       return 'url(#arrow)'
     })
@@ -209,11 +254,15 @@ function draw() {
     .selectAll('.edgelabel')
     .data(links)
     .join('text')
-    .attr('fill', (node) => 'var(--app-color-text)')
+    .attr('fill', ({ type }) => {
+      if (type === 1) return 'orange'
+      if (type === 2) return 'green'
+      return 'var(--app-color-text)'
+    })
     .attr('class', 'edgelabel')
     .attr('id', (node, i) => 'edgepath' + i)
-    .attr('dx', -14)
-    .attr('dy', 14)
+    .attr('dx', (node) => `-${node.relation.length / 2}em`)
+    .attr('dy', '0.5em')
     .style('pointer-events', 'none')
     .text((node) => node.relation)
 }
