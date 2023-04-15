@@ -23,7 +23,7 @@ export interface CharacterExtraData {
 
 export interface CharacterTimeline {
   // 绑定的时间点id
-  bind: string
+  targetId: string
   data: CharacterExtraData
 }
 

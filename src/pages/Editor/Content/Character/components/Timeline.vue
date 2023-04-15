@@ -6,7 +6,6 @@ import { useEditorStore } from '/@/stores'
 import ExtraInfo from './ExtraInfo.vue'
 import CharacterFgimage from './Fgimage.vue'
 import CharacterRelations from './Relations.vue'
-import { time } from 'console'
 
 const props = defineProps({
   character: { type: Object as PropType<CharacterPage>, default: () => ({}) }
@@ -22,15 +21,15 @@ type MixedTimelineItem = CharacterTimeline & {
 const timeline = computed(() => props.character.timeline || [])
 const defaultTimepoint = computed(() => ({
   name: '初登场',
-  bind: '',
+  targetId: '',
   default: true,
   data: props.character
 }))
 const timelineList = computed<MixedTimelineItem[]>(() => [
   defaultTimepoint.value,
-  ...(timeline.value || []).map((item) => ({
-    ...item,
-    name: getTimePonitName(item.bind)
+  ...timeline.value.map((item) => ({
+    name: getTimePonitName(item.targetId),
+    ...item
   }))
 ])
 
@@ -54,7 +53,7 @@ const treeData = computed(() => {
           markerTitle: title + marker,
           disabled:
             key === props.character.timepoint ||
-            timeline.value.some((item) => item.bind === key)
+            timeline.value.some((item) => item.targetId === key)
         }
       })
     }
@@ -72,10 +71,9 @@ function showInputDialog() {
   isDisplayNameDialog.value = true
 }
 
-function createTimePoint(name: string, bind: string) {
+function createTimePoint(targetId: string) {
   return {
-    name,
-    bind,
+    targetId,
     data: {
       content: '',
       image: '',
@@ -97,7 +95,7 @@ function addTimeline() {
   const { label, value } = timePointName.value
   const name = label.trim()
   if (value) {
-    if (timeline.value.some((item) => item.bind === value)) {
+    if (timeline.value.some((item) => item.targetId === value)) {
       Notification.warning({
         title: `无法添加时间点“${name}”`,
         content: '已经存在同名的时间点',
@@ -107,24 +105,25 @@ function addTimeline() {
       })
       return false
     }
-    const timepoint = createTimePoint(name, value)
+    const timepoint = createTimePoint(value)
     timeline.value.push(timepoint)
-    tab.value = timepoint.bind
+    tab.value = timepoint.targetId
     return true
   }
   return false
 }
 
 function removeTimeline(key: string | number) {
-  const timepoint = timeline.value.find((item) => item.bind === key)
+  const timepoint = timeline.value.find((item) => item.targetId === key)
   if (timepoint) {
     Modal.confirm({
       title: '删除时间点',
-      content: `确认删除时间点“${getTimePonitName(timepoint.bind)}”吗？`,
+      content: `确认删除时间点“${getTimePonitName(timepoint.targetId)}”吗？`,
       modalStyle: { 'text-align': 'center' },
       onOk: () => {
         const index = timeline.value.indexOf(timepoint)
         if (~index) timeline.value.splice(index, 1)
+        if (tab.value === timepoint.targetId) tab.value = ''
       }
     })
   }
@@ -150,7 +149,7 @@ function removeTimeline(key: string | number) {
       </template>
       <a-tab-pane
         v-for="(point, index) of timelineList"
-        :key="point.bind"
+        :key="point.targetId"
         :title="point.name"
         :closable="!point.default"
       >
@@ -159,8 +158,8 @@ function removeTimeline(key: string | number) {
             <CharacterFgimage
               :data="point.data"
               :title="
-                point.bind
-                  ? `${character.title}_${point.bind}`
+                point.targetId
+                  ? `${character.title}_${point.targetId}`
                   : character.title
               "
               @change="$emit('item-image-change')"
