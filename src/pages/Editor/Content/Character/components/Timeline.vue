@@ -6,6 +6,7 @@ import { useEditorStore } from '/@/stores'
 import ExtraInfo from './ExtraInfo.vue'
 import CharacterFgimage from './Fgimage.vue'
 import CharacterRelations from './Relations.vue'
+import { time } from 'console'
 
 const props = defineProps({
   character: { type: Object as PropType<CharacterPage>, default: () => ({}) }
@@ -13,6 +14,7 @@ const props = defineProps({
 const $emit = defineEmits(['item-image-change', 'item-image-removed'])
 
 type MixedTimelineItem = CharacterTimeline & {
+  name: string
   default?: boolean
   data: { timepoint?: string }
 }
@@ -26,7 +28,10 @@ const defaultTimepoint = computed(() => ({
 }))
 const timelineList = computed<MixedTimelineItem[]>(() => [
   defaultTimepoint.value,
-  ...(timeline.value || [])
+  ...(timeline.value || []).map((item) => ({
+    ...item,
+    name: getTimePonitName(item.bind)
+  }))
 ])
 
 const editorStore = useEditorStore()
@@ -35,39 +40,42 @@ const treeData = computed(() => {
   const { name } = defaultTimepoint.value
   return worldTimeline.map((item) => {
     return {
-      key: item.title,
+      key: item.id,
       title: item.title,
       markerTitle: item.title,
       disabled: true,
       children: item.children.map((child) => {
-        const key = item.title + child.title
+        const key = child.id
         const title = item.title + child.title
         const marker = props.character.timepoint === key ? `(${name})` : ''
         return {
           key,
           title,
           markerTitle: title + marker,
-          disabled: timeline.value.some(
-            (item) => item.bind === key || key === props.character.timepoint
-          )
+          disabled:
+            key === props.character.timepoint ||
+            timeline.value.some((item) => item.bind === key)
         }
       })
     }
   })
 })
+const allTimePoint = computed(() =>
+  treeData.value.map((item) => item.children).flat()
+)
 const tab = ref('')
 const isDisplayNameDialog = ref(false)
-const timePointName = ref('')
+const timePointName = ref({ label: '', value: '' })
 
 function showInputDialog() {
-  timePointName.value = ''
+  timePointName.value = { label: '', value: '' }
   isDisplayNameDialog.value = true
 }
 
-function createTimePoint(name: string) {
+function createTimePoint(name: string, bind: string) {
   return {
     name,
-    bind: name,
+    bind,
     data: {
       content: '',
       image: '',
@@ -79,12 +87,17 @@ function createTimePoint(name: string) {
   }
 }
 
-function addTimeline() {
-  const name = timePointName.value.trim()
-  console.log(name)
+function getTimePonitName(id: string) {
+  const timepoint = allTimePoint.value.find((item) => item.key === id)
+  if (timepoint) return timepoint.title
+  return '(已删除)'
+}
 
-  if (name) {
-    if (timeline.value.some((item) => item.name === name)) {
+function addTimeline() {
+  const { label, value } = timePointName.value
+  const name = label.trim()
+  if (value) {
+    if (timeline.value.some((item) => item.bind === value)) {
       Notification.warning({
         title: `无法添加时间点“${name}”`,
         content: '已经存在同名的时间点',
@@ -94,7 +107,7 @@ function addTimeline() {
       })
       return false
     }
-    const timepoint = createTimePoint(name)
+    const timepoint = createTimePoint(name, value)
     timeline.value.push(timepoint)
     tab.value = timepoint.bind
     return true
@@ -107,7 +120,7 @@ function removeTimeline(key: string | number) {
   if (timepoint) {
     Modal.confirm({
       title: '删除时间点',
-      content: `确认删除时间点“${timepoint.name}”吗？`,
+      content: `确认删除时间点“${getTimePonitName(timepoint.bind)}”吗？`,
       modalStyle: { 'text-align': 'center' },
       onOk: () => {
         const index = timeline.value.indexOf(timepoint)
@@ -200,13 +213,14 @@ function removeTimeline(key: string | number) {
       simple
       title="创建时间点"
       width="400px"
-      :ok-button-props="{ disabled: !timePointName.trim() }"
+      :ok-button-props="{ disabled: !timePointName.value.trim() }"
       :on-before-ok="addTimeline"
     >
       <a-tree-select
         v-model="timePointName"
         :data="treeData"
         :field-names="{ title: 'markerTitle' }"
+        label-in-value
         placeholder="请选择已创建的时间点"
       ></a-tree-select>
     </a-modal>

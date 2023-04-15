@@ -12,6 +12,7 @@ import {
   forceY
 } from 'd3-force'
 import { drag as D3Drag } from 'd3-drag'
+import { only } from '/@/utils/object'
 
 const { getLocalUrl } = useProjectStore()
 
@@ -28,15 +29,16 @@ useResizeObserver(wrapEl, (entries) => {
 const characterList = useEditorStore().character.list
 const links: { source: string; target: string; [K: string]: any }[] = []
 const nodes: Record<string, any> = {}
-const characterNames = characterList.map((item) => item.title)
+const characterIds = characterList.map((item) => item.id)
 characterList.forEach((character) => {
-  nodes[character.title] = { name: character.title, avatar: character.avatar }
+  nodes[character.id] = only(character, 'id avatar title timepoint')
 
   character.relations.forEach((item) => {
-    if (!item.target || !characterNames.includes(item.target)) return
+    console.log(item.target, characterIds.includes(item.target))
+
+    if (!item.target || !characterIds.includes(item.target)) return
     links.push({
-      avatar: character.avatar,
-      source: character.title,
+      source: character.id,
       target: item.target,
       type: 1,
       relation: item.relation
@@ -57,7 +59,7 @@ function draw() {
   // console.log(forceNodes)
 
   const forceLinks = forceLink(links)
-    .id((d) => d.name)
+    .id((d) => d.id)
     .strength(() => 0.1)
   // console.log(forceLinks)
 
@@ -185,7 +187,7 @@ function draw() {
   text
     .append('tspan')
     .attr('style', 'font-size: 16px;')
-    .text((d) => d.name)
+    .text((d) => d.title)
 
   const image = svg
     .append('g')

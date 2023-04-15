@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, nextTick, PropType, ref, watch } from 'vue'
-import { InputInstance } from '@arco-design/web-vue'
+import { InputInstance, Modal } from '@arco-design/web-vue'
 import { useFocus } from '@vueuse/core'
-import { useProjectStore } from '/@/stores'
+import { useContextViewStore, useProjectStore } from '/@/stores'
 import CharacterPage from '/@/classes/CharacterPage'
 
 const props = defineProps({
@@ -58,6 +58,48 @@ function handlePageClick() {
   if (!props.character.isSelected) $emit('page-click', props.character)
 }
 
+const contextView = useContextViewStore()
+const menuList = [
+  {
+    label: '打开',
+    value: 'open',
+    fn: handlePageClick
+  },
+  {
+    label: '删除',
+    value: 'delete',
+    icon: 'icon-delete',
+    iconColor: 'rgb(var(--red-5))',
+    fn: () => {
+      Modal.confirm({
+        title: `删除确认`,
+        content: `是否确认要删除“${props.character.title}”？`,
+        width: '300px',
+        alignCenter: true,
+        modalStyle: { 'text-align': 'center' },
+        okButtonProps: { status: 'danger' },
+        onOk: () => {
+          $emit('delete', props.character)
+        }
+      })
+    }
+  }
+]
+
+function showContextmenu(e: MouseEvent) {
+  isContextMenu.value = true
+  const { clientX, clientY } = e
+  contextView.showContextMenu({
+    menuList,
+    position: { left: clientX, top: clientY },
+    callback: (item: CtxMenu.Item | null) => {
+      isContextMenu.value = false
+      if (item !== null && item.fn) {
+        item.fn()
+      }
+    }
+  })
+}
 watch(
   () => props.character.isEdit,
   (v) => {
@@ -82,6 +124,7 @@ watch(
       'context-menu': isContextMenu
     }"
     :tabindex="character.isSelected ? 10 : -1"
+    @contextmenu="showContextmenu"
     @click="handlePageClick"
   >
     <div class="avatar w-[50px] flex-shrink-0 layout-center">

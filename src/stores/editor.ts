@@ -179,7 +179,7 @@ export const useEditorStore = defineStore('EditorStore', {
         })
       }
       let data = await $API.Electron.project.getData(moduleName, path)
-      data = data.map((page: CharacterPageObject) => CharacterPage.create(page))
+      data = data.map((page: CharacterPageObject) => new CharacterPage(page))
       const characterList = this.character.list
       characterList.length = 0
       characterList.push(...data)
@@ -205,7 +205,7 @@ export const useEditorStore = defineStore('EditorStore', {
       }
       const { world } = await $API.Electron.project.getManyData(names, path)
       Object.keys(world).forEach((key) => {
-        const data = world[key].map((page: PageObject) => Page.create(page))
+        const data = world[key].map((page: PageObject) => new Page(page))
         const list = this.getWorldPaneData(key)
         if (Array.isArray(list)) {
           list.length = 0

@@ -67,10 +67,10 @@ function existsRelations(key: string) {
       >
         <a-option
           v-for="character of characterList"
-          :key="character.title"
-          :value="character.title"
+          :key="character.id"
+          :value="character.id"
           :label="character.title"
-          :disabled="existsRelations(character.title)"
+          :disabled="existsRelations(character.id)"
         ></a-option>
       </a-select>
       <a-button

@@ -61,6 +61,7 @@ function handlePageCancel(page: CharacterPage) {
 function handlePageDelete(page: CharacterPage) {
   const index = characterList.indexOf(page)
   if (~index) characterList.splice(index, 1)
+  // TODO: 人物关系的删除
   editorStore.saveActionData(moduleName)
   if (page.isSelected) {
     $router.replace({ name: 'EditorCharacter' })
@@ -72,7 +73,7 @@ function handlePageClick(page: CharacterPage) {
   clearSelected()
   page.isSelected = true
   editorStore.switchPage(moduleName, page)
-  const route = { name: `CharacterEditor`, query: { name: page.title } }
+  const route = { name: `CharacterEditor`, query: { id: page.id } }
   $router.replace(route)
   editorStore.character.route = route
 }

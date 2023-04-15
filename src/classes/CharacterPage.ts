@@ -22,8 +22,7 @@ export interface CharacterExtraData {
 }
 
 export interface CharacterTimeline {
-  name: string
-  //TODO: 绑定的时间点id
+  // 绑定的时间点id
   bind: string
   data: CharacterExtraData
 }
@@ -48,6 +47,7 @@ export default class CharacterPage extends Page {
 
   constructor(
     {
+      id,
       title = '',
       content = '',
       action = '',
@@ -62,7 +62,7 @@ export default class CharacterPage extends Page {
       timeline = []
     }: CharacterPageObject = {} as CharacterPageObject
   ) {
-    super(title, content, action)
+    super({ id, title, content, action })
     this.image = image
     this.avatar = avatar
     this.sex = sex
@@ -72,10 +72,6 @@ export default class CharacterPage extends Page {
     this.info = info
     this.relations = relations
     this.timeline = timeline
-  }
-
-  static create(page: CharacterPageObject): CharacterPage {
-    return new this(page)
   }
 
   toObject() {

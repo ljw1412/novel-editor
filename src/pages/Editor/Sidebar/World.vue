@@ -82,7 +82,7 @@ function handlePageClick(page: Page, parentPage?: Page) {
   editorStore.switchPage('world', page, parentPage)
   const route = {
     name: `World${toTitleCase(page.action)}`,
-    query: { mode: parentPage ? 'child' : 'root' }
+    query: { mode: parentPage ? 'child' : 'root', id: page.id }
   }
   $router.replace(route)
   editorStore.world.route = route

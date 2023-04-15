@@ -1,6 +1,8 @@
 import { only } from '../utils/object'
+import { ulid } from 'ulid'
 
 export interface PageObject {
+  id?: string
   title: string
   content: string
   action: string
@@ -9,6 +11,7 @@ export interface PageObject {
 }
 
 export default class Page {
+  id = ''
   title = ''
   content = ''
   action = ''
@@ -19,38 +22,25 @@ export default class Page {
   isSelected = false
 
   constructor(
-    title = '',
-    content = '',
-    action = '',
-    children: Page[] = [],
-    isCollapsed = true
-  ) {
-    this.title = title
-    this.content = content
-    this.action = action
-    this.children = children
-    this.isCollapsed = isCollapsed
-  }
-
-  static create(page: PageObject): Page {
-    const {
+    {
+      id = ulid(),
       title = '',
       content = '',
       action = '',
-      children = [],
+      children = [] as PageObject[],
       isCollapsed = true
-    } = page
-    return new this(
-      title,
-      content,
-      action,
-      children.map((child) => this.create(child)),
-      isCollapsed
-    )
+    }: PageObject = {} as PageObject
+  ) {
+    this.id = id
+    this.title = title
+    this.content = content
+    this.action = action
+    this.children = children.map((child) => new Page(child))
+    this.isCollapsed = isCollapsed
   }
 
   toObject() {
-    const obj = only(this, 'title content action isCollapsed') as PageObject
+    const obj = only(this, 'id title content action isCollapsed') as PageObject
     const children = this.children.map((child) => child.toObject())
     if (children.length) {
       obj.children = children
