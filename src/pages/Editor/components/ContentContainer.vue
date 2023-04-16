@@ -3,7 +3,7 @@ import { computed, PropType } from 'vue'
 import { useRoute } from 'vue-router'
 import { useEditorStore } from '/@/stores'
 import Page from '/@/classes/Page'
-import CharacterPage from '/@/classes/CharacterPage'
+import CharacterPage from '/@/classes/Character'
 import EditorState from './EditorState.vue'
 
 type MixedPage = Page & CharacterPage

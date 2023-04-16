@@ -1,7 +1,7 @@
 <script setup lang="ts" name="CharacterExtraInfo">
 import { PropType } from 'vue'
 import { ResponsiveValue } from '@arco-design/web-vue'
-import { CharacterExtraInfo } from '/@/classes/CharacterPage'
+import { CharacterExtraInfo } from '/@/classes/Character'
 
 const props = defineProps({
   cols: {

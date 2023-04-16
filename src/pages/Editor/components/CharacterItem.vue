@@ -3,7 +3,7 @@ import { computed, nextTick, PropType, ref, watch } from 'vue'
 import { InputInstance, Modal } from '@arco-design/web-vue'
 import { useFocus } from '@vueuse/core'
 import { useContextViewStore, useProjectStore } from '/@/stores'
-import CharacterPage from '/@/classes/CharacterPage'
+import CharacterPage from '/@/classes/Character'
 
 const props = defineProps({
   isAdding: Boolean,

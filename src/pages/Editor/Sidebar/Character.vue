@@ -2,7 +2,7 @@
 import { ref, computed, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useEditorStore, useProjectStore } from '/@/stores'
-import CharacterPage from '/@/classes/CharacterPage'
+import CharacterPage from '/@/classes/Character'
 import EditorSidebar from '../components/Sidebar.vue'
 import CharacterItem from '../components/CharacterItem.vue'
 

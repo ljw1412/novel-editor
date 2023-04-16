@@ -1,6 +1,6 @@
 <script setup lang="ts" name="CharacterRelations">
 import { PropType } from 'vue'
-import CharacterPage, { CharacterRelation } from '/@/classes/CharacterPage'
+import CharacterPage, { CharacterRelation } from '/@/classes/Character'
 import { useEditorStore } from '/@/stores'
 
 const props = defineProps({

@@ -2,7 +2,7 @@
 import { PropType, reactive } from 'vue'
 import { useFileSystemAccess } from '@vueuse/core'
 import { useDialogStore, useProjectStore } from '/@/stores'
-import { CharacterExtraData } from '/@/classes/CharacterPage'
+import { CharacterExtraData } from '/@/classes/Character'
 import $API from '/@/apis'
 
 const props = defineProps({

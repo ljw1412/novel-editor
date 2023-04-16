@@ -1,7 +1,7 @@
 <script setup lang="ts" name="CharacterTimeline">
 import { computed, PropType, ref } from 'vue'
 import { Modal, Notification } from '@arco-design/web-vue'
-import CharacterPage, { CharacterTimeline } from '/@/classes/CharacterPage'
+import CharacterPage, { CharacterTimeline } from '/@/classes/Character'
 import { useEditorStore } from '/@/stores'
 import ExtraInfo from './ExtraInfo.vue'
 import CharacterFgimage from './Fgimage.vue'
