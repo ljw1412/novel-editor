@@ -75,7 +75,10 @@ export default class CharacterPage extends Page {
   }
 
   toObject() {
-    const obj = nin(this, 'children isEdit isSelected') as CharacterPageObject
+    const obj = nin(
+      this,
+      'children isEdit isSelected isCollapsed'
+    ) as CharacterPageObject
     obj.info = toRaw(obj.info)
     obj.relations = toRaw(obj.relations)
     obj.timeline = toRaw(obj.timeline)

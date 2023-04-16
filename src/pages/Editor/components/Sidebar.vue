@@ -7,7 +7,7 @@ const $route = useRoute()
 </script>
 
 <template>
-  <div class="editor-sidebar flex flex-col h-full">
+  <div class="editor-sidebar flex flex-col h-full shadow-xl">
     <header
       class="sidebar-header layout-lr h-[40px] px-3 shadow-sm flex-shrink-0"
     >

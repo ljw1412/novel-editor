@@ -98,9 +98,15 @@ function handlePageClick(page: Page, parentPage?: Page) {
 
 function handleDragStart(e: Event & { item: HTMLElement }) {
   isDrag.value = true
-  console.log(e)
   nextTick(() => {
     e.item.classList.add('ghost')
+  })
+}
+
+function handleDragEnd(e: Event & { item: HTMLElement }) {
+  isDrag.value = false
+  nextTick(() => {
+    e.item.classList.remove('ghost')
   })
 }
 
@@ -110,7 +116,7 @@ function handleDragChange() {
 </script>
 
 <template>
-  <EditorSidebar class="shadow-xl">
+  <EditorSidebar>
     <div class="sidebar-world h-full">
       <a-collapse
         v-model:active-key="activeKey"
@@ -143,7 +149,7 @@ function handleDragChange() {
                 title="折叠全部"
                 @click.stop="collapseAll"
               >
-                <icon-folder-delete :size="16" />
+                <icon-mind-mapping :size="16" />
               </div>
             </a-space>
           </template>
@@ -156,7 +162,7 @@ function handleDragChange() {
               filter=".children"
               :disabled="item.key === 'summary'"
               @start="handleDragStart"
-              @end="isDrag = false"
+              @end="handleDragEnd"
               @change="handleDragChange"
             >
               <template #item="{ element: page }">

@@ -23,7 +23,7 @@ const projectData = computed(() => {
 </script>
 
 <template>
-  <EditorSidebar class="shadow-xl">
+  <EditorSidebar>
     <a-scrollbar
       outer-class="sidebar-info h-full"
       class="h-full overflow-auto py-2 px-3"

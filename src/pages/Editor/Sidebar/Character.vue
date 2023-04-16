@@ -108,7 +108,7 @@ function handleDragMove(e: Event & { dragged: HTMLElement }) {
 </script>
 
 <template>
-  <EditorSidebar class="shadow-xl" show-add-btn @add="addCharacter">
+  <EditorSidebar show-add-btn @add="addCharacter">
     <template #extra>
       <div
         title="关系图"
