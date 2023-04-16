@@ -4,6 +4,7 @@ import { useEventListener } from '@vueuse/core'
 import { useEditorStore } from '/@/stores'
 import ContentContainer from '../../components/ContentContainer.vue'
 import CharacterTimeline from './components/Timeline.vue'
+import Character from '/@/classes/Character'
 
 const editorStore = useEditorStore()
 
@@ -26,7 +27,7 @@ useEventListener('keydown', (e) => {
 
 <template>
   <ContentContainer class="character-editor">
-    <template #default="{ page }">
+    <template #default="{ page }: { page: Character }">
       <a-space direction="vertical" fill class="pt-4">
         <a-input v-model="page.title" placeholder="姓名" class="name-input" />
         <a-space>

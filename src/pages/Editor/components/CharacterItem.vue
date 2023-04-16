@@ -3,13 +3,13 @@ import { computed, nextTick, PropType, ref, watch } from 'vue'
 import { InputInstance, Modal } from '@arco-design/web-vue'
 import { useFocus } from '@vueuse/core'
 import { useContextViewStore, useProjectStore } from '/@/stores'
-import CharacterPage from '/@/classes/Character'
+import Character from '/@/classes/Character'
 
 const props = defineProps({
   isAdding: Boolean,
   placeholder: String,
   hideLabel: Boolean,
-  character: { type: Object as PropType<CharacterPage>, default: () => ({}) }
+  character: { type: Object as PropType<Character>, default: () => ({}) }
 })
 const $emit = defineEmits(['page-click', 'text-change', 'cancel', 'delete'])
 const projectStore = useProjectStore()

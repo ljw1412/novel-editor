@@ -2,7 +2,7 @@
 import { ref, computed, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useEditorStore, useProjectStore } from '/@/stores'
-import CharacterPage from '/@/classes/Character'
+import Character from '/@/classes/Character'
 import EditorSidebar from '../components/Sidebar.vue'
 import CharacterItem from '../components/CharacterItem.vue'
 
@@ -42,13 +42,13 @@ function handleHeaderBtnClick(action: string) {
 
 function addCharacter() {
   isAdding.value = true
-  const page = new CharacterPage()
-  page.action = moduleName
+  const page = new Character()
+  page.type = moduleName
   page.isEdit = true
   characterList.value.push(page)
 }
 
-async function handlePageTextChange(page: CharacterPage) {
+async function handlePageTextChange(page: Character) {
   if (isAdding.value) {
     if (!page.title.trim()) {
       characterList.value.pop()
@@ -64,14 +64,14 @@ async function handlePageTextChange(page: CharacterPage) {
   page.isEdit = false
 }
 
-function handlePageCancel(page: CharacterPage) {
+function handlePageCancel(page: Character) {
   if (isAdding.value) {
     characterList.value.pop()
     isAdding.value = false
   }
 }
 
-function handlePageDelete(page: CharacterPage) {
+function handlePageDelete(page: Character) {
   const index = characterList.value.indexOf(page)
   if (~index) characterList.value.splice(index, 1)
   // TODO: 人物关系的删除
@@ -81,7 +81,7 @@ function handlePageDelete(page: CharacterPage) {
   }
 }
 
-function handlePageClick(page: CharacterPage) {
+function handlePageClick(page: Character) {
   if (page.isEdit) return
   clearSelected()
   page.isSelected = true

@@ -1,14 +1,14 @@
 <script setup lang="ts" name="CharacterTimeline">
 import { computed, PropType, ref } from 'vue'
 import { Modal, Notification } from '@arco-design/web-vue'
-import CharacterPage, { CharacterTimeline } from '/@/classes/Character'
+import Character, { CharacterTimeline } from '/@/classes/Character'
 import { useEditorStore } from '/@/stores'
 import ExtraInfo from './ExtraInfo.vue'
 import CharacterFgimage from './Fgimage.vue'
 import CharacterRelations from './Relations.vue'
 
 const props = defineProps({
-  character: { type: Object as PropType<CharacterPage>, default: () => ({}) }
+  character: { type: Object as PropType<Character>, default: () => ({}) }
 })
 const $emit = defineEmits(['item-image-change', 'item-image-removed'])
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, PropType, nextTick, computed } from 'vue'
-import Page from '/@/classes/Page'
+import WorldItem from '/@/classes/WorldItem'
 import { InputInstance, Modal } from '@arco-design/web-vue'
 import { useFocus } from '@vueuse/core'
 import { useContextViewStore } from '/@/stores'
@@ -28,7 +28,7 @@ const props = defineProps({
   // 编辑时的输入框占位符
   placeholder: String,
   // 页面数据
-  page: { type: Object as PropType<Page>, default: () => ({}) },
+  page: { type: Object as PropType<WorldItem>, default: () => ({}) },
   // 父节点的类
   parentClass: [String, Object]
 })
@@ -171,7 +171,7 @@ const menuList = [
 ]
 
 function getMenuList() {
-  if (props.page.action === 'summary') {
+  if (props.page.type === 'summary') {
     return menuList.slice(0, 1)
   }
   return props.allowAddChild

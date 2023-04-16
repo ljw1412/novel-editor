@@ -2,10 +2,10 @@
 import { computed, nextTick, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useProjectStore, useEditorStore, useConfigStore } from '/@/stores'
-import Page from '/@/classes/Page'
+import WorldItem from '/@/classes/WorldItem'
 import { toTitleCase } from '/@/utils/string'
 import EditorSidebar from '../components/Sidebar.vue'
-import PageItem from '../components/PageItem.vue'
+import WorldItemComp from '../components/WorldItem.vue'
 
 const $router = useRouter()
 const configStore = useConfigStore()
@@ -36,52 +36,52 @@ async function save(action: string) {
   editorStore.setState('success', '保存成功')
 }
 
-function addPage(key: string, list: Page[]) {
+function addPage(key: string, list: WorldItem[]) {
   activeKey.value = [key]
   isAdding.value = true
-  const page = new Page()
-  page.action = key
+  const page = new WorldItem()
+  page.type = key
   page.isEdit = true
   list.push(page)
 }
 
 async function handlePageTextChange(
-  page: Page,
-  list: Page[],
-  parentPage?: Page
+  page: WorldItem,
+  list: WorldItem[],
+  parentPage?: WorldItem
 ) {
   if (isAdding.value) {
     if (!page.title.trim()) {
       list.pop()
     } else {
-      await save(page.action)
+      await save(page.type)
       handlePageClick(page)
     }
     isAdding.value = false
   } else {
-    await save(page.action)
+    await save(page.type)
     handlePageClick(page, parentPage)
   }
   page.isEdit = false
 }
 
-function handlePageCancel(page: Page, list: Page[]) {
+function handlePageCancel(page: WorldItem, list: WorldItem[]) {
   if (isAdding.value) {
     list.pop()
     isAdding.value = false
   }
 }
 
-function handlePageDelete(page: Page, list: Page[]) {
+function handlePageDelete(page: WorldItem, list: WorldItem[]) {
   const index = list.indexOf(page)
   if (~index) list.splice(index, 1)
-  save(page.action)
+  save(page.type)
   if (page.isSelected) {
     $router.replace({ name: 'EditorWorld' })
   }
 }
 
-function handlePageClick(page: Page, parentPage?: Page) {
+function handlePageClick(page: WorldItem, parentPage?: WorldItem) {
   if (page.isEdit) return
   allPageList.value.forEach((page) => {
     page.isSelected = false
@@ -89,7 +89,7 @@ function handlePageClick(page: Page, parentPage?: Page) {
   page.isSelected = true
   editorStore.switchPage('world', page, parentPage)
   const route = {
-    name: `World${toTitleCase(page.action)}`,
+    name: `World${toTitleCase(page.type)}`,
     query: { mode: parentPage ? 'child' : 'root', id: page.id }
   }
   $router.replace(route)
@@ -166,7 +166,7 @@ function handleDragChange() {
               @change="handleDragChange"
             >
               <template #item="{ element: page }">
-                <PageItem
+                <WorldItemComp
                   :page="page"
                   :is-edit="page.isEdit"
                   :is-adding="isAdding"
@@ -196,7 +196,7 @@ function handleDragChange() {
                       @change="handleDragChange"
                     >
                       <template #item="{ element: sPage }">
-                        <PageItem
+                        <WorldItemComp
                           is-child
                           :page="sPage"
                           :placeholder="item.childPlaceholder"
@@ -208,11 +208,11 @@ function handleDragChange() {
                           @cancel="handlePageCancel(sPage, page.children)"
                           @page-click="handlePageClick(sPage, page)"
                           @delete="handlePageDelete(sPage, page.children)"
-                        ></PageItem>
+                        ></WorldItemComp>
                       </template>
                     </draggable>
                   </template>
-                </PageItem>
+                </WorldItemComp>
               </template>
             </draggable>
           </a-scrollbar>

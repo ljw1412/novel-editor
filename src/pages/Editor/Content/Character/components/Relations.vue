@@ -1,10 +1,10 @@
 <script setup lang="ts" name="CharacterRelations">
 import { PropType } from 'vue'
-import CharacterPage, { CharacterRelation } from '/@/classes/Character'
+import Character, { CharacterRelation } from '/@/classes/Character'
 import { useEditorStore } from '/@/stores'
 
 const props = defineProps({
-  character: { type: Object as PropType<CharacterPage>, default: () => ({}) },
+  character: { type: Object as PropType<Character>, default: () => ({}) },
   relations: { type: Array as PropType<CharacterRelation[]>, default: () => [] }
 })
 

@@ -2,6 +2,7 @@
 import { useRoute } from 'vue-router'
 import { useEventListener } from '@vueuse/core'
 import { useEditorStore } from '/@/stores'
+import WorldItem from '/@/classes/WorldItem'
 import ContentContainer from '../../components/ContentContainer.vue'
 
 const $route = useRoute()
@@ -26,7 +27,7 @@ useEventListener('keydown', (e) => {
 
 <template>
   <ContentContainer>
-    <template #default="{ page }">
+    <template #default="{ page }: { page: WorldItem }">
       <a-typography-title
         class="mt-2 mb-1 pl-1"
         style="background-color: var(--editor-bg)"

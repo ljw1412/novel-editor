@@ -2,11 +2,8 @@
 import { computed, PropType } from 'vue'
 import { useRoute } from 'vue-router'
 import { useEditorStore } from '/@/stores'
-import Page from '/@/classes/Page'
-import CharacterPage from '/@/classes/Character'
+import Page from '/@/classes/BasePage'
 import EditorState from './EditorState.vue'
-
-type MixedPage = Page & CharacterPage
 
 const props = defineProps({
   action: { type: String as PropType<Editor.SidebarActions> }
@@ -49,7 +46,7 @@ const breadcrumbData = computed(() => {
       class="h-full overflow-y-auto"
     >
       <main v-if="action.data && action.data.page" class="w-full px-6">
-        <slot :page="action.data.page as MixedPage"></slot>
+        <slot :page="action.data.page as any"></slot>
       </main>
     </a-scrollbar>
   </div>
