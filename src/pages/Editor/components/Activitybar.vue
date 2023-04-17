@@ -37,26 +37,81 @@ function handleActionItemClick(item: {
 </script>
 
 <template>
-  <div class="activitybar w-[56px] h-full flex-shrink-0">
-    <a-tooltip
+  <div class="activitybar h-full flex-shrink-0 select-none">
+    <div
       v-for="item of actions"
-      :key="item.label"
-      :content="item.label"
-      content-class="select-none"
-      position="right"
-      mini
+      :key="item.key"
+      class="action-item relative layout-center flex-col w-[56px] h-[56px] mx-auto my-1 rounded-md cursor-pointer"
+      :class="{
+        collapsed: isCollapsed,
+        active: item.key === activity
+      }"
+      @click="handleActionItemClick(item)"
     >
+      <component
+        v-if="item.icon"
+        :is="item.icon"
+        :size="item.key === activity ? 32 : 28"
+        class="action-icon"
+      />
       <div
-        class="action-item relative layout-center w-[56px] h-[56px] cursor-pointer opacity-50 hover:opacity-100"
-        :class="{
-          active: !isCollapsed && item.key === activity
-        }"
-        @click="handleActionItemClick(item)"
+        :class="item.key === activity ? 'h-0 overflow-hidden' : 'h-4 mt-1'"
+        class="action-label text-sm"
       >
-        <component v-if="item.icon" :is="item.icon" :size="32"></component>
+        {{ item.label }}
       </div>
-    </a-tooltip>
+    </div>
   </div>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+.activitybar {
+  background-color: var(--editor-activitybar-bg);
+  border-right: 1px solid var(--color-border-2);
+  width: var(--app-activitybar-width);
+
+  .action-item {
+    opacity: 0.5;
+
+    &::before {
+      content: '';
+      position: absolute;
+      right: 2px;
+      top: 50%;
+      width: 4px;
+      height: 40%;
+      transform: translateY(-50%);
+      background-color: var(--app-color-common);
+      border-radius: 6px;
+      opacity: 0;
+    }
+
+    .action-icon {
+      transition: font-size 0.2s;
+    }
+
+    .action-label {
+      transition: height 0.15s;
+    }
+
+    &.active {
+      opacity: 1;
+      color: var(--app-color-common);
+      background-color: rgba(123, 123, 123, 0.2);
+
+      &:active::before {
+        opacity: 0.5;
+      }
+
+      &:not(.collapsed):not(:active)::before {
+        opacity: 1;
+      }
+    }
+
+    &:not(.active):hover {
+      opacity: 0.8;
+      background-color: rgba(123, 123, 123, 0.07);
+    }
+  }
+}
+</style>

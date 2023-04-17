@@ -160,7 +160,7 @@ const routes = [
             },
             meta: { title: '人物', action: 'character' }
           },
-          // 基础信息
+          // 项目信息
           {
             path: 'info',
             name: 'EditorInfo',
@@ -168,7 +168,7 @@ const routes = [
               sidebar: InfoSidebar,
               default: EmptyContent
             },
-            meta: { title: '基础信息' }
+            meta: { title: '项目' }
           }
         ]
       }

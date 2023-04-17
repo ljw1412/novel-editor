@@ -133,7 +133,7 @@ export const useEditorStore = defineStore('EditorStore', {
     },
     info: {
       key: 'info',
-      label: '基础信息',
+      label: '项目',
       icon: 'icon-info-circle',
       route: { name: 'EditorInfo' },
       currentRoute: null,
