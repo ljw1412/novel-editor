@@ -14,14 +14,15 @@ if (projectStore.isProjectLoaded) {
 <template>
   <div class="app-home flex text-color-2 select-none">
     <div class="flex flex-col max-w-[1200px] w-3/4 h-[600px] m-auto">
-      <div class="app-home__header flex-shrink-0">
-        <h1 class="inline-block">{{ APP_TITLE }}</h1>
-        <p class="inline-block text-color-3 text-2xl ml-3">
-          {{ APP_BELONG_TO }}荣誉出品
-        </p>
+      <div
+        class="app-home__header flex flex-col justify-center px-7 flex-shrink-0 rounded-lg overflow-hidden"
+        :class="$route.name !== 'HomeWelcome' ? 'h-[120px]' : 'h-[240px]'"
+      >
+        <h3 class="">{{ APP_TITLE }}</h3>
+        <p class="text-color-3 text-xl mt-2">{{ APP_BELONG_TO }}荣誉出品</p>
       </div>
 
-      <div class="app-home__content relative flex-grow mt-5">
+      <div class="app-home__content relative flex-grow mt-2">
         <router-view v-slot="{ Component }">
           <transition name="bottom-in">
             <component :is="Component" />
@@ -34,6 +35,12 @@ if (projectStore.isProjectLoaded) {
 
 <style lang="scss">
 .app-home {
+  &__header {
+    background-color: rgb(var(--primary-6), 0.01);
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.25);
+    transition: height 0.4s;
+  }
+
   &__content {
     .arco-page-header-wrapper {
       padding: 0;

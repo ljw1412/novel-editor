@@ -34,7 +34,6 @@ function resizeMovingStart() {
 function resizeMoving({ width }: { width: number }) {
   if (width < 100) {
     isCollapsed.value = true
-    // asideWidth.value = 56
   }
   if (width >= 100 && width < 256) {
     isCollapsed.value = false
@@ -101,37 +100,6 @@ editorStore.loadCharacterData()
 <style lang="scss">
 .app-editor {
   background-color: var(--editor-bg);
-
-  .activitybar {
-    background-color: var(--editor-activitybar-bg);
-    border-right: 1px solid var(--color-border-2);
-
-    .action-item {
-      &::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 3px;
-        height: 100%;
-        background-color: var(--app-color-common);
-        opacity: 0;
-      }
-
-      &.active {
-        opacity: 1 !important;
-        color: var(--app-color-common);
-
-        &::before {
-          opacity: 1;
-        }
-      }
-
-      &:active::before {
-        opacity: 0.5;
-      }
-    }
-  }
 
   .aside-resize-box {
     .arco-resizebox-trigger {
