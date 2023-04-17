@@ -6,14 +6,14 @@ import Page from '/@/classes/BasePage'
 import EditorState from './EditorState.vue'
 
 const props = defineProps({
-  action: { type: String as PropType<Editor.SidebarActions> }
+  action: { type: String as PropType<Editor.ActivityActions> }
 })
 
 const $route = useRoute()
 const editorStore = useEditorStore()
 
 const action = editorStore.getAction(
-  props.action || ($route.meta.action as Editor.SidebarActions)
+  props.action || ($route.meta.action as Editor.ActivityActions)
 )
 
 const breadcrumbData = computed(() => {
