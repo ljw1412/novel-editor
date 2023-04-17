@@ -21,18 +21,28 @@ const themeList = [
   { name: '黑暗', value: 'dark', type: 'dark', variable: '--skin-dark' }
 ]
 
+const theme = useLocalStorage('APP_THEME', {
+  now: 'dark',
+  before: ''
+})
+
 const config = useLocalStorage('APP_CONFIG', {
-  theme: { now: 'dark', before: '' },
-  sidebar: { tab: '', 'tab.world': '', width: 300, isCollapsed: false }
+  sidebar: {
+    activity: '',
+    state: {
+      worldPane: ''
+    },
+    width: 300,
+    isCollapsed: false
+  }
 })
 
 export const useConfigStore = defineStore('configStore', {
-  state: () => ({ config, themeList }),
+  state: () => ({ config, theme, themeList }),
 
   getters: {
-    theme: (state) => state.config.theme,
     sidebar: (state) => state.config.sidebar,
-    isDarkMode: (state) => state.config.theme.now === 'dark'
+    isDarkMode: (state) => state.theme.now === 'dark'
   },
 
   actions: {
@@ -60,6 +70,8 @@ export const useConfigStore = defineStore('configStore', {
      */
     flushBodyTheme() {
       document.body.setAttribute('arco-theme', this.theme.now)
-    }
+    },
+
+    updateSidebar() {}
   }
 })

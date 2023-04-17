@@ -9,11 +9,8 @@ const props = defineProps({
 async function createAppShortcutLink() {
   try {
     const result = await $API.Electron.shell.createAppShortcutLink()
-    if (result) {
-      Message.success({ content: '添加成功!', position: 'bottom' })
-    } else {
-      Message.error({ content: '添加失败…', position: 'bottom' })
-    }
+    if (!result) throw new Error()
+    Message.success({ content: '添加成功!', position: 'bottom' })
   } catch (error) {
     Message.error({ content: '添加失败…', position: 'bottom' })
   }
@@ -21,6 +18,13 @@ async function createAppShortcutLink() {
 
 async function optionChange(key: string, value: any) {
   await $API.Electron.config.setOption(key, value)
+}
+
+async function resetMenuCache() {
+  const keys = ['APP_CONFIG']
+  keys.forEach((key) => {
+    localStorage.removeItem(key)
+  })
 }
 </script>
 
@@ -44,6 +48,13 @@ async function optionChange(key: string, value: any) {
 
       <a-form-item label="创建快捷方式" help="在桌面创建该应用程序的快捷方式。">
         <a-button @click="createAppShortcutLink" size="small">创建</a-button>
+      </a-form-item>
+
+      <a-form-item
+        label="重置界面缓存"
+        help="当出现程序显示异常的时候可以尝试此项。"
+      >
+        <a-button @click="resetMenuCache" size="small">重置</a-button>
       </a-form-item>
     </a-form>
   </div>
