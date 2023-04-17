@@ -1,5 +1,6 @@
 <script setup lang="ts" name="AppHome">
 import { useProjectStore } from '/@/stores'
+import { getPublicUrl } from '/@/utils/url'
 
 const APP_TITLE = import.meta.env.VITE_APP_TITLE
 const APP_BELONG_TO = import.meta.env.VITE_APP_BELONG_TO
@@ -10,7 +11,9 @@ if (projectStore.isProjectLoaded) {
   projectStore.clearProject()
 }
 
-const bannerBg = `/images/banner-${parseInt(Math.random() * 23 + '') + 1}.png`
+const bannerBg = getPublicUrl(
+  `/images/banner-${parseInt(Math.random() * 23 + '') + 1}.png`
+)
 </script>
 
 <template>
