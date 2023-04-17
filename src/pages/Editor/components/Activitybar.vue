@@ -71,7 +71,7 @@ function handleActionItemClick(item: {
   width: var(--app-activitybar-width);
 
   .action-item {
-    opacity: 0.5;
+    color: var(--color-text-3);
 
     &::before {
       content: '';
@@ -109,7 +109,7 @@ function handleActionItemClick(item: {
     }
 
     &:not(.active):hover {
-      opacity: 0.8;
+      color: var(--color-text-1);
       background-color: rgba(123, 123, 123, 0.07);
     }
   }
