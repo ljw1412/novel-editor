@@ -167,12 +167,12 @@ export const useEditorStore = defineStore('EditorStore', {
 
   actions: {
     getAction(
-      action: Editor.SidebarActions
+      action: Editor.ActivityActions
     ): ActionBookshelf | ActionWorld | ActionCharacter | ActionInfo {
       return this[action]
     },
 
-    getActionRoute(action: Editor.SidebarActions) {
+    getActionRoute(action: Editor.ActivityActions) {
       const { data, currentRoute, route } = this[action]
       return data && currentRoute ? currentRoute : route
     },
@@ -258,7 +258,7 @@ export const useEditorStore = defineStore('EditorStore', {
 
     async loadInfoData() {},
 
-    switchPage(action: Editor.SidebarActions, page: Page, parentPage?: Page) {
+    switchPage(action: Editor.ActivityActions, page: Page, parentPage?: Page) {
       this.getAction(action).data = { page, parentPage }
     },
 
@@ -275,13 +275,6 @@ export const useEditorStore = defineStore('EditorStore', {
       if (timeout > 0) {
         this.state.timer = window.setTimeout(() => {
           if (this.state.timer) window.clearTimeout(this.state.timer)
-          // Object.assign(this.state, {
-          //   status: '',
-          //   icon: '',
-          //   color: '',
-          //   message: '',
-          //   timer: null
-          // })
           this.$patch({
             state: {
               status: '',

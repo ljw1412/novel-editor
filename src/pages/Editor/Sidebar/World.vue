@@ -15,7 +15,7 @@ const editorStore = useEditorStore()
 const isAdding = ref(false)
 const isDrag = ref(false)
 const isChildDrag = ref(false)
-const activeKey = ref([configStore.sidebar['tab.world'] || 'summary'])
+const activeKey = ref([configStore.sidebar.state.worldPane || 'summary'])
 const paneList = editorStore.worldPaneList
 const allPageList = computed(() => {
   const list = paneList.map((item) => item.list).flat()
@@ -23,7 +23,7 @@ const allPageList = computed(() => {
 })
 
 function handeCollapseChange([activeKey]: (string | number)[]) {
-  configStore.sidebar['tab.world'] = activeKey as string
+  configStore.sidebar.state.worldPane = activeKey as string
 }
 
 function collapseAll() {

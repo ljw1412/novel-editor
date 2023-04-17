@@ -3,27 +3,20 @@ import { ref, computed, onUnmounted } from 'vue'
 import { RouteLocationRaw, useRoute, useRouter } from 'vue-router'
 import { useConfigStore, useDialogStore, useEditorStore } from '/@/stores'
 import ImageCropperDialog from '/@/components/ImageCropperDialog.vue'
+import Activitybar from './components/Activitybar.vue'
 
 const configStore = useConfigStore()
 const editorStore = useEditorStore()
 const dialogStore = useDialogStore()
 
-const $route = useRoute()
-const $router = useRouter()
+const sidebar = configStore.sidebar
 
-const actions = editorStore.actions
-const isCollapsed = ref(configStore.sidebar.isCollapsed || false)
 const asideWidth = ref(configStore.sidebar.width || 300)
-const currentTab = ref(configStore.sidebar.tab as Editor.SidebarActions)
 const isSideResizing = ref(false)
-if (!actions.map((i) => i.key).includes(currentTab.value)) {
-  currentTab.value = actions[0].key
-}
-$router.replace(editorStore.getActionRoute(currentTab.value))
 
 const asideWidthComp = computed({
   get() {
-    if (isCollapsed.value || asideWidth.value < 0) return 0
+    if (sidebar.isCollapsed || asideWidth.value < 0) return 0
     return asideWidth.value
   },
   set(v: number) {
@@ -37,74 +30,34 @@ function resizeMovingStart() {
 
 function resizeMoving({ width }: { width: number }) {
   if (width < 100) {
-    isCollapsed.value = true
+    sidebar.isCollapsed = true
     // asideWidth.value = 56
   }
   if (width >= 100 && width < 256) {
-    isCollapsed.value = false
+    sidebar.isCollapsed = false
     asideWidthComp.value = 256
   }
 }
 
 function resizeMovingEnd() {
   isSideResizing.value = false
-  updateState()
-}
-
-function handleActionItemClick(item: {
-  key: Editor.SidebarActions
-  route: RouteLocationRaw
-}) {
-  if (currentTab.value === item.key) {
-    isCollapsed.value = !isCollapsed.value
-  } else {
-    currentTab.value = item.key
-    isCollapsed.value = false
-    $router.replace(editorStore.getActionRoute(item.key))
-  }
-  updateState()
-}
-
-function updateState() {
-  configStore.sidebar.isCollapsed = isCollapsed.value
   configStore.sidebar.width = asideWidthComp.value
-  configStore.sidebar.tab = currentTab.value
 }
 
 editorStore.loadWorldData()
 editorStore.loadCharacterData()
-
-onUnmounted(updateState)
-window.addEventListener('unload', updateState)
 </script>
 
 <template>
   <div class="app-editor flex">
     <!-- 活动栏 -->
-    <div class="activitybar w-[56px] h-full flex-shrink-0">
-      <a-tooltip
-        v-for="item of actions"
-        :key="item.label"
-        :content="item.label"
-        content-class="select-none"
-        position="right"
-        mini
-      >
-        <div
-          class="action-item relative layout-center w-[56px] h-[56px] cursor-pointer opacity-50 hover:opacity-100"
-          :class="{ active: !isCollapsed && item.key === currentTab }"
-          @click="handleActionItemClick(item)"
-        >
-          <component v-if="item.icon" :is="item.icon" :size="32"></component>
-        </div>
-      </a-tooltip>
-    </div>
+    <Activitybar></Activitybar>
     <!-- 侧边栏 -->
     <a-resize-box
       component="aside"
       class="aside-resize-box max-w-[500px] flex-shrink-0 h-full select-none"
       :class="{ resizing: isSideResizing }"
-      :style="{ minWidth: isCollapsed ? '0' : '256px' }"
+      :style="{ minWidth: sidebar.isCollapsed ? '0' : '256px' }"
       v-model:width="asideWidthComp"
       @moving-start="resizeMovingStart"
       @moving="resizeMoving"
@@ -114,7 +67,7 @@ window.addEventListener('unload', updateState)
         <div class="aside-resize-line h-full w-[2px] bg-color-common"></div>
       </template>
       <router-view
-        v-show="!isCollapsed"
+        v-show="!sidebar.isCollapsed"
         name="sidebar"
         v-slot="{ Component, route }"
       >

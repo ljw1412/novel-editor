@@ -28,12 +28,12 @@ const theme = useLocalStorage('APP_THEME', {
 
 const config = useLocalStorage('APP_CONFIG', {
   sidebar: {
-    activity: '',
+    activity: '' as Editor.ActivityActions,
+    width: 300,
+    isCollapsed: false,
     state: {
       worldPane: ''
-    },
-    width: 300,
-    isCollapsed: false
+    }
   }
 })
 
@@ -70,8 +70,6 @@ export const useConfigStore = defineStore('configStore', {
      */
     flushBodyTheme() {
       document.body.setAttribute('arco-theme', this.theme.now)
-    },
-
-    updateSidebar() {}
+    }
   }
 })

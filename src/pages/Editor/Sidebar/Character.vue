@@ -99,8 +99,6 @@ function handleDragStart(e: Event & { item: HTMLElement }) {
 }
 
 function handleDragMove(e: Event & { dragged: HTMLElement }) {
-  console.log(e)
-
   setTimeout(() => {
     e.dragged.classList.add('ghost')
   }, 0)
