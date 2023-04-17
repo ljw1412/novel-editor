@@ -26,7 +26,7 @@ const theme = useLocalStorage('APP_THEME', {
   before: ''
 })
 
-const config = useLocalStorage('APP_CONFIG', {
+const view = useLocalStorage('APP_VIEW', {
   sidebar: {
     activity: '' as Editor.ActivityActions,
     width: 300,
@@ -38,10 +38,10 @@ const config = useLocalStorage('APP_CONFIG', {
 })
 
 export const useConfigStore = defineStore('configStore', {
-  state: () => ({ config, theme, themeList }),
+  state: () => ({ view, theme, themeList }),
 
   getters: {
-    sidebar: (state) => state.config.sidebar,
+    sidebar: (state) => state.view.sidebar,
     isDarkMode: (state) => state.theme.now === 'dark'
   },
 

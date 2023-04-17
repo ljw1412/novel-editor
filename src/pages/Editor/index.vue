@@ -9,14 +9,17 @@ const configStore = useConfigStore()
 const editorStore = useEditorStore()
 const dialogStore = useDialogStore()
 
-const sidebar = configStore.sidebar
+const isCollapsed = computed({
+  get: () => configStore.sidebar.isCollapsed,
+  set: (v) => (configStore.sidebar.isCollapsed = v)
+})
 
 const asideWidth = ref(configStore.sidebar.width || 300)
 const isSideResizing = ref(false)
 
 const asideWidthComp = computed({
   get() {
-    if (sidebar.isCollapsed || asideWidth.value < 0) return 0
+    if (isCollapsed.value || asideWidth.value < 0) return 0
     return asideWidth.value
   },
   set(v: number) {
@@ -30,11 +33,11 @@ function resizeMovingStart() {
 
 function resizeMoving({ width }: { width: number }) {
   if (width < 100) {
-    sidebar.isCollapsed = true
+    isCollapsed.value = true
     // asideWidth.value = 56
   }
   if (width >= 100 && width < 256) {
-    sidebar.isCollapsed = false
+    isCollapsed.value = false
     asideWidthComp.value = 256
   }
 }
@@ -57,7 +60,7 @@ editorStore.loadCharacterData()
       component="aside"
       class="aside-resize-box max-w-[500px] flex-shrink-0 h-full select-none"
       :class="{ resizing: isSideResizing }"
-      :style="{ minWidth: sidebar.isCollapsed ? '0' : '256px' }"
+      :style="{ minWidth: isCollapsed ? '0' : '256px' }"
       v-model:width="asideWidthComp"
       @moving-start="resizeMovingStart"
       @moving="resizeMoving"
@@ -67,7 +70,7 @@ editorStore.loadCharacterData()
         <div class="aside-resize-line h-full w-[2px] bg-color-common"></div>
       </template>
       <router-view
-        v-show="!sidebar.isCollapsed"
+        v-show="!isCollapsed"
         name="sidebar"
         v-slot="{ Component, route }"
       >

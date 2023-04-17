@@ -21,7 +21,7 @@ async function optionChange(key: string, value: any) {
 }
 
 async function resetMenuCache() {
-  const keys = ['APP_CONFIG']
+  const keys = ['APP_VIEW']
   keys.forEach((key) => {
     localStorage.removeItem(key)
   })
