@@ -2,12 +2,12 @@
 import { useRouter } from 'vue-router'
 import $API from '/@/apis'
 import { ulid } from 'ulid'
-import { useProjectStore } from '/@/stores'
+import useStore from '/@/stores'
 import { only } from '/@/utils/object'
 import { getPublicUrl } from '/@/utils/url'
 
 const $router = useRouter()
-const projectStore = useProjectStore()
+const { projectStore, cacheStore } = useStore()
 const appInfo = window.bridge.package
 const versions = window.bridge.versions
 
@@ -60,6 +60,7 @@ async function openRecentProject(item: Editor.RecentRecord) {
         (record) => item === record
       )
       if (~index) projectStore.recentList.splice(index, 1)
+      cacheStore.removeRouteCache(item.id)
     }
   }
 }

@@ -1,7 +1,8 @@
 import { useLocalStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'
 import { RouteLocationNamedRaw } from 'vue-router'
-import { useEditorStore, useProjectStore } from './index'
+import { useProjectStore } from './index'
+import * as logger from '/@/utils/logger'
 
 type RouteCache = Record<Editor.ActivityActions, RouteLocationNamedRaw | null>
 
@@ -33,6 +34,14 @@ export const useCacheStore = defineStore('cacheStore', {
       this.$patch({
         routeCache: useLocalStorage(`PROJECT_${projectId}`, createRouteCache())
       })
+    },
+
+    removeRouteCache(projectId: string) {
+      if (!projectId) return
+      this.$patch({ routeCache: createRouteCache() })
+      const key = `PROJECT_${projectId}`
+      localStorage.removeItem(key)
+      logger.success('移除路由缓存', key)
     }
   }
 })

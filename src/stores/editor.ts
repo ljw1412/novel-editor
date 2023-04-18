@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
-import { nextTick, WatchSource } from 'vue'
+import { nextTick } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
-import { watchOnce } from '@vueuse/core'
 import * as logger from '/@/utils/logger'
 import $API from '/@/apis'
 import Page, { PageObject } from '/@/classes/BasePage'
