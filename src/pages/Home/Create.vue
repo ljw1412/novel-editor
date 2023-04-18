@@ -1,7 +1,8 @@
 <script setup lang="ts" name="HomeCreate">
 import { ref, reactive, watch, toRaw } from 'vue'
 import $API from '/@/apis'
-import { FormInstance, Notification } from '@arco-design/web-vue'
+import { ulid } from 'ulid'
+import { FormInstance } from '@arco-design/web-vue'
 import { useRouter } from 'vue-router'
 import { only } from '/@/utils/object'
 import { useProjectStore } from '/@/stores'
@@ -12,6 +13,7 @@ const formRef = ref<FormInstance>()
 const sep = ref('')
 const projectDir = ref('')
 const project = reactive<Editor.Project>({
+  id: ulid(),
   title: '',
   author: '',
   desc: '',

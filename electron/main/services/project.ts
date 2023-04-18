@@ -1,5 +1,6 @@
 import fsp from 'node:fs/promises'
 import { join, relative } from 'node:path'
+import { nin } from '../utils/object'
 import storage from '../utils/storage'
 import ApiError from '/@/classes/ApiError'
 
@@ -61,6 +62,16 @@ export async function openProject(dataPath: string) {
     project.path = dataPath
     await storage.set(CONFIG_FILENAME, project, { dataPath })
   }
+  return project
+}
+
+export async function updateProject(
+  dataPath: string,
+  data: Record<string, any>
+) {
+  const project = await openProject(dataPath)
+  Object.assign(project, nin(data, 'path'))
+  await storage.set(CONFIG_FILENAME, project, { dataPath })
   return project
 }
 

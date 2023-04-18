@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
+import { nextTick, WatchSource } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
+import { watchOnce } from '@vueuse/core'
 import * as logger from '/@/utils/logger'
 import $API from '/@/apis'
 import Page, { PageObject } from '/@/classes/BasePage'
@@ -7,7 +9,7 @@ import Volume, { VolumeObject } from '/@/classes/Volume'
 import Chapter, { ChapterObject } from '/@/classes/Chapter'
 import WorldItem, { WorldItemObject } from '/@/classes/WorldItem'
 import Character, { CharacterObject } from '/@/classes/Character'
-import { useProjectStore } from './index'
+import { useCacheStore, useConfigStore, useProjectStore } from './index'
 import { Notification } from '@arco-design/web-vue'
 import { only } from '../utils/object'
 
@@ -49,7 +51,6 @@ interface ActionItem<T extends Page, P = T> {
   label: string
   icon: string
   route: RouteLocationRaw
-  currentRoute: RouteLocationRaw | null
   data: null | { page: T; parentPage?: P }
   list: (P | T)[]
 }
@@ -83,7 +84,6 @@ export const useEditorStore = defineStore('EditorStore', {
       label: '小说',
       icon: 'icon-bookmark',
       route: { name: 'EditorBookshelf' },
-      currentRoute: null,
       data: null,
       list: []
     },
@@ -92,7 +92,6 @@ export const useEditorStore = defineStore('EditorStore', {
       label: '世界观',
       icon: 'icon-common',
       route: { name: 'EditorWorld' },
-      currentRoute: null,
       data: null,
       list: [],
       panes: {
@@ -127,7 +126,6 @@ export const useEditorStore = defineStore('EditorStore', {
       label: '人物',
       icon: 'icon-user-group',
       route: { name: 'EditorCharacter' },
-      currentRoute: null,
       data: null,
       list: []
     },
@@ -136,7 +134,6 @@ export const useEditorStore = defineStore('EditorStore', {
       label: '项目',
       icon: 'icon-info-circle',
       route: { name: 'EditorInfo' },
-      currentRoute: null,
       data: null,
       list: []
     },
@@ -162,27 +159,55 @@ export const useEditorStore = defineStore('EditorStore', {
 
     worldPaneList(state) {
       return Object.values(state.world.panes)
+    },
+
+    allWorldPageList(state): WorldItem[] {
+      const list = Object.values(state.world.panes)
+        .map((item) => item.list)
+        .flat()
+      return [list, list.map((page) => page.children || []).flat()].flat()
     }
   },
 
   actions: {
+    /**
+     * 获取活动页数据
+     * @param action
+     * @returns
+     */
     getAction(
       action: Editor.ActivityActions
     ): ActionBookshelf | ActionWorld | ActionCharacter | ActionInfo {
       return this[action]
     },
 
+    /**
+     * 获取活动页当前路由，如果没有则为默认路由
+     * @param action
+     * @returns
+     */
     getActionRoute(action: Editor.ActivityActions) {
-      const { data, currentRoute, route } = this[action]
-      return data && currentRoute ? currentRoute : route
+      const { data, route } = this[action]
+      const currentRoute = useCacheStore().routeCache[action]
+      return currentRoute && data ? currentRoute : route
     },
 
+    /**
+     * 获取世界观子面板的数据数组
+     * @param key
+     * @returns
+     */
     getWorldPaneData(key: Editor.World.PaneType | string) {
       const pane = this.world.panes[key as Editor.World.PaneType]
       const { list = [] } = pane
       return list
     },
 
+    /**
+     * 保存对应活动页的数据
+     * @param action
+     * @returns
+     */
     async saveActionData(action: 'character') {
       const path = useProjectStore().project.path
       if (!this[action]) {
@@ -194,6 +219,11 @@ export const useEditorStore = defineStore('EditorStore', {
       return await $API.Electron.project.saveData(action, data, path)
     },
 
+    /**
+     * 保存世界观子面板的数据数组
+     * @param type
+     * @returns
+     */
     async saveWorldPaneData(type: string) {
       const path = this.project.path
       const list = this.getWorldPaneData(type)
@@ -201,8 +231,48 @@ export const useEditorStore = defineStore('EditorStore', {
       return await $API.Electron.project.saveData(`world.${type}`, data, path)
     },
 
+    loadActionRouteCache(action: Editor.ActivityActions, list: Page[]) {
+      const routeCache = useCacheStore().routeCache[action]
+
+      if (routeCache) {
+        logger.message(`发现[${action}]的路由缓存`, routeCache)
+        const { query } = routeCache
+        if (query) {
+          const id = query.id as string
+          const page = list.find((item) => item.id === id)
+          if (page) {
+            if (action === 'world') {
+              useConfigStore().sidebar.state.worldPane = page.type
+            }
+            nextTick(() => {
+              page.isSelected = true
+              this.switchPage(action, page)
+            })
+          }
+        }
+      }
+    },
+
+    /**
+     * 加载本地的路由缓存
+     */
+    async loadRouteCache() {
+      const actionNames = ['bookshelf', 'world', 'character', 'info']
+      ;(actionNames as Editor.ActivityActions[]).map(async (action) => {
+        const list =
+          action === 'world' ? this.allWorldPageList : this[action].list
+        this.loadActionRouteCache(action, list)
+      })
+    },
+
+    /**
+     * 加载小说书架的文件数据
+     */
     async loadBookshelfData() {},
 
+    /**
+     * 加载角色的文件数据
+     */
     async loadCharacterData() {
       const moduleName = 'character'
       const path = this.project.path
@@ -225,6 +295,9 @@ export const useEditorStore = defineStore('EditorStore', {
       characterList.push(...data)
     },
 
+    /**
+     * 加载世界观的文件数据
+     */
     async loadWorldData() {
       const names = this.worldPaneList.map((item) => `world.${item.key}`)
       const path = this.project.path
@@ -256,12 +329,27 @@ export const useEditorStore = defineStore('EditorStore', {
       })
     },
 
+    /**
+     * 加载项目信息的文件数据
+     */
     async loadInfoData() {},
 
-    switchPage(action: Editor.ActivityActions, page: Page, parentPage?: Page) {
-      this.getAction(action).data = { page, parentPage }
+    /**
+     * 切换对应活动页的当前页面
+     * @param action
+     * @param page
+     * @param parentPage
+     */
+    switchPage(action: Editor.ActivityActions, page?: Page, parentPage?: Page) {
+      this.getAction(action).data = page ? { page, parentPage } : null
     },
 
+    /**
+     * 显示项目状态的提示文字，比如保存情况等
+     * @param status
+     * @param message
+     * @param timeout
+     */
     setState(
       status: keyof typeof STATUS_DEFAULT_MAP,
       message: string,

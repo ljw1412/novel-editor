@@ -1,6 +1,7 @@
 <script setup lang="ts" name="HomeWelcome">
 import { useRouter } from 'vue-router'
 import $API from '/@/apis'
+import { ulid } from 'ulid'
 import { useProjectStore } from '/@/stores'
 import { only } from '/@/utils/object'
 import { getPublicUrl } from '/@/utils/url'
@@ -27,9 +28,14 @@ const linkList = [
 async function openProject(path: string) {
   const project = await $API.Electron.project.openProject(path)
   if (!project.title) project.title = '(未设置标题)'
+  if (!project.id) {
+    const id = ulid()
+    project.id = id
+    await $API.Electron.project.updateProject(path, { id })
+  }
   projectStore.setCurrentProject(project)
   projectStore.addRecentProject(
-    only(project, 'title path') as Editor.RecentRecord
+    only(project, 'id title path') as Editor.RecentRecord
   )
   $router.push({ name: 'AppEditor' })
 }

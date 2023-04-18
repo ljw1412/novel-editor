@@ -1,5 +1,6 @@
 import { useLocalStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'
+import { RouteLocationRaw } from 'vue-router'
 
 const themeList = [
   { name: '蓝色', value: '', type: 'light', variable: '--skin-blue' },

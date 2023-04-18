@@ -30,7 +30,7 @@ const breadcrumbData = computed(() => {
 <template>
   <div class="content-container flex flex-col h-full overflow-hidden">
     <header
-      class="content-header layout-lr select-none h-[40px] px-6 pt-6 pb-4 flex-shrink-0"
+      class="content-header layout-lr select-none h-[40px] px-6 pt-4 flex-shrink-0 box-content"
     >
       <a-breadcrumb class="text-md">
         <template #separator><icon-right /></template>

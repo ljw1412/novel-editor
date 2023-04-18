@@ -66,6 +66,13 @@ export const project = {
     return ipcInvoke<Editor.Project>(this.channel, 'openProject', { path })
   },
 
+  async updateProject(path: string, data: Partial<Editor.Project>) {
+    return ipcInvoke<Editor.Project>(this.channel, 'updateProject', {
+      path,
+      data
+    })
+  },
+
   initData(names: string | string[], path: string) {
     if (typeof names === 'string') names = [names]
     return ipcInvoke(this.channel, 'initData', { names, path })

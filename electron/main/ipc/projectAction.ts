@@ -29,6 +29,13 @@ const handle = createHandle(channel, {
     })
   },
 
+  async updateProject(e, win, payload) {
+    const { path, data } = payload
+    return handleWrap(() => {
+      return ProjectService.updateProject(path, data)
+    })
+  },
+
   async initData(e, win, payload) {
     const { names = [], path } = payload
     return handleWrap(() => {

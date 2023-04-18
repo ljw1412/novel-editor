@@ -118,6 +118,7 @@ watch(
   <div
     ref="itemEl"
     class="character-item flex h-[50px] items-center px-1 cursor-pointer"
+    sidebar-page-item
     :class="{
       active: character.isSelected,
       focus: isItemFocus,

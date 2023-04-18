@@ -1,7 +1,7 @@
 <script setup lang="ts" name="SidebarCharacter">
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, WatchSource } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useEditorStore, useProjectStore } from '/@/stores'
+import useStore from '/@/stores'
 import Character from '/@/classes/Character'
 import EditorSidebar from '../components/Sidebar.vue'
 import CharacterItem from '../components/CharacterItem.vue'
@@ -9,10 +9,9 @@ import CharacterItem from '../components/CharacterItem.vue'
 const moduleName = 'character'
 const $route = useRoute()
 const $router = useRouter()
-const projectStore = useProjectStore()
-const editorStore = useEditorStore()
+const { projectStore, editorStore, cacheStore } = useStore()
 const characterList = computed({
-  get: () => editorStore.character.list,
+  get: () => editorStore.character.list as Character[],
   set(value) {
     editorStore.$patch({ character: { list: value } })
     save()
@@ -22,9 +21,9 @@ const isAdding = ref(false)
 const isDrag = ref(false)
 
 async function save() {
-  editorStore.setState('loading', '保存中…', 0)
+  // editorStore.setState('loading', '保存中…', 0)
   await editorStore.saveActionData('character')
-  editorStore.setState('success', '保存成功')
+  // editorStore.setState('success', '保存成功')
 }
 
 function clearSelected() {
@@ -78,6 +77,7 @@ function handlePageDelete(page: Character) {
   editorStore.saveActionData(moduleName)
   if (page.isSelected) {
     $router.replace({ name: 'EditorCharacter' })
+    cacheStore.routeCache.character = null
   }
 }
 
@@ -89,6 +89,7 @@ function handlePageClick(page: Character) {
   const route = { name: `CharacterEditor`, query: { id: page.id } }
   $router.replace(route)
   editorStore.character.route = route
+  cacheStore.routeCache.character = route
 }
 
 function handleDragStart(e: Event & { item: HTMLElement }) {

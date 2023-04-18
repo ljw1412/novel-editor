@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { RouteLocationRaw, useRouter } from 'vue-router'
 import { useConfigStore, useEditorStore } from '/@/stores'
+import * as logger from '/@/utils/logger'
 
 const $router = useRouter()
 
@@ -18,9 +19,12 @@ const isCollapsed = computed({
 })
 
 if (!actions.map((i) => i.key).includes(activity.value)) {
+  logger.warning(
+    `不合法的activity=${activity.value}`,
+    `现已修复为合法值${actions[0].key}`
+  )
   activity.value = actions[0].key
 }
-$router.replace(editorStore.getActionRoute(activity.value))
 
 function handleActionItemClick(item: {
   key: Editor.ActivityActions

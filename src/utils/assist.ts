@@ -1,5 +1,13 @@
 export function noop() {}
 
+export function sleep(time = 1000) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(true)
+    }, time)
+  })
+}
+
 export function typeOf(obj: any) {
   const toString = Object.prototype.toString
   const map: Record<string, string> = {

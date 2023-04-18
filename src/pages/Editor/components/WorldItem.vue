@@ -8,8 +8,6 @@ import { useContextViewStore } from '/@/stores'
 const props = defineProps({
   // 是否在编辑状态
   isEdit: Boolean,
-  // 是否为子项
-  isChild: Boolean,
   // 是否在添加状态
   isAdding: Boolean,
   // 是否允许添加子项
@@ -29,8 +27,10 @@ const props = defineProps({
   placeholder: String,
   // 页面数据
   page: { type: Object as PropType<WorldItem>, default: () => ({}) },
-  // 父节点的类
-  parentClass: [String, Object]
+  // 父级
+  parent: Object as PropType<WorldItem>,
+  // 是否为拖拽状态
+  isDragging: Boolean
 })
 const $emit = defineEmits([
   'page-click',
@@ -46,6 +46,7 @@ const _collapsed = ref(props.allowCollapse && props.defaultCollapsed)
 const isCollapsed = computed(() => {
   return props.collapsed ?? _collapsed.value
 })
+const isChild = computed(() => !!props.parent)
 const inputRef = ref<InputInstance>()
 const inputText = ref('')
 const isInputFocus = ref(false)
@@ -55,14 +56,14 @@ const isChildSelected = computed(() => {
 })
 const pageItemClass = computed(() => {
   const classList: (string | Record<string, boolean>)[] = [
-    props.parentClass || {},
     {
+      dragging: props.isDragging,
       active: props.page.isSelected,
       focus: isItemFocus.value,
       'context-menu': isContextMenu.value
     }
   ]
-  if (props.isChild) {
+  if (isChild.value) {
     classList.push(props.isEdit ? 'pl-7' : 'pl-8')
   } else {
     classList.push(props.isEdit ? 'pl-[26px]' : 'pl-[34px]')
@@ -206,6 +207,15 @@ watch(
   },
   { immediate: true }
 )
+
+watch(
+  () => props.page.isSelected,
+  (v) => {
+    if (v && props.parent) {
+      props.parent.isCollapsed = false
+    }
+  }
+)
 </script>
 
 <template>
@@ -221,6 +231,7 @@ watch(
     <div
       ref="pageItemEl"
       class="page-item h-6 pr-2 cursor-pointer flex items-center"
+      sidebar-page-item
       :class="pageItemClass"
       :tabindex="page.isSelected ? 10 : -1"
       @contextmenu="showContextmenu"
@@ -254,7 +265,7 @@ watch(
             :size="16"
           />
         </div>
-        <span class="truncate">{{ page.title }}</span>
+        <span class="page-title truncate">{{ page.title }}</span>
         <div
           v-if="allowAddChild"
           v-show="!isAdding"
@@ -297,6 +308,7 @@ watch(
     }
 
     &.active {
+      font-weight: 700;
       background-color: rgba(var(--app-color-common-rgb), 0.36);
     }
   }
@@ -345,6 +357,11 @@ watch(
     > .children::before {
       left: 18px;
     }
+  }
+
+  &.child-selected > .page-item {
+    font-weight: 700;
+    color: var(--app-color-common);
   }
 
   &.child-selected > .children::before,

@@ -1,4 +1,4 @@
-import { nin, only } from '../utils/object'
+import { nin } from '../utils/object'
 import { ulid } from 'ulid'
 
 export interface PageObject {

@@ -1,13 +1,13 @@
 <script setup lang="ts" name="AppEditor">
-import { ref, computed, onUnmounted } from 'vue'
-import { RouteLocationRaw, useRoute, useRouter } from 'vue-router'
-import { useConfigStore, useDialogStore, useEditorStore } from '/@/stores'
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import useStore from '/@/stores'
+import { sleep } from '/@/utils/assist'
 import ImageCropperDialog from '/@/components/ImageCropperDialog.vue'
 import Activitybar from './components/Activitybar.vue'
 
-const configStore = useConfigStore()
-const editorStore = useEditorStore()
-const dialogStore = useDialogStore()
+const $router = useRouter()
+const { configStore, editorStore, dialogStore, cacheStore } = useStore()
 
 const isCollapsed = computed({
   get: () => configStore.sidebar.isCollapsed,
@@ -46,8 +46,28 @@ function resizeMovingEnd() {
   configStore.sidebar.width = asideWidthComp.value
 }
 
-editorStore.loadWorldData()
-editorStore.loadCharacterData()
+const isDisplayInitDialog = ref(false)
+const initMsg = ref('')
+
+async function init() {
+  isDisplayInitDialog.value = true
+  initMsg.value = '加载世界观数据……'
+  await sleep(500)
+  await editorStore.loadWorldData()
+  initMsg.value = '加载角色数据……'
+  await sleep(300)
+  await editorStore.loadCharacterData()
+  initMsg.value = '加载缓存数据……'
+  await sleep(300)
+  cacheStore.initRouteCache()
+  editorStore.loadRouteCache()
+  initMsg.value = '数据加载完毕'
+  await sleep(300)
+  $router.replace(editorStore.getActionRoute(configStore.sidebar.activity))
+  isDisplayInitDialog.value = false
+}
+
+init()
 </script>
 
 <template>
@@ -87,6 +107,20 @@ editorStore.loadCharacterData()
       </router-view>
     </main>
     <!-- 全局弹窗 -->
+    <a-modal
+      v-model:visible="isDisplayInitDialog"
+      simple
+      :footer="false"
+      :esc-to-close="false"
+      :mask-closable="false"
+      width="280px"
+      modal-class="px-5 pb-5 pt-0"
+    >
+      <a-space size="large">
+        <a-spin :size="32" />
+        <span>{{ initMsg }}</span>
+      </a-space>
+    </a-modal>
     <ImageCropperDialog
       v-model:visiable="dialogStore.cropper.isDisplay"
       :image="dialogStore.cropper.image"

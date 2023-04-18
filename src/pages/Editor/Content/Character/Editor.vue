@@ -28,7 +28,7 @@ useEventListener('keydown', (e) => {
 <template>
   <ContentContainer class="character-editor">
     <template #default="{ page }: { page: Character }">
-      <a-space direction="vertical" fill class="pt-4">
+      <a-space direction="vertical" fill class="mt-2">
         <a-input v-model="page.title" placeholder="姓名" class="name-input" />
         <a-space>
           <a-select
