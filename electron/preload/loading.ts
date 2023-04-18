@@ -58,7 +58,8 @@ function useLoading() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #2a2a2b;
+  background-color: var(--app-theme, #2a2a2b);
+  transition: background-color 0.4s, opacity 0.5s 0.4s;
   z-index: 9;
 }
     `
@@ -71,20 +72,25 @@ function useLoading() {
   oDiv.innerHTML = `<div class="${className}"><div></div></div>`
 
   return {
+    el: oDiv,
     appendLoading() {
+      oDiv.style.opacity = '1'
       safeDOM.append(document.head, oStyle)
       safeDOM.append(document.body, oDiv)
     },
     removeLoading() {
-      safeDOM.remove(document.head, oStyle)
-      safeDOM.remove(document.body, oDiv)
+      oDiv.style.opacity = '0'
+      setTimeout(() => {
+        safeDOM.remove(document.head, oStyle)
+        safeDOM.remove(document.body, oDiv)
+      }, 1000)
     }
   }
 }
 
 // ----------------------------------------------------------------------
 
-const { appendLoading, removeLoading } = useLoading()
+const { el, appendLoading, removeLoading } = useLoading()
 domReady().then(appendLoading)
 
 window.onmessage = (ev) => {
