@@ -12,16 +12,6 @@ import { useCacheStore, useConfigStore, useProjectStore } from './index'
 import { Notification } from '@arco-design/web-vue'
 import { only } from '../utils/object'
 
-interface PaneItem {
-  key: string
-  title: string
-  list: WorldItem[]
-  placeholder?: string
-  childPlaceholder?: string
-  allowAdd: boolean
-  allowAddChild: boolean
-}
-
 const STATUS_DEFAULT_MAP = {
   loading: {
     status: 'loading',
@@ -45,21 +35,6 @@ const STATUS_DEFAULT_MAP = {
   }
 }
 
-interface ActionItem<T extends Page, P = T> {
-  key: string
-  label: string
-  icon: string
-  route: RouteLocationRaw
-  data: null | { page: T; parentPage?: P }
-  list: (P | T)[]
-}
-type ActionBookshelf = ActionItem<Chapter, Volume>
-type ActionWorld = ActionItem<WorldItem> & {
-  panes: Record<Editor.World.PaneType, PaneItem>
-}
-type ActionCharacter = ActionItem<Character>
-type ActionInfo = ActionItem<Page>
-
 interface EditorState {
   status: string
   icon: string
@@ -69,10 +44,10 @@ interface EditorState {
 }
 
 interface EditorStoreState {
-  bookshelf: ActionItem<Chapter, Volume>
-  world: ActionWorld
-  character: ActionCharacter
-  info: ActionInfo
+  bookshelf: Editor.Activity.Bookshelf
+  world: Editor.Activity.World
+  character: Editor.Activity.Character
+  info: Editor.Activity.Info
   state: EditorState
 }
 
@@ -174,9 +149,7 @@ export const useEditorStore = defineStore('EditorStore', {
      * @param action
      * @returns
      */
-    getAction(
-      action: Editor.ActivityActions
-    ): ActionBookshelf | ActionWorld | ActionCharacter | ActionInfo {
+    getAction(action: Editor.Activity.Types): Editor.Activity.Items {
       return this[action]
     },
 
@@ -185,8 +158,9 @@ export const useEditorStore = defineStore('EditorStore', {
      * @param action
      * @returns
      */
-    getActionRoute(action: Editor.ActivityActions) {
+    getActionRoute(action: Editor.Activity.Types, isDefault = false) {
       const { data, route } = this[action]
+      if (isDefault) return route
       const currentRoute = useCacheStore().routeCache[action]
       return currentRoute && data ? currentRoute : route
     },
@@ -230,9 +204,13 @@ export const useEditorStore = defineStore('EditorStore', {
       return await $API.Electron.project.saveData(`world.${type}`, data, path)
     },
 
-    loadActionRouteCache(action: Editor.ActivityActions, list: Page[]) {
+    /**
+     * 加载对应活动栏的路由缓存
+     * @param action
+     * @param list
+     */
+    loadActionRouteCache(action: Editor.Activity.Types, list: Page[]) {
       const routeCache = useCacheStore().routeCache[action]
-
       if (routeCache) {
         logger.message(`发现[${action}]的路由缓存`, routeCache)
         const { query } = routeCache
@@ -257,7 +235,7 @@ export const useEditorStore = defineStore('EditorStore', {
      */
     async loadRouteCache() {
       const actionNames = ['bookshelf', 'world', 'character', 'info']
-      ;(actionNames as Editor.ActivityActions[]).map(async (action) => {
+      ;(actionNames as Editor.Activity.Types[]).map(async (action) => {
         const list =
           action === 'world' ? this.allWorldPageList : this[action].list
         this.loadActionRouteCache(action, list)
@@ -339,7 +317,7 @@ export const useEditorStore = defineStore('EditorStore', {
      * @param page
      * @param parentPage
      */
-    switchPage(action: Editor.ActivityActions, page?: Page, parentPage?: Page) {
+    switchPage(action: Editor.Activity.Types, page?: Page, parentPage?: Page) {
       this.getAction(action).data = page ? { page, parentPage } : null
     },
 

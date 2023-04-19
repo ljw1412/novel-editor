@@ -29,7 +29,7 @@ const theme = useLocalStorage('APP_THEME', {
 
 const view = useLocalStorage('APP_VIEW', {
   sidebar: {
-    activity: '' as Editor.ActivityActions,
+    activity: '' as Editor.Activity.Types,
     width: 300,
     isCollapsed: false,
     state: {

@@ -77,7 +77,7 @@ function handlePageDelete(page: Character) {
   editorStore.saveActionData(moduleName)
   if (page.isSelected) {
     $router.replace({ name: 'EditorCharacter' })
-    cacheStore.routeCache.character = null
+    cacheStore.setRouteCache('character', null)
   }
 }
 
@@ -89,7 +89,7 @@ function handlePageClick(page: Character) {
   const route = { name: `CharacterEditor`, query: { id: page.id } }
   $router.replace(route)
   editorStore.character.route = route
-  cacheStore.routeCache.character = route
+  cacheStore.setRouteCache('character', route)
 }
 
 function handleDragStart(e: Event & { item: HTMLElement }) {

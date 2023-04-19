@@ -27,7 +27,7 @@ if (!actions.map((i) => i.key).includes(activity.value)) {
 }
 
 function handleActionItemClick(item: {
-  key: Editor.ActivityActions
+  key: Editor.Activity.Types
   route: RouteLocationRaw
 }) {
   if (activity.value === item.key) {

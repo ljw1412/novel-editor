@@ -1,19 +1,21 @@
 <script setup lang="ts">
 import { computed, PropType } from 'vue'
-import { useRoute } from 'vue-router'
-import { useEditorStore } from '/@/stores'
+import { useRoute, useRouter } from 'vue-router'
+import useStore from '/@/stores'
 import Page from '/@/classes/BasePage'
 import EditorState from './EditorState.vue'
 
 const props = defineProps({
-  action: { type: String as PropType<Editor.ActivityActions> }
+  action: { type: String as PropType<Editor.Activity.Types> }
 })
+const $emit = defineEmits(['back'])
 
 const $route = useRoute()
-const editorStore = useEditorStore()
+const $router = useRouter()
+const { editorStore, cacheStore } = useStore()
 
 const action = editorStore.getAction(
-  props.action || ($route.meta.action as Editor.ActivityActions)
+  props.action || ($route.meta.action as Editor.Activity.Types)
 )
 
 const breadcrumbData = computed(() => {
@@ -25,6 +27,17 @@ const breadcrumbData = computed(() => {
     page && page.title
   ].filter((i) => i)
 })
+
+function back() {
+  if (action.key === 'world') {
+    editorStore.allWorldPageList.forEach((page) => (page.isSelected = false))
+  } else if (action) {
+    action.list.forEach((page) => (page.isSelected = false))
+  }
+  cacheStore.setRouteCache(action.key, null)
+  $router.replace(action.route)
+  $emit('back')
+}
 </script>
 
 <template>
@@ -32,14 +45,24 @@ const breadcrumbData = computed(() => {
     <header
       class="content-header layout-lr select-none h-[40px] px-6 pt-4 flex-shrink-0 box-content"
     >
-      <a-breadcrumb class="text-md">
-        <template #separator><icon-right /></template>
-        <a-breadcrumb-item v-for="item of breadcrumbData">
-          {{ item }}
-        </a-breadcrumb-item>
-      </a-breadcrumb>
-      <EditorState></EditorState>
-      <slot name="extra"></slot>
+      <div class="left flex items-center">
+        <div
+          class="flex-shrink-0 mr-3 hover:bg-fill-2 p-2 rounded-full cursor-pointer"
+          @click="back"
+        >
+          <icon-arrow-left />
+        </div>
+        <a-breadcrumb class="text-md flex-shrink-0">
+          <template #separator><icon-right /></template>
+          <a-breadcrumb-item v-for="item of breadcrumbData">
+            {{ item }}
+          </a-breadcrumb-item>
+        </a-breadcrumb>
+      </div>
+      <div class="right">
+        <EditorState></EditorState>
+        <slot name="extra"></slot>
+      </div>
     </header>
     <a-scrollbar
       outer-class="flex-grow h-0 w-full"

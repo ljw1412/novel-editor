@@ -4,7 +4,7 @@ import { RouteLocationNamedRaw } from 'vue-router'
 import { useProjectStore } from './index'
 import * as logger from '/@/utils/logger'
 
-type RouteCache = Record<Editor.ActivityActions, RouteLocationNamedRaw | null>
+type RouteCache = Record<Editor.Activity.Types, RouteLocationNamedRaw | null>
 
 function createRouteCache(): RouteCache {
   return {
@@ -34,6 +34,13 @@ export const useCacheStore = defineStore('cacheStore', {
       this.$patch({
         routeCache: useLocalStorage(`PROJECT_${projectId}`, createRouteCache())
       })
+    },
+
+    setRouteCache(
+      action: Editor.Activity.Types,
+      route: RouteLocationNamedRaw | null
+    ) {
+      this.routeCache[action] = route
     },
 
     removeRouteCache(projectId: string) {

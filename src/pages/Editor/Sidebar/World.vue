@@ -73,7 +73,7 @@ function handlePageDelete(page: WorldItem, list: WorldItem[]) {
   save(page.type)
   if (page.isSelected) {
     $router.replace({ name: 'EditorWorld' })
-    cacheStore.routeCache.world = null
+    cacheStore.setRouteCache('world', null)
   }
 }
 
@@ -89,7 +89,7 @@ function handlePageClick(page: WorldItem, parentPage?: WorldItem) {
     query: { mode: parentPage ? 'child' : 'root', id: page.id }
   }
   $router.replace(route)
-  cacheStore.routeCache.world = route
+  cacheStore.setRouteCache('world', route)
 }
 
 function handleDragStart(e: Event & { item: HTMLElement }) {

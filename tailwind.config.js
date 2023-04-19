@@ -79,6 +79,10 @@ module.exports = {
         'color-2': 'var(--color-bg-2)',
         'color-3': 'var(--color-bg-3)',
         'color-4': 'var(--color-bg-4)',
+        'fill-1': 'var(--color-fill-1)',
+        'fill-2': 'var(--color-fill-2)',
+        'fill-3': 'var(--color-fill-3)',
+        'fill-4': 'var(--color-fill-4)',
         'color-theme': opacityColor('var(--app-theme-rgb)'),
         'color-common': opacityColor('var(--app-color-common-rgb)'),
         'color-app': 'var(--app-color-bg)'
