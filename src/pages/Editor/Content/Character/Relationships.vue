@@ -1,22 +1,11 @@
 <script setup lang="ts" name="CharacterRelationships">
-//@ts-nocheck
-import { onMounted, ref } from 'vue'
-import { useResizeObserver } from '@vueuse/core'
-import { useEditorStore, useProjectStore } from '/@/stores'
-import { select, Selection } from 'd3-selection'
-import {
-  forceLink,
-  forceManyBody,
-  forceSimulation,
-  forceX,
-  forceY
-} from 'd3-force'
-import { drag as D3Drag } from 'd3-drag'
+import { onMounted, ref, computed } from 'vue'
+import { usePointerSwipe, useResizeObserver } from '@vueuse/core'
+import { useEditorStore } from '/@/stores'
 import { only } from '/@/utils/object'
+import draw from './RelationshipsDraw'
 
-const { getLocalUrl } = useProjectStore()
-
-const wrapEl = ref<SVGElement>()
+const wrapEl = ref<HTMLElement>()
 const svgWidth = ref(0)
 const svgHeight = ref(0)
 useResizeObserver(wrapEl, (entries) => {
@@ -43,7 +32,7 @@ const a2bMap = characterList
     obj[item] ?? (obj[item] = -1)
     obj[item]++
     return obj
-  }, {})
+  }, {} as Record<string, any>)
 
 characterList.forEach((character) => {
   nodes[character.id] = only(character, 'id avatar title timepoint')
@@ -59,232 +48,129 @@ characterList.forEach((character) => {
     })
   })
 })
-console.log(a2bMap)
+// console.log(a2bMap)
 
-function draw() {
-  const svg = select('#character-relationships')
-    .attr('viewBox', [-400, -400, 800, 800])
-    .style('width', '100%')
-    .style('height', '100%')
+const markerArrowList = [
+  { id: 'arrow', color: '#999' },
+  { id: 'arrow-green', color: 'green' },
+  { id: 'arrow-orange', color: 'orange' }
+]
 
-  console.log(links, nodes)
-
-  const forceNodes = forceManyBody().strength(() => -4000)
-  // console.log(forceNodes)
-
-  const forceLinks = forceLink(links)
-    .id((d) => d.id)
-    .strength(() => 0.1)
-  // console.log(forceLinks)
-
-  function ticked() {
-    link
-      .attr('x1', (d) => d.source.x)
-      .attr('y1', (d) => {
-        if (d.type === 1) return d.source.y + 20
-        if (d.type === 2) return d.source.y - 20
-        return d.source.y
-      })
-      .attr('x2', (d) => d.target.x)
-      .attr('y2', (d) => {
-        if (d.type === 1) return d.target.y + 20
-        if (d.type === 2) return d.target.y - 20
-        return d.target.y
-      })
-    edges_text
-      .attr('x', (d) => {
-        return (d.source.x + d.target.x) / 2
-      })
-      .attr('y', (d) => {
-        if (d.type === 1) return (d.target.y + d.source.y + 40) / 2
-        if (d.type === 2) return (d.target.y + d.source.y - 40) / 2
-        return (d.target.y + d.source.y) / 2
-      })
-      .attr('style', (d) => {
-        const angle =
-          (Math.atan2(d.source.y - d.target.y, d.source.x - d.target.x) * 180) /
-          Math.PI
-        return `transform: rotate(${angle}deg);transform-origin: center;transform-box: fill-box;`
-      })
-    node.attr('cx', (d) => d.x).attr('cy', (d) => d.y)
-    text.attr('x', (d) => d.x).attr('y', (d) => d.y)
-    image.attr('transform', (d) => `translate(${d.x},${d.y})`)
-  }
-
-  function drag(simulation: any) {
-    return D3Drag()
-      .on('start', (event: any) => {
-        if (!event.active) simulation.alphaTarget(0.3).restart()
-        event.subject.fx = event.subject.x
-        event.subject.fy = event.subject.y
-      })
-      .on('drag', (event: any) => {
-        event.subject.fx = event.x
-        event.subject.fy = event.y
-      })
-      .on('end', (event: any) => {
-        if (!event.active) simulation.alphaTarget(0)
-        event.subject.fx = null
-        event.subject.fy = null
-      })
-  }
-
-  const simulation = forceSimulation(Object.values(nodes))
-    .force('link', forceLinks)
-    .force('charge', forceNodes)
-    .force('x', forceX())
-    .force('y', forceY())
-    .on('tick', ticked)
-  console.log('simulation', simulation)
-
-  const marker = svg
-    .append('marker')
-    //.attr("id", function(d) { return d; })
-    .attr('id', 'arrow')
-    //.attr("markerUnits","strokeWidth")//设置为strokeWidth箭头会随着线的粗细发生变化
-    .attr('markerUnits', 'userSpaceOnUse')
-    .attr('viewBox', '0 -5 10 10') //坐标系的区域
-    .attr('refX', 80) //箭头坐标
-    .attr('refY', 0)
-    .attr('markerWidth', 8) //标识的大小
-    .attr('markerHeight', 8)
-    .attr('orient', 'auto') //绘制方向，可设定为：auto（自动确认方向）和 角度值
-    .attr('stroke-width', 2) //箭头宽度
-    .append('path')
-    .attr('d', 'M0,-5L10,0L0,5') //箭头的路径
-    .attr('fill', '#999') //箭头颜色
-
-  const link = svg
-    .append('g')
-    // .attr('stroke', '#999')
-
-    .attr('stroke-opacity', 0.6)
-    .attr('stroke-width', 1.5)
-    .attr('stroke-linecap', 'round')
-    .selectAll('line')
-    .data(links)
-    .join('line')
-    .attr('stroke', ({ type }) => {
-      if (type === 1) return 'orange'
-      if (type === 2) return 'green'
-      return '#999'
-    })
-    .style('--marker-color', ({ type }) => {
-      if (type === 1) return 'orange'
-      if (type === 2) return 'green'
-      return '#999'
-    })
-    .attr('marker-end', function (d) {
-      return 'url(#arrow)'
-    })
-
-  const node = svg
-    .append('g')
-    .selectAll('circle')
-    .data(simulation.nodes()) //表示使用force.nodes数据
-    .join('circle')
-    .style('fill', (node) => {
-      // var link = links[node.index]
-
-      // if (link) {
-      //   if (link.type == '1') {
-      //     return '#C03939'
-      //   } else if (link.type == '3') {
-      //     return '#5095FF'
-      //   } else if (link.source.name.length <= 4) {
-      //     return '#CD994C'
-      //   } else {
-      //     return '#1943AC'
-      //   }
-      return '#CD994C'
-    })
-    .style('stroke', (node) => {
-      // var color //圆圈线条的颜色
-      // var link = links[node.index]
-      // if (link) {
-      //   console.log(link.rela)
-      //   if (link.type == '1') {
-      //     //p2p
-      //     return (color = '#C03939')
-      //   } else if (link.type == '3') {
-      //     return (color = '#5095FF')
-      //   } else if (link.source.name.length <= 4) {
-      //     //人
-      //     return (color = '#CD994C')
-      //   } else {
-      //     return (color = '#1943AC')
-      //   }
-      // }
-      return '#CD994C'
-    })
-    .attr('r', 30)
-    .call(drag(simulation))
-
-  const text = svg
-    .append('g')
-    .attr('text-anchor', 'middle')
-    .attr('fill', (node) => 'var(--app-color-text)')
-    .selectAll('text')
-    .data(simulation.nodes())
-    .join('text')
-    .attr('dy', 48)
-    .style('pointer-events', 'none')
-  text
-    .append('tspan')
-    .attr('style', 'font-size: 16px;')
-    .text((d) => d.title)
-
-  const image = svg
-    .append('g')
-    .selectAll('image')
-    .data(simulation.nodes().filter((node) => node.avatar))
-    .join('g')
-    .attr('clip-path', 'url(#clip)')
-
-  image
-    .append('image')
-    .attr('xlink:href', (node) => getLocalUrl(node.avatar))
-    .attr('width', 60)
-    .attr('height', 60)
-    .attr('transform', 'translate(-30,-30)')
-    .style('pointer-events', 'none')
-
-  const edges_text = svg
-    .append('g')
-    .selectAll('.edgelabel')
-    .data(links)
-    .join('text')
-    .attr('fill', ({ type }) => {
-      if (type === 1) return 'orange'
-      if (type === 2) return 'green'
-      return 'var(--app-color-text)'
-    })
-    .attr('class', 'edgelabel')
-    .attr('id', (node, i) => 'edgepath' + i)
-    .attr('dx', (node) => `-${node.relation.length / 2}em`)
-    .attr('dy', '0.5em')
-    .style('pointer-events', 'none')
-    .text((node) => node.relation)
-}
 onMounted(() => {
-  draw()
+  draw(nodes, links)
 })
+
+const ratio = ref(1)
+const dx = ref(0)
+const dy = ref(0)
+const sliderValue = computed({
+  get() {
+    return Math.round((1 / ratio.value) * 10000) / 100
+  },
+
+  set(v) {
+    ratio.value = 100 / v
+  }
+})
+const viewBox = computed(() => {
+  const baseWith = svgWidth.value * ratio.value
+  const baseHeight = svgHeight.value * ratio.value
+
+  return [
+    -baseWith / 2 - dx.value,
+    -baseHeight / 2 - dy.value,
+    baseWith,
+    baseHeight
+  ]
+})
+
+const isNode = ref(false)
+const isDragging = ref(false)
+usePointerSwipe(wrapEl, {
+  onSwipeStart: (e) => {
+    const target = e.target as HTMLElement
+    if (target) {
+      isNode.value = target.classList.contains('character-node')
+    }
+    if (!isNode.value) isDragging.value = true
+  },
+
+  onSwipe(e) {
+    const { movementX, movementY } = e
+    if (isNode.value && !isDragging.value) return
+    dx.value += movementX * ratio.value
+    dy.value += movementY * ratio.value
+  },
+
+  onSwipeEnd(e, direction) {
+    isNode.value = false
+    isDragging.value = false
+  }
+})
+
+function handleWheel(e: WheelEvent) {
+  const base = e.deltaY < 0 ? -1 : 1
+  const d = Math.round((ratio.value + base / 10) * 100) / 100
+  ratio.value = Math.max(0.4, Math.min(d, 2))
+}
+
+function reset() {
+  ratio.value = 1
+  dx.value = 0
+  dy.value = 0
+}
 </script>
 
 <template>
-  <div ref="wrapEl" class="character-relationships w-full h-full overflow-hide">
+  <div
+    ref="wrapEl"
+    class="character-relationships w-full h-full overflow-hide"
+    :class="{ 'dragging cursor-grabbing': isDragging }"
+    @wheel="handleWheel"
+  >
     <svg
       id="character-relationships"
       xmlns="https://www.w3.org/2000/svg"
       xmlns:xlink="https://www.w3.org/1999/xlink"
       class="select-none"
+      :viewBox="viewBox.join(',')"
     >
       <defs>
+        <!-- 预设圆角裁切 -->
         <clipPath id="clip">
           <rect x="-30" y="-30" width="60" height="60" rx="30" />
         </clipPath>
+        <!-- 预设不同颜色的箭头 -->
+        <marker
+          v-for="item of markerArrowList"
+          :key="item.id"
+          :id="item.id"
+          markerUnits="userSpaceOnUse"
+          viewBox="0 -5 10 10"
+          refX="80"
+          refY="0"
+          markerWidth="8"
+          markerHeight="8"
+          orient="auto"
+          stroke-width="2"
+        >
+          <path d="M0,-5L10,0L0,5" :fill="item.color"></path>
+        </marker>
       </defs>
     </svg>
+
+    <a-space class="actions absolute right-3 bottom-3" @pointerdown.stop>
+      <a-slider
+        v-model="sliderValue"
+        :style="{ width: '150px' }"
+        :min="50"
+        :max="250"
+      />
+
+      <a-button size="small" @click.stop="reset">
+        <template #icon><icon-refresh /></template>
+      </a-button>
+    </a-space>
   </div>
 </template>
 

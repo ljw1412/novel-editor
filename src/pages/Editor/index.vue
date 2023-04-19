@@ -50,6 +50,9 @@ const isDisplayInitDialog = ref(false)
 const initMsg = ref('')
 
 async function init() {
+  const activity = configStore.sidebar.activity
+  const defaultRoute = editorStore.getActionRoute(activity, true)
+  $router.replace(defaultRoute)
   isDisplayInitDialog.value = true
   initMsg.value = '加载世界观数据……'
   await sleep(500)
@@ -63,9 +66,7 @@ async function init() {
   editorStore.loadRouteCache()
   initMsg.value = '数据加载完毕'
   await sleep(300)
-  const route = editorStore.getActionRoute(configStore.sidebar.activity)
-  console.log(route)
-
+  const route = editorStore.getActionRoute(activity)
   $router.replace(route)
   isDisplayInitDialog.value = false
 }
@@ -103,7 +104,8 @@ init()
     </a-resize-box>
     <!-- 主体 -->
     <main
-      class="editor-content relative h-full max-w-[1200px] mx-auto flex-grow overflow-hidden"
+      class="editor-content relative h-full mx-auto flex-grow overflow-hidden"
+      :class="{ 'max-w-[1200px]': !$route.meta.full }"
     >
       <router-view v-slot="{ Component, route }">
         <component :is="Component" :key="route.fullPath" />

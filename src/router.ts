@@ -148,7 +148,12 @@ const routes = [
               sidebar: CharacterSidebar,
               default: CharacterRelationships
             },
-            meta: { title: '人物', subtitle: '关系图', action: 'character' }
+            meta: {
+              title: '人物',
+              subtitle: '关系图',
+              action: 'character',
+              full: true
+            }
           },
           // 人物 - 编辑器
           {
