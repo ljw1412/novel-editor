@@ -35,7 +35,9 @@ function clearSelected() {
 function handleHeaderBtnClick(action: string) {
   if (action === 'relationships' && $route.name !== 'CharacterRelationships') {
     clearSelected()
-    $router.replace({ name: 'CharacterRelationships' })
+    const route = { name: 'CharacterRelationships' }
+    $router.replace(route)
+    cacheStore.setRouteCache('character', route)
   }
 }
 
@@ -88,7 +90,6 @@ function handlePageClick(page: Character) {
   editorStore.switchPage(moduleName, page)
   const route = { name: `CharacterEditor`, query: { id: page.id } }
   $router.replace(route)
-  editorStore.character.route = route
   cacheStore.setRouteCache('character', route)
 }
 

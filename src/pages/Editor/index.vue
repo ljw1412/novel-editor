@@ -63,7 +63,10 @@ async function init() {
   editorStore.loadRouteCache()
   initMsg.value = '数据加载完毕'
   await sleep(300)
-  $router.replace(editorStore.getActionRoute(configStore.sidebar.activity))
+  const route = editorStore.getActionRoute(configStore.sidebar.activity)
+  console.log(route)
+
+  $router.replace(route)
   isDisplayInitDialog.value = false
 }
 

@@ -159,10 +159,10 @@ export const useEditorStore = defineStore('EditorStore', {
      * @returns
      */
     getActionRoute(action: Editor.Activity.Types, isDefault = false) {
-      const { data, route } = this[action]
+      const { route } = this[action]
       if (isDefault) return route
       const currentRoute = useCacheStore().routeCache[action]
-      return currentRoute && data ? currentRoute : route
+      return currentRoute ? currentRoute : route
     },
 
     /**
