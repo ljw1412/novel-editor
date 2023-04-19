@@ -71,7 +71,7 @@ function handleActionItemClick(item: {
 <style lang="scss">
 .activitybar {
   background-color: var(--editor-activitybar-bg);
-  border-right: 1px solid var(--color-border-2);
+  border-right: 1px solid var(--color-border);
   width: var(--app-activitybar-width);
 
   .action-item {

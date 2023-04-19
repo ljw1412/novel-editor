@@ -154,6 +154,8 @@ function handleUpdateCollapsed(page: WorldItem, collapsed: boolean) {
               </div>
             </a-space>
           </template>
+          <div class="shadow top"></div>
+          <div class="shadow top-left-corner top"></div>
           <a-scrollbar outer-class="h-full" class="h-full overflow-auto">
             <draggable
               v-model="item.list"
@@ -225,6 +227,25 @@ function handleUpdateCollapsed(page: WorldItem, collapsed: boolean) {
 
 <style lang="scss">
 .sidebar-world {
+  .shadow {
+    position: absolute;
+
+    &.top {
+      top: 0;
+      left: 3px;
+      height: 3px;
+      width: 100%;
+      box-shadow: var(--app-color-shadow) 0 6px 6px -6px inset;
+    }
+
+    &.top-left-corner {
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 3px;
+    }
+  }
+
   &:hover {
     // 同族的引导线
     .page-item-wrap .children::before {

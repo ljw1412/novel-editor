@@ -49,7 +49,7 @@ function existsRelations(key: string) {
           class="h-line layout-center-py left-4 right-0 h-[2px] bg-current bg-opacity-30"
         ></div>
         <div
-          class="arrow absolute top-1/2 right-0 w-[12px] h-[12px] origin-center -translate-y-1/2 rotate-45 border-t-2 border-r-2 border-current"
+          class="arrow absolute top-1/2 right-0 w-[9px] h-[9px] origin-center -translate-y-1/2 rotate-45 border-current border-t-2 border-r-2"
         ></div>
       </div>
       <a-input

@@ -54,11 +54,13 @@ const $route = useRoute()
     }
 
     .arco-collapse-item-header {
-      padding-top: 4px;
-      padding-bottom: 4px;
+      padding-top: 0;
+      padding-bottom: 0;
       padding-right: 4px;
       padding-left: 24px;
-      min-height: 34px;
+      min-height: 28px;
+      line-height: 1;
+      border-color: none;
       background-color: var(--color-bg-4);
 
       .arco-icon-hover {

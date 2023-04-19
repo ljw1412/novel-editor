@@ -152,7 +152,7 @@ function draw() {
     .attr('stroke-width', 2) //箭头宽度
     .append('path')
     .attr('d', 'M0,-5L10,0L0,5') //箭头的路径
-    .attr('fill', 'var(--marker-color, #999)') //箭头颜色
+    .attr('fill', '#999') //箭头颜色
 
   const link = svg
     .append('g')
