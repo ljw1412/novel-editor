@@ -31,7 +31,7 @@ declare namespace Editor {
     interface PaneItem {
       key: string
       title: string
-      list: WorldItem[]
+      list: WorldPage[]
       placeholder?: string
       childPlaceholder?: string
       allowAdd: boolean
