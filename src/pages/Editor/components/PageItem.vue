@@ -28,7 +28,7 @@ const props = defineProps({
   // 触发折叠的行为模式：按钮 整行
   collapseMode: {
     type: String as PropType<'button' | 'line'>,
-    default: 'line'
+    default: 'button'
   },
   // 上下文菜单
   contextMenu: {
@@ -65,7 +65,7 @@ const contextView = useContextViewStore()
 
 const metaStyles = computed(() => {
   let paddingLeft = 34
-  if (props.parent) paddingLeft += 22
+  if (props.parent) paddingLeft += 9
   if (props.page.isEdit) paddingLeft -= 9
   return [{ paddingLeft: paddingLeft + 'px' }, props.metaStyle]
 })
@@ -122,21 +122,21 @@ function handleInputBlur() {
   isInputFocus.value = false
   if (inputText.value.trim()) {
     props.page.title = inputText.value.trim()
-    $emit('submit', props.page)
+    $emit('submit', props.page, props.parent)
   } else {
-    $emit('cancel', props.page)
+    $emit('cancel', props.page, props.parent)
   }
 }
 
 function handleEscapeKeydown() {
   isInputFocus.value = false
-  $emit('cancel', props.page)
+  $emit('cancel', props.page, props.parent)
 }
 
 function handlePressEnter() {
   if (inputText.value.trim()) {
     props.page.title = inputText.value.trim()
-    $emit('submit', props.page)
+    $emit('submit', props.page, props.parent)
   }
 }
 
@@ -226,6 +226,11 @@ watch(
 
 <style lang="scss">
 .page-item {
+  &.ghost {
+    outline: 1px solid var(--app-color-common);
+    outline-offset: -1px;
+  }
+
   &:not(.dragging) {
     transition: background-color 0.15s, outline 0.15s, font-weight 0.15s;
 

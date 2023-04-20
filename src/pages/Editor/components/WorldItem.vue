@@ -15,13 +15,6 @@ const props = defineProps({
   allowCollapse: Boolean,
   // 是否折叠状态
   collapsed: { type: Boolean, default: undefined },
-  // 默认折叠状态
-  defaultCollapsed: { type: Boolean, default: true },
-  // 触发折叠的行为模式：按钮 整行
-  collapseMode: {
-    type: String as PropType<'button' | 'line'>,
-    default: 'line'
-  },
   // 编辑时的输入框占位符
   placeholder: String,
   // 页面数据
@@ -35,21 +28,15 @@ const $emit = defineEmits([
   'cancel',
   'add-child',
   'delete',
-  'collapse-change',
-  'update:collapsed'
+  'collapse-change'
 ])
 
-const _collapsed = ref(props.allowCollapse && props.defaultCollapsed)
-const isCollapsed = computed(() => {
-  return props.collapsed ?? _collapsed.value
-})
 const isChild = computed(() => !!props.parent)
-
 const isChildSelected = computed(() => {
   return props.page.children.some((item) => item.isSelected)
 })
 
-const menuList = [
+const contextMenuList = [
   {
     label: '编辑',
     value: 'open',
@@ -99,11 +86,11 @@ const menuList = [
 
 function getContextMenuList() {
   if (props.page.type === 'summary') {
-    return menuList.slice(0, 1)
+    return contextMenuList.slice(0, 1)
   }
   return props.allowAddChild
-    ? menuList
-    : menuList.filter((item) => item.value !== 'newChild')
+    ? contextMenuList
+    : contextMenuList.filter((item) => item.value !== 'newChild')
 }
 </script>
 
@@ -114,7 +101,7 @@ function getContextMenuList() {
       active: page.isSelected,
       'child-selected': isChildSelected,
       collapsable: allowCollapse,
-      collapsed: isCollapsed
+      collapsed: collapsed
     }"
   >
     <PageItem
@@ -130,7 +117,7 @@ function getContextMenuList() {
 
     <div
       v-if="!isChild && page.children && page.children.length"
-      v-show="!isCollapsed"
+      v-show="!collapsed"
       class="children relative"
     >
       <slot name="children"></slot>

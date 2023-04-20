@@ -22,7 +22,7 @@ const infoList = computed(() => {
   ].filter((item) => item.value)
 })
 
-const menuList = [
+const contextMenuList = [
   {
     label: '编辑',
     value: 'open',
@@ -59,7 +59,7 @@ const menuList = [
     :placeholder="placeholder"
     :is-adding="isAdding"
     :is-dragging="isDragging"
-    :context-menu="menuList"
+    :context-menu="contextMenuList"
     :meta-style="{ paddingLeft: '4px' }"
     class="character-item h-[50px] pl-1"
     @submit="$emit('text-change', $event)"
@@ -94,10 +94,5 @@ const menuList = [
 <style lang="scss">
 .character-item {
   line-height: 20px;
-
-  &.ghost {
-    outline: 1px solid var(--app-color-common);
-    outline-offset: -1px;
-  }
 }
 </style>

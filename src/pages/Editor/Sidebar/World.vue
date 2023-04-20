@@ -174,12 +174,11 @@ function handleCollapseChange(page: WorldItem, collapsed: boolean) {
                 <WorldItemComp
                   :page="page"
                   :is-adding="isAdding"
+                  :is-dragging="isDragging"
                   :placeholder="item.placeholder"
                   :allow-add-child="item.allowAddChild"
                   :allow-collapse="item.key === 'timeline'"
-                  collapse-mode="button"
                   :collapsed="isDragging || page.isCollapsed"
-                  :is-dragging="isDragging"
                   @text-change="handlePageTextChange(page, item.list)"
                   @cancel="handlePageCancel(page, item.list)"
                   @add-child="addPage(item.key, page.children)"

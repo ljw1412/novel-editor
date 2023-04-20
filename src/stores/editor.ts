@@ -131,6 +131,17 @@ export const useEditorStore = defineStore('EditorStore', {
       )
     },
 
+    allBookshelfPageList(state) {
+      const list: (Volume | Chapter)[] = []
+      state.bookshelf.list.forEach((page) => {
+        list.push(page)
+        if (page instanceof Volume) {
+          list.push(...page.children)
+        }
+      })
+      return list
+    },
+
     worldPaneList(state) {
       return Object.values(state.world.panes)
     },
