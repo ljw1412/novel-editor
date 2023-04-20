@@ -1,24 +1,19 @@
 <script setup lang="ts">
-import { computed, nextTick, PropType, ref, watch } from 'vue'
-import { InputInstance, Modal } from '@arco-design/web-vue'
-import { useFocus } from '@vueuse/core'
-import { useContextViewStore, useProjectStore } from '/@/stores'
+import { computed, PropType } from 'vue'
+import { Modal } from '@arco-design/web-vue'
+import { useProjectStore } from '/@/stores'
 import Character from '/@/classes/Character'
+import PageItem from './PageItem.vue'
 
 const props = defineProps({
   isAdding: Boolean,
-  placeholder: String,
+  isDragging: Boolean,
+  placeholder: { type: String, default: '请输入角色名称' },
   hideLabel: Boolean,
   character: { type: Object as PropType<Character>, default: () => ({}) }
 })
 const $emit = defineEmits(['page-click', 'text-change', 'cancel', 'delete'])
 const projectStore = useProjectStore()
-const itemEl = ref<HTMLElement>()
-const inputRef = ref<InputInstance>()
-const inputText = ref('')
-const isInputFocus = ref(false)
-const { focused: isItemFocus } = useFocus(itemEl)
-const isContextMenu = ref(false)
 const infoList = computed(() => {
   const { sex, age } = props.character
   return [
@@ -27,43 +22,14 @@ const infoList = computed(() => {
   ].filter((item) => item.value)
 })
 
-function handleInputFocus() {
-  isInputFocus.value = true
-}
-
-function handleInputBlur() {
-  if (!isInputFocus.value) return
-  isInputFocus.value = false
-  if (inputText.value.trim()) {
-    props.character.title = inputText.value.trim()
-    $emit('text-change', props.character)
-  } else {
-    $emit('cancel', props.character)
-  }
-}
-
-function handleEscapeKeydown() {
-  isInputFocus.value = false
-  $emit('cancel', props.character)
-}
-
-function handlePressEnter() {
-  if (inputText.value.trim()) {
-    props.character.title = inputText.value.trim()
-    $emit('text-change', props.character)
-  }
-}
-
-function handlePageClick() {
-  if (!props.character.isSelected) $emit('page-click', props.character)
-}
-
-const contextView = useContextViewStore()
 const menuList = [
   {
-    label: '打开',
+    label: '编辑',
     value: 'open',
-    fn: handlePageClick
+    icon: 'icon-pen-fill',
+    fn: () => {
+      if (!props.character.isSelected) $emit('page-click', props.character)
+    }
   },
   {
     label: '删除',
@@ -85,123 +51,53 @@ const menuList = [
     }
   }
 ]
-
-function showContextmenu(e: MouseEvent) {
-  isContextMenu.value = true
-  const { clientX, clientY } = e
-  contextView.showContextMenu({
-    menuList,
-    position: { left: clientX, top: clientY },
-    callback: (item: Editor.CtxMenu.Item | null) => {
-      isContextMenu.value = false
-      if (item !== null && item.fn) {
-        item.fn()
-      }
-    }
-  })
-}
-watch(
-  () => props.character.isEdit,
-  (v) => {
-    if (v) {
-      inputText.value = props.character.title || ''
-      nextTick(() => {
-        inputRef.value?.focus()
-      })
-    }
-  },
-  { immediate: true }
-)
 </script>
 
 <template>
-  <div
-    ref="itemEl"
-    class="character-item flex h-[50px] items-center px-1 cursor-pointer"
-    sidebar-page-item
-    :class="{
-      active: character.isSelected,
-      focus: isItemFocus,
-      'context-menu': isContextMenu
-    }"
-    :tabindex="character.isSelected ? 10 : -1"
-    @contextmenu="showContextmenu"
-    @click="handlePageClick"
+  <PageItem
+    :page="character"
+    :placeholder="placeholder"
+    :is-adding="isAdding"
+    :is-dragging="isDragging"
+    :context-menu="menuList"
+    :meta-style="{ paddingLeft: '4px' }"
+    class="character-item h-[50px] pl-1"
+    @submit="$emit('text-change', $event)"
+    @cancel="$emit('cancel', $event)"
+    @page-click="$emit('page-click', $event)"
   >
-    <div class="avatar w-[50px] flex-shrink-0 layout-center">
-      <a-avatar :size="40" shape="square" :key="character.avatar">
-        <img
-          v-if="character.avatar"
-          :src="projectStore.getLocalUrl(character.avatar)"
-          loading="lazy"
-        />
-      </a-avatar>
+    <template #prepend>
+      <div class="avatar w-[50px] flex-shrink-0 layout-center">
+        <a-avatar :size="40" shape="square" :key="character.avatar">
+          <img
+            v-if="character.avatar"
+            :src="projectStore.getLocalUrl(character.avatar)"
+            loading="lazy"
+          />
+        </a-avatar>
+      </div>
+    </template>
+    <div class="name text-base h-5 leading-5">{{ character.title }}</div>
+    <div class="info text-sm text-color-2 h-4 leading-4">
+      <a-space v-if="infoList.length" size="small">
+        <a-space v-for="info of infoList" :key="info.label" size="mini">
+          <span v-if="!hideLabel" class="text-color-3">
+            {{ info.label }}
+          </span>
+          <span>{{ info.value }}</span>
+        </a-space>
+      </a-space>
     </div>
-    <div class="flex-grow ml-1">
-      <a-input
-        v-if="character.isEdit"
-        v-model="inputText"
-        ref="inputRef"
-        class="px-[7px]"
-        :placeholder="placeholder"
-        @contextmenu.stop
-        @focus="handleInputFocus"
-        @blur="handleInputBlur"
-        @keydown.esc="handleEscapeKeydown"
-        @press-enter="handlePressEnter"
-      />
-      <template v-else>
-        <div class="name text-base">{{ character.title }}</div>
-        <div class="info text-sm text-color-2">
-          <a-space v-if="infoList.length" size="small">
-            <a-space v-for="info of infoList" :key="info.label" size="mini">
-              <span v-if="!hideLabel" class="text-color-3">
-                {{ info.label }}
-              </span>
-              <span>{{ info.value }}</span>
-            </a-space>
-          </a-space>
-        </div>
-      </template>
-    </div>
-  </div>
+  </PageItem>
 </template>
 
 <style lang="scss">
 .character-item {
   line-height: 20px;
-  &:not(.dragging) {
-    &:hover {
-      background-color: rgba(var(--app-color-common-rgb), 0.06);
-    }
-
-    &:focus,
-    &.context-menu {
-      outline: 1px solid var(--app-color-common);
-      outline-offset: -1px;
-    }
-
-    &:active {
-      background-color: rgba(var(--app-color-common-rgb), 0.12);
-    }
-
-    &.active {
-      background-color: rgba(var(--app-color-common-rgb), 0.36);
-    }
-  }
 
   &.ghost {
     outline: 1px solid var(--app-color-common);
     outline-offset: -1px;
-  }
-
-  .name {
-    height: 20px;
-    line-height: 20px;
-  }
-  .info {
-    height: 20px;
-    line-height: 20px;
   }
 }
 </style>

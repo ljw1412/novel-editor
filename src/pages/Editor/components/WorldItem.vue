@@ -1,13 +1,10 @@
 <script setup lang="ts">
-import { ref, watch, PropType, nextTick, computed } from 'vue'
+import { ref, PropType, computed } from 'vue'
 import WorldItem from '/@/classes/WorldItem'
-import { InputInstance, Modal } from '@arco-design/web-vue'
-import { useFocus } from '@vueuse/core'
-import { useContextViewStore } from '/@/stores'
+import { Modal } from '@arco-design/web-vue'
+import PageItem from './PageItem.vue'
 
 const props = defineProps({
-  // 是否在编辑状态
-  isEdit: Boolean,
   // 是否在添加状态
   isAdding: Boolean,
   // 是否为拖拽状态
@@ -38,113 +35,42 @@ const $emit = defineEmits([
   'cancel',
   'add-child',
   'delete',
-  'update-collapsed',
+  'collapse-change',
   'update:collapsed'
 ])
-const pageItemEl = ref<HTMLElement>()
+
 const _collapsed = ref(props.allowCollapse && props.defaultCollapsed)
 const isCollapsed = computed(() => {
   return props.collapsed ?? _collapsed.value
 })
 const isChild = computed(() => !!props.parent)
-const inputRef = ref<InputInstance>()
-const inputText = ref('')
-const isInputFocus = ref(false)
-const { focused: isItemFocus } = useFocus(pageItemEl)
+
 const isChildSelected = computed(() => {
   return props.page.children.some((item) => item.isSelected)
 })
-const pageItemClass = computed(() => {
-  const classList: (string | Record<string, boolean>)[] = [
-    {
-      dragging: props.isDragging,
-      active: props.page.isSelected,
-      focus: isItemFocus.value,
-      'context-menu': isContextMenu.value
-    }
-  ]
-  if (isChild.value) {
-    classList.push(props.isEdit ? 'pl-7' : 'pl-8')
-  } else {
-    classList.push(props.isEdit ? 'pl-[26px]' : 'pl-[34px]')
-  }
-  return classList
-})
 
-function handleInputFocus() {
-  // console.log('handleInputFocus')
-  isInputFocus.value = true
-}
-
-function handleInputBlur() {
-  if (!isInputFocus.value) return
-  // console.log('handleInputBlur')
-  isInputFocus.value = false
-  if (inputText.value.trim()) {
-    props.page.title = inputText.value.trim()
-    $emit('text-change', props.page)
-  } else {
-    $emit('cancel', props.page)
-  }
-}
-
-function handleEscapeKeydown() {
-  // console.log('handleEscapeKeydown')
-  isInputFocus.value = false
-  $emit('cancel', props.page)
-}
-
-function handlePressEnter() {
-  // console.log('handlePressEnter')
-  if (inputText.value.trim()) {
-    props.page.title = inputText.value.trim()
-    $emit('text-change', props.page)
-  }
-}
-
-function handleAddSubPage() {
-  _collapsed.value = false
-  $emit('update-collapsed', false)
-  $emit('update:collapsed', false)
-  $emit('add-child', props.page)
-}
-
-function handlePageClick() {
-  if (props.allowCollapse && props.collapseMode === 'line') {
-    _collapsed.value = !isCollapsed.value
-    $emit('update-collapsed', !isCollapsed.value)
-    $emit('update:collapsed', !isCollapsed.value)
-  }
-  if (!props.page.isSelected) $emit('page-click', props.page)
-}
-
-function handleCollapseBtnClick() {
-  if (props.allowCollapse && props.collapseMode === 'button') {
-    _collapsed.value = !isCollapsed.value
-    $emit('update-collapsed', !isCollapsed.value)
-    $emit('update:collapsed', !isCollapsed.value)
-  }
-}
-
-const isContextMenu = ref(false)
-const contextView = useContextViewStore()
 const menuList = [
   {
-    label: '打开',
+    label: '编辑',
     value: 'open',
-    fn: handlePageClick
+    icon: 'icon-pen-fill',
+    fn: () => {
+      if (!props.page.isSelected) $emit('page-click', props.page)
+    }
   },
   {
     label: '新建子项',
     value: 'newChild',
     icon: 'icon-drive-file',
     iconColor: 'rgb(var(--green-5))',
-    fn: handleAddSubPage
+    fn: () => {
+      $emit('add-child', props.page)
+    }
   },
   {
     label: '重命名',
     value: 'rename',
-    icon: 'icon-pen-fill',
+    icon: 'icon-font-colors',
     iconColor: 'rgb(var(--blue-5))',
     fn: () => {
       props.page.isEdit = true
@@ -171,7 +97,7 @@ const menuList = [
   }
 ]
 
-function getMenuList() {
+function getContextMenuList() {
   if (props.page.type === 'summary') {
     return menuList.slice(0, 1)
   }
@@ -179,48 +105,11 @@ function getMenuList() {
     ? menuList
     : menuList.filter((item) => item.value !== 'newChild')
 }
-
-function showContextmenu(e: MouseEvent) {
-  isContextMenu.value = true
-  const { clientX, clientY } = e
-  contextView.showContextMenu({
-    menuList: getMenuList(),
-    position: { left: clientX, top: clientY },
-    callback: (item: Editor.CtxMenu.Item | null) => {
-      isContextMenu.value = false
-      if (item !== null && item.fn) {
-        item.fn()
-      }
-    }
-  })
-}
-
-watch(
-  () => props.isEdit,
-  (v) => {
-    if (v) {
-      inputText.value = props.page.title || ''
-      nextTick(() => {
-        inputRef.value?.focus()
-      })
-    }
-  },
-  { immediate: true }
-)
-
-watch(
-  () => props.page.isSelected,
-  (v) => {
-    if (v && props.parent) {
-      props.parent.isCollapsed = false
-    }
-  }
-)
 </script>
 
 <template>
   <div
-    class="page-item-wrap"
+    class="world-item"
     :class="{
       active: page.isSelected,
       'child-selected': isChildSelected,
@@ -228,55 +117,16 @@ watch(
       collapsed: isCollapsed
     }"
   >
-    <div
-      ref="pageItemEl"
-      class="page-item h-6 pr-2 cursor-pointer flex items-center"
-      sidebar-page-item
-      :class="pageItemClass"
-      :tabindex="page.isSelected ? 10 : -1"
-      @contextmenu="showContextmenu"
-      @click="handlePageClick"
-    >
-      <a-input
-        v-if="isEdit"
-        v-model="inputText"
-        size="small"
-        ref="inputRef"
-        class="px-[7px]"
-        :placeholder="placeholder"
-        @contextmenu.stop
-        @focus="handleInputFocus"
-        @blur="handleInputBlur"
-        @keydown.esc="handleEscapeKeydown"
-        @press-enter="handlePressEnter"
-      />
-      <div
-        v-else
-        class="relative layout-lr w-full leading-6"
-        :title="page.title"
-      >
-        <div
-          v-if="allowCollapse"
-          class="btn-collapse absolute layout-center h-5 w-5 rounded"
-          @click.stop="handleCollapseBtnClick"
-        >
-          <component
-            :is="isCollapsed ? 'icon-right' : 'icon-down'"
-            :size="16"
-          />
-        </div>
-        <span class="page-title truncate">{{ page.title }}</span>
-        <div
-          v-if="allowAddChild"
-          v-show="!isAdding"
-          class="btn-child-add text-btn w-5 h-5 mr-3 layout-center rounded flex-shrink-0 cursor-pointer"
-          title="添加子项"
-          @click.stop="handleAddSubPage"
-        >
-          <icon-plus />
-        </div>
-      </div>
-    </div>
+    <PageItem
+      class="h-6"
+      v-bind="props"
+      :context-menu="getContextMenuList()"
+      @collapse-change="$emit('collapse-change', $event)"
+      @submit="$emit('text-change', $event)"
+      @cancel="$emit('cancel', $event)"
+      @add-child="$emit('add-child', $event)"
+      @page-click="$emit('page-click', $event)"
+    ></PageItem>
 
     <div
       v-if="!isChild && page.children && page.children.length"
@@ -289,30 +139,7 @@ watch(
 </template>
 
 <style lang="scss">
-.page-item-wrap {
-  .page-item:not(.dragging) {
-    transition: background-color 0.15s, outline 0.15s;
-
-    &:hover {
-      background-color: rgba(var(--app-color-common-rgb), 0.06);
-    }
-
-    &:focus,
-    &.context-menu {
-      outline: 1px solid var(--app-color-common);
-      outline-offset: -1px;
-    }
-
-    &:active {
-      background-color: rgba(var(--app-color-common-rgb), 0.12);
-    }
-
-    &.active {
-      font-weight: 700;
-      background-color: rgba(var(--app-color-common-rgb), 0.36);
-    }
-  }
-
+.world-item {
   &.ghost {
     .page-item {
       outline: 1px solid var(--app-color-common);
@@ -334,26 +161,11 @@ watch(
     }
   }
 
-  .btn-collapse {
-    left: -28px;
-  }
-
   .btn-child-add {
     opacity: 0;
   }
 
   &.collapsable {
-    .btn-collapse {
-      transition: background-color 0.15s;
-
-      &:hover {
-        background-color: rgba(var(--app-color-common-rgb), 0.12);
-      }
-      &:active {
-        background-color: rgba(var(--app-color-common-rgb), 0.24);
-      }
-    }
-
     > .children::before {
       left: 18px;
     }
@@ -366,6 +178,7 @@ watch(
 
   &.child-selected > .children::before,
   &.active > .children::before {
+    background-color: var(--app-color-common);
     opacity: 0.2 !important;
   }
 

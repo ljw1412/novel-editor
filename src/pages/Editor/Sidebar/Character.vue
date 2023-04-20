@@ -17,7 +17,7 @@ const characterList = computed({
   }
 })
 const isAdding = ref(false)
-const isDrag = ref(false)
+const isDragging = ref(false)
 
 async function save() {
   // editorStore.setState('loading', '保存中…', 0)
@@ -92,16 +92,17 @@ function handlePageClick(page: Character) {
 }
 
 function handleDragStart(e: Event & { item: HTMLElement }) {
-  isDrag.value = true
-  nextTick(() => {
-    e.item.classList.add('ghost')
-  })
+  isDragging.value = true
+  nextTick(() => e.item.classList.add('ghost'))
 }
 
 function handleDragMove(e: Event & { dragged: HTMLElement }) {
-  setTimeout(() => {
-    e.dragged.classList.add('ghost')
-  }, 0)
+  setTimeout(() => e.dragged.classList.add('ghost'), 0)
+}
+
+function handleDragEnd(e: Event & { item: HTMLElement }) {
+  isDragging.value = false
+  nextTick(() => e.item.classList.remove('ghost'))
 }
 </script>
 
@@ -112,7 +113,8 @@ function handleDragMove(e: Event & { dragged: HTMLElement }) {
         title="关系图"
         class="text-btn-common h-5 px-1 layout-center rounded cursor-pointer focus-outline"
         :class="{
-          'active text-white': $route.name === 'CharacterRelationships'
+          'active text-color-common outline-common':
+            $route.name === 'CharacterRelationships'
         }"
         tabindex="9"
         @click="handleHeaderBtnClick('relationships')"
@@ -128,12 +130,13 @@ function handleDragMove(e: Event & { dragged: HTMLElement }) {
       class="sidebar-character"
       @start="handleDragStart"
       @move="handleDragMove"
-      @end="isDrag = false"
+      @end="handleDragEnd"
     >
       <template #item="{ element: character }">
         <CharacterItem
           :character="character"
-          :class="{ dragging: isDrag }"
+          :is-dragging="isDragging"
+          :is-adding="isAdding"
           @text-change="handlePageTextChange"
           @cancel="handlePageCancel"
           @page-click="handlePageClick"

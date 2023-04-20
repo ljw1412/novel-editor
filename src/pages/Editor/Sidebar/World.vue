@@ -11,7 +11,7 @@ const $router = useRouter()
 const { configStore, projectStore, editorStore, cacheStore } = useStore()
 
 const isAdding = ref(false)
-const isDrag = ref(false)
+const isDragging = ref(false)
 const isChildDrag = ref(false)
 const activeKey = ref([configStore.sidebar.state.worldPane || 'summary'])
 const paneList = editorStore.worldPaneList
@@ -93,24 +93,26 @@ function handlePageClick(page: WorldItem, parentPage?: WorldItem) {
 }
 
 function handleDragStart(e: Event & { item: HTMLElement }) {
-  isDrag.value = true
-  nextTick(() => {
-    e.item.classList.add('ghost')
-  })
+  isDragging.value = true
+  nextTick(() => e.item.classList.add('ghost'))
 }
 
 function handleDragEnd(e: Event & { item: HTMLElement }) {
-  isDrag.value = false
-  nextTick(() => {
-    e.item.classList.remove('ghost')
-  })
+  isDragging.value = false
+  nextTick(() => e.item.classList.remove('ghost'))
 }
 
 function handleDragChange() {
   if (activeKey.value[0]) save(activeKey.value[0])
 }
 
-function handleUpdateCollapsed(page: WorldItem, collapsed: boolean) {
+function handlePageDragover(page: WorldItem, e: DragEvent) {
+  if (isChildDrag.value) {
+    page.isCollapsed = false
+  }
+}
+
+function handleCollapseChange(page: WorldItem, collapsed: boolean) {
   page.isCollapsed = collapsed
   save(page.type)
 }
@@ -171,20 +173,20 @@ function handleUpdateCollapsed(page: WorldItem, collapsed: boolean) {
               <template #item="{ element: page }">
                 <WorldItemComp
                   :page="page"
-                  :is-edit="page.isEdit"
                   :is-adding="isAdding"
                   :placeholder="item.placeholder"
                   :allow-add-child="item.allowAddChild"
                   :allow-collapse="item.key === 'timeline'"
                   collapse-mode="button"
-                  :collapsed="isDrag || page.isCollapsed"
-                  :is-dragging="isDrag"
+                  :collapsed="isDragging || page.isCollapsed"
+                  :is-dragging="isDragging"
                   @text-change="handlePageTextChange(page, item.list)"
                   @cancel="handlePageCancel(page, item.list)"
                   @add-child="addPage(item.key, page.children)"
                   @page-click="handlePageClick(page)"
                   @delete="handlePageDelete(page, item.list)"
-                  @update-collapsed="handleUpdateCollapsed(page, $event)"
+                  @collapse-change="handleCollapseChange(page, $event)"
+                  @dragover="handlePageDragover(page, $event)"
                 >
                   <template #children>
                     <draggable
@@ -203,7 +205,6 @@ function handleUpdateCollapsed(page: WorldItem, collapsed: boolean) {
                           :page="sPage"
                           :parent="page"
                           :placeholder="item.childPlaceholder"
-                          :is-edit="sPage.isEdit"
                           :is-dragging="isChildDrag"
                           @text-change="
                             handlePageTextChange(sPage, page.children, page)
@@ -248,7 +249,7 @@ function handleUpdateCollapsed(page: WorldItem, collapsed: boolean) {
 
   &:hover {
     // 同族的引导线
-    .page-item-wrap .children::before {
+    .world-item .children::before {
       opacity: 0.1;
     }
   }
