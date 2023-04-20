@@ -42,6 +42,23 @@ declare namespace Editor {
   namespace World {
     type PaneType = 'summary' | 'timeline' | 'keywords'
   }
+
+  namespace CtxMenu {
+    interface Item {
+      label: string
+      value: string
+      icon?: string
+      iconColor?: string
+      fn?: Function
+    }
+
+    interface Position {
+      left?: number
+      right?: number
+      top?: number
+      bottom?: number
+    }
+  }
 }
 
 export as namespace Editor

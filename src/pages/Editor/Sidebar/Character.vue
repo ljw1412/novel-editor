@@ -1,12 +1,11 @@
 <script setup lang="ts" name="SidebarCharacter">
-import { ref, computed, nextTick, WatchSource } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import useStore from '/@/stores'
 import Character from '/@/classes/Character'
 import EditorSidebar from '../components/Sidebar.vue'
 import CharacterItem from '../components/CharacterItem.vue'
 
-const moduleName = 'character'
 const $route = useRoute()
 const $router = useRouter()
 const { projectStore, editorStore, cacheStore } = useStore()
@@ -44,7 +43,6 @@ function handleHeaderBtnClick(action: string) {
 function addCharacter() {
   isAdding.value = true
   const page = new Character()
-  page.type = moduleName
   page.isEdit = true
   characterList.value.push(page)
 }
@@ -54,12 +52,12 @@ async function handlePageTextChange(page: Character) {
     if (!page.title.trim()) {
       characterList.value.pop()
     } else {
-      await editorStore.saveActionData(moduleName)
+      await editorStore.saveActionData('character')
       handlePageClick(page)
     }
     isAdding.value = false
   } else {
-    await editorStore.saveActionData(moduleName)
+    await editorStore.saveActionData('character')
     handlePageClick(page)
   }
   page.isEdit = false
@@ -76,7 +74,7 @@ function handlePageDelete(page: Character) {
   const index = characterList.value.indexOf(page)
   if (~index) characterList.value.splice(index, 1)
   // TODO: 人物关系的删除
-  editorStore.saveActionData(moduleName)
+  editorStore.saveActionData('character')
   if (page.isSelected) {
     $router.replace({ name: 'EditorCharacter' })
     cacheStore.setRouteCache('character', null)
@@ -87,7 +85,7 @@ function handlePageClick(page: Character) {
   if (page.isEdit) return
   clearSelected()
   page.isSelected = true
-  editorStore.switchPage(moduleName, page)
+  editorStore.switchPage('character', page)
   const route = { name: `CharacterEditor`, query: { id: page.id } }
   $router.replace(route)
   cacheStore.setRouteCache('character', route)

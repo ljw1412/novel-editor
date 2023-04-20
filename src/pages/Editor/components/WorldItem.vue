@@ -10,6 +10,8 @@ const props = defineProps({
   isEdit: Boolean,
   // 是否在添加状态
   isAdding: Boolean,
+  // 是否为拖拽状态
+  isDragging: Boolean,
   // 是否允许添加子项
   allowAddChild: Boolean,
   // 是否允许折叠
@@ -28,9 +30,7 @@ const props = defineProps({
   // 页面数据
   page: { type: Object as PropType<WorldItem>, default: () => ({}) },
   // 父级
-  parent: Object as PropType<WorldItem>,
-  // 是否为拖拽状态
-  isDragging: Boolean
+  parent: Object as PropType<WorldItem>
 })
 const $emit = defineEmits([
   'page-click',
@@ -186,7 +186,7 @@ function showContextmenu(e: MouseEvent) {
   contextView.showContextMenu({
     menuList: getMenuList(),
     position: { left: clientX, top: clientY },
-    callback: (item: CtxMenu.Item | null) => {
+    callback: (item: Editor.CtxMenu.Item | null) => {
       isContextMenu.value = false
       if (item !== null && item.fn) {
         item.fn()

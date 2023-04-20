@@ -35,6 +35,7 @@ export interface CharacterObject extends PageObject, CharacterExtraData {
 }
 
 export default class Character extends Page {
+  type = 'character'
   image = ''
   avatar = ''
   sex = ''

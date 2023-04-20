@@ -92,7 +92,7 @@ function showContextmenu(e: MouseEvent) {
   contextView.showContextMenu({
     menuList,
     position: { left: clientX, top: clientY },
-    callback: (item: CtxMenu.Item | null) => {
+    callback: (item: Editor.CtxMenu.Item | null) => {
       isContextMenu.value = false
       if (item !== null && item.fn) {
         item.fn()

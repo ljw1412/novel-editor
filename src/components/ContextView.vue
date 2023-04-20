@@ -13,7 +13,7 @@ function handleOutsideClick() {
   }
 }
 
-function handleMenuItemClick(item: CtxMenu.Item) {
+function handleMenuItemClick(item: Editor.CtxMenu.Item) {
   setTimeout(() => {
     isDisplay.value = false
     callback.value(item)

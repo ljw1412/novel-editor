@@ -8,6 +8,7 @@ export interface VolumeObject extends PageObject {
 }
 
 export default class Volume extends Page {
+  type = 'volume'
   cover = ''
   children: Chapter[]
 
