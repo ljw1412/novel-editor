@@ -43,7 +43,8 @@ function back() {
 <template>
   <div class="content-container flex flex-col h-full overflow-hidden">
     <header
-      class="content-header layout-lr select-none h-[40px] px-6 pt-4 flex-shrink-0 box-content"
+      class="content-header layout-lr select-none h-[40px] w-full mx-auto px-6 pt-4 flex-shrink-0 box-content"
+      :class="{ 'max-w-[1200px]': !$route.meta.full }"
     >
       <div class="left flex items-center">
         <div
@@ -66,9 +67,13 @@ function back() {
     </header>
     <a-scrollbar
       outer-class="flex-grow h-0 w-full"
-      class="h-full overflow-y-auto"
+      class="h-full w-full overflow-y-auto"
     >
-      <main v-if="action.data && action.data.page" class="w-full px-6">
+      <main
+        v-if="action.data && action.data.page"
+        class="w-full px-6 mx-auto"
+        :class="{ 'max-w-[1200px]': !$route.meta.full }"
+      >
         <slot :page="action.data.page as any"></slot>
       </main>
     </a-scrollbar>

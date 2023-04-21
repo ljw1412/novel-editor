@@ -29,6 +29,7 @@ useEventListener('keydown', (e) => {
   <ContentContainer>
     <template #default="{ page }: { page: WorldItem }">
       <a-typography-title
+        :id="`title`"
         class="mt-2 mb-1 pl-1"
         style="background-color: var(--editor-bg)"
       >
@@ -42,23 +43,42 @@ useEventListener('keydown', (e) => {
           @change="save"
         ></a-textarea>
       </template>
-      <a-timeline v-else-if="$route.query.mode === 'root'" class="px-5">
-        <a-timeline-item v-for="child of page.children">
-          <a-typography-paragraph
-            type="secondary"
-            class="mb-1 pl-1 text-md sticky top-0 z-10"
-            style="background-color: var(--editor-bg)"
-          >
-            {{ child.title }}
-          </a-typography-paragraph>
-          <a-textarea
-            v-model="child.content"
-            :auto-size="{ minRows: 2 }"
-            placeholder="请记录这个时间点发生的关键"
-            @change="save"
-          ></a-textarea>
-        </a-timeline-item>
-      </a-timeline>
+      <div v-else-if="$route.query.mode === 'root'" class="flex items-start">
+        <a-timeline class="px-5 flex-grow">
+          <a-timeline-item v-for="child of page.children">
+            <a-typography-paragraph
+              :id="`timepoint-${child.id}`"
+              type="secondary"
+              class="mb-1 pl-1 text-md sticky top-0 z-10"
+              style="background-color: var(--editor-bg)"
+            >
+              {{ child.title }}
+            </a-typography-paragraph>
+            <a-textarea
+              v-model="child.content"
+              :auto-size="{ minRows: 2 }"
+              placeholder="请记录这个时间点发生的关键"
+              @change="save"
+            ></a-textarea>
+          </a-timeline-item>
+        </a-timeline>
+        <a-anchor
+          :change-hash="false"
+          scroll-container=".editor-content .arco-scrollbar-container"
+          class="sticky top-0 z-10 hidden 2xl:block"
+        >
+          <a-anchor-link href="#title">
+            {{ page.title }}
+            <template #sublist>
+              <a-anchor-link
+                v-for="child of page.children"
+                :href="`#timepoint-${child.id}`"
+                >{{ child.title }}</a-anchor-link
+              >
+            </template>
+          </a-anchor-link>
+        </a-anchor>
+      </div>
     </template>
   </ContentContainer>
 </template>

@@ -103,10 +103,7 @@ init()
       </router-view>
     </a-resize-box>
     <!-- 主体 -->
-    <main
-      class="editor-content relative h-full mx-auto flex-grow overflow-hidden"
-      :class="{ 'max-w-[1200px]': !$route.meta.full }"
-    >
+    <main class="editor-content relative h-full flex-grow overflow-hidden">
       <router-view v-slot="{ Component, route }">
         <component :is="Component" :key="route.fullPath" />
       </router-view>
