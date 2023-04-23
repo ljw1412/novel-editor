@@ -8,8 +8,8 @@ const $router = useRouter()
 const config = ref({})
 
 const tabList = [
-  { title: '常规', name: 'SettingRegular' },
-  { title: '主题', name: 'SettingTheme' }
+  { title: '常规', name: 'AppSettingRegular' },
+  { title: '界面', name: 'AppSettingInterface' }
 ]
 let toTab = $route.query.tab as string
 const tabKey = computed({
@@ -25,6 +25,7 @@ if (!toTab || tabList.map((t) => t.name).includes(toTab)) {
 $router.replace({ name: toTab })
 ;(async () => {
   config.value = await $API.Electron.config.getConfig()
+  console.log('loadConifg')
 })()
 </script>
 

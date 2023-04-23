@@ -6,8 +6,9 @@ import { hyphenate } from '/@/utils/string'
 import Draggable from 'vuedraggable'
 import AppCloseBtn from '/@/components/AppCloseBtn.vue'
 import AcgRatioDiv from '/@/components/AcgRatioDiv.vue'
+import Cell from '/@/components/Cell.vue'
 
-const components = [Draggable, AppCloseBtn, AcgRatioDiv]
+const components = [Draggable, AppCloseBtn, AcgRatioDiv, Cell]
 
 import '@arco-design/web-vue/dist/arco.css'
 

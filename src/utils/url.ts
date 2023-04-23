@@ -4,3 +4,10 @@ export function getPublicUrl(path: string) {
   }
   return path
 }
+
+export function getRandomBanner() {
+  const bgCount = 23
+  return getPublicUrl(
+    `/images/banner-${parseInt(Math.random() * bgCount + '') + 1}.png`
+  )
+}

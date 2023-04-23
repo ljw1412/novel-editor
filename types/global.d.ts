@@ -6,6 +6,8 @@ interface WindowConfig {
   singleInstance?: boolean
   // 唯一可读标识，方便从窗体群中找到指定窗体
   name?: string
+  // 使用系统默认浏览器
+  useSystemBrowser?: boolean
 }
 
 interface ApiError extends Error {

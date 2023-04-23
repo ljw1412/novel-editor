@@ -11,17 +11,15 @@ function createRouteCache(): RouteCache {
     bookshelf: null,
     world: null,
     character: null,
-    info: null
+    info: null,
+    setting: null
   }
 }
 
 export const useCacheStore = defineStore('cacheStore', {
   state: () => {
     const routeCache = createRouteCache()
-
-    return {
-      routeCache
-    }
+    return { routeCache }
   },
 
   getters: {},

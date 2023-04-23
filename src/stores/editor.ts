@@ -48,6 +48,7 @@ interface EditorStoreState {
   world: Editor.Activity.World
   character: Editor.Activity.Character
   info: Editor.Activity.Info
+  setting: Editor.Activity.Setting
   state: EditorState
 }
 
@@ -111,6 +112,12 @@ export const useEditorStore = defineStore('EditorStore', {
       data: null,
       list: []
     },
+    setting: {
+      key: 'setting',
+      label: '设置',
+      icon: 'icon-settings',
+      route: { name: 'EditorSetting' }
+    },
     state: {
       status: '',
       icon: '',
@@ -127,7 +134,7 @@ export const useEditorStore = defineStore('EditorStore', {
 
     actions(state) {
       return Object.values(
-        only(state, ['bookshelf', 'world', 'character', 'info'])
+        only(state, ['bookshelf', 'world', 'character', 'info', 'setting'])
       )
     },
 
@@ -170,6 +177,7 @@ export const useEditorStore = defineStore('EditorStore', {
      * @returns
      */
     getActionRoute(action: Editor.Activity.Types, isDefault = false) {
+      if (!action) action = 'bookshelf'
       const { route } = this[action]
       if (isDefault) return route
       const currentRoute = useCacheStore().routeCache[action]
@@ -224,6 +232,7 @@ export const useEditorStore = defineStore('EditorStore', {
       const routeCache = useCacheStore().routeCache[action]
       if (routeCache) {
         logger.message(`发现[${action}]的路由缓存`, routeCache)
+        if (action === 'setting') return
         const { query } = routeCache
         if (query) {
           const id = query.id as string
@@ -245,7 +254,7 @@ export const useEditorStore = defineStore('EditorStore', {
      * 加载本地的路由缓存
      */
     async loadRouteCache() {
-      const actionNames = ['bookshelf', 'world', 'character', 'info']
+      const actionNames = ['bookshelf', 'world', 'character', 'info', 'setting']
       ;(actionNames as Editor.Activity.Types[]).map(async (action) => {
         const list =
           action === 'world' ? this.allWorldPageList : this[action].list

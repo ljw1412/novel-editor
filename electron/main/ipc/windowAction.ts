@@ -5,6 +5,16 @@ import * as winService from '../services/window'
 const channel = 'window'
 
 const listener = createListener(channel, {
+  openBuiltInBrowser(e, win, payload) {
+    const { config = {}, options = {} } = payload
+    new winService.BuiltInBrowser(config, options)
+  },
+
+  openSystemBrowser(e, win, payload) {
+    const { config = {}, options = {} } = payload
+    if (config.url) winService.openExternal(config.url)
+  },
+
   openPresetWindow(e, win, payload) {
     const { name = '' } = payload
     if (!winService.presetWindowNames.includes(name)) {
@@ -42,14 +52,6 @@ const handle: IpcInvokeListener = createHandle(channel, {
     }
   },
   close: (e, win, payload) => {
-    const { who } = payload
-    // if (who === 'main') {
-    //   const allWindows = BrowserWindow.getAllWindows()
-    //   allWindows.reverse().forEach((win) => {
-    //     win.close()
-    //   })
-    //   return
-    // }
     if (win.isPreset) {
       return win.hide()
     }

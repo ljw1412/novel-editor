@@ -1,6 +1,6 @@
 {
   "name": "novel-editor",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "main": "dist-electron/main/index.js",
   "description": "小说编辑器",
   "author": "ljw1412",
@@ -49,6 +49,7 @@
   },
   "dependencies": {
     "@arco-design/web-vue": "^2.44.7",
+    "@iconfu/svg-inject": "^1.2.3",
     "@vueuse/core": "^9.13.0",
     "d3": "^7.8.4",
     "dayjs": "^1.11.7",

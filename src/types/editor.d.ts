@@ -6,7 +6,7 @@ import CharacterPage from '/@/classes/Character'
 
 declare namespace Editor {
   namespace Activity {
-    type Types = 'bookshelf' | 'character' | 'world' | 'info'
+    type Types = 'bookshelf' | 'character' | 'world' | 'info' | 'setting'
 
     interface Item<T extends Page, P = T> {
       key: Types
@@ -23,7 +23,7 @@ declare namespace Editor {
     }
     type Character = Item<CharacterPage>
     type Info = Item<Page>
-
+    type Setting = Item
     type Items = Bookshelf | World | Character | Info
   }
 

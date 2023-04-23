@@ -13,6 +13,7 @@ const activity = computed({
   get: () => configStore.sidebar.activity,
   set: (v) => (configStore.sidebar.activity = v)
 })
+
 const isCollapsed = computed({
   get: () => configStore.sidebar.isCollapsed,
   set: (v) => (configStore.sidebar.isCollapsed = v)
@@ -41,15 +42,17 @@ function handleActionItemClick(item: {
 </script>
 
 <template>
-  <div class="activitybar h-full flex-shrink-0 select-none">
+  <div class="activitybar flex flex-col h-full py-1 flex-shrink-0 select-none">
     <div
       v-for="item of actions"
       :key="item.key"
-      class="action-item relative layout-center flex-col w-[56px] h-[56px] mx-auto my-1 rounded-md cursor-pointer"
+      :id="`action-${item.key}`"
       :class="{
         collapsed: isCollapsed,
-        active: item.key === activity
+        active: item.key === activity,
+        'mt-auto': item.key === 'setting'
       }"
+      class="action-item relative layout-center flex-col w-[56px] h-[56px] mx-auto my-[1px] rounded-md cursor-pointer"
       @click="handleActionItemClick(item)"
     >
       <component

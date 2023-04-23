@@ -1,25 +1,8 @@
 import { BrowserView, BrowserWindow } from 'electron'
-import { shell } from 'electron'
-// import { createBrowser, createBuiltInBrowser } from '../window'
 import AppConfig from '../config'
 import { nin } from '../utils/object'
 import qs from 'qs'
-import { BuiltInBrowser, createWindow } from '../services/window'
-
-export async function openExternal(url: string) {
-  const HTTP_REGEXP = /^https?:\/\//
-  // 非http协议不打开，防止出现自定义协议等导致的安全问题
-  if (!HTTP_REGEXP.test(url)) {
-    return false
-  }
-  try {
-    await shell.openExternal(url)
-    return true
-  } catch (error) {
-    console.error('open external error: ', error)
-    return false
-  }
-}
+import { BuiltInBrowser, createWindow, openExternal } from '../services/window'
 
 export default function (win: BrowserWindow | BrowserView): void {
   win.webContents.setWindowOpenHandler(

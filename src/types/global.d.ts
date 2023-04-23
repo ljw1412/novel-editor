@@ -19,3 +19,5 @@ declare interface Window {
 interface MouseEvent {
   path: HTMLElement[]
 }
+
+declare module '@iconfu/svg-inject'

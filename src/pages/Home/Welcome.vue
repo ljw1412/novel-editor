@@ -9,7 +9,6 @@ import { getPublicUrl } from '/@/utils/url'
 const $router = useRouter()
 const { projectStore, cacheStore } = useStore()
 const appInfo = window.bridge.package
-const versions = window.bridge.versions
 
 const linkList = [
   { title: '小说编辑器官网', url: '', icon: 'icon-edit' },

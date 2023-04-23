@@ -80,6 +80,7 @@ init()
     <Activitybar></Activitybar>
     <!-- 侧边栏 -->
     <a-resize-box
+      v-if="!$route.meta.hideSidebar"
       component="aside"
       class="aside-resize-box max-w-[500px] flex-shrink-0 h-full select-none"
       :class="{ resizing: isSideResizing }"
@@ -105,7 +106,10 @@ init()
     <!-- 主体 -->
     <main class="editor-content relative h-full flex-grow overflow-hidden">
       <router-view v-slot="{ Component, route }">
-        <component :is="Component" :key="route.fullPath" />
+        <component
+          :is="Component"
+          :key="route.meta.reflush === false ? undefined : route.fullPath"
+        />
       </router-view>
     </main>
     <!-- 全局弹窗 -->
@@ -172,10 +176,12 @@ init()
 body:not([arco-theme='dark']) {
   .app-editor {
     .editor-content {
-      --color-fill-1: rgba(255, 255, 255, 0.3);
-      --color-fill-2: rgba(255, 255, 255, 0.4);
-      --color-fill-3: rgba(255, 255, 255, 0.6);
-      --color-fill-4: rgba(255, 255, 255, 0.7);
+      > :not(.editor-setting) {
+        --color-fill-1: rgba(255, 255, 255, 0.3);
+        --color-fill-2: rgba(255, 255, 255, 0.4);
+        --color-fill-3: rgba(255, 255, 255, 0.6);
+        --color-fill-4: rgba(255, 255, 255, 0.7);
+      }
     }
   }
 }

@@ -124,17 +124,6 @@ export const win = {
     return ipcInvoke(this.channel, action, { who })
   },
   /**
-   * 创建窗体
-   * @param config
-   * @param options
-   */
-  create(
-    config: WindowConfig,
-    options: Electron.BrowserWindowConstructorOptions
-  ) {
-    ipcSend(this.channel, 'create', { config, options })
-  },
-  /**
    * 用内置浏览器或系统默认浏览器打开页面
    * @param url
    * @param options
@@ -143,10 +132,9 @@ export const win = {
     config: WindowConfig,
     options: Electron.BrowserWindowConstructorOptions
   ) {
-    // const action = appConfig.useSystemBrowser
-    //   ? 'openSystemBrowser'
-    //   : 'openBuiltInBrowser'
-    const action = 'openBuiltInBrowser'
+    const action = config.useSystemBrowser
+      ? 'openSystemBrowser'
+      : 'openBuiltInBrowser'
     ipcSend(this.channel, action, { config, options })
   },
   /**

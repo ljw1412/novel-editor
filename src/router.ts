@@ -17,12 +17,17 @@ import CharacterEditor from '/@/pages/Editor/Content/Character/Editor.vue'
 import CharacterRelationships from '/@/pages/Editor/Content/Character/Relationships.vue'
 import WorldSidebar from '/@/pages/Editor/Sidebar/World.vue'
 import WorldCommon from '/@/pages/Editor/Content/World/Common.vue'
-import WorldTimeline from './pages/Editor/Content/World/Timeline.vue'
+import WorldTimeline from '/@/pages/Editor/Content/World/Timeline.vue'
 import InfoSidebar from '/@/pages/Editor/Sidebar/Info.vue'
-import EditorInfo from './pages/Editor/Content/Info/Info.vue'
+import EditorInfo from '/@/pages/Editor/Content/Info/Info.vue'
+import EditorSetting from '/@/pages/Editor/Content/Setting/index.vue'
+import SettingRegular from '/@/pages/Editor/Content/Setting/Regular.vue'
+import SettingInterface from '/@/pages/Editor/Content/Setting/Interface.vue'
+import SettingAbout from '/@/pages/Editor/Content/Setting/About.vue'
+
 import AppSetting from '/@/pages/Setting/index.vue'
-import SettingTheme from '/@/pages/Setting/Theme.vue'
-import SettingRegular from '/@/pages/Setting/Regular.vue'
+// import SettingTheme from '/@/pages/Setting/Theme.vue'
+// import SettingRegular from '/@/pages/Setting/Regular.vue'
 
 const routes = [
   { path: '/', redirect: { name: 'HomeWelcome' } },
@@ -174,6 +179,32 @@ const routes = [
               default: EmptyContent
             },
             meta: { title: '项目' }
+          },
+          {
+            path: 'setting',
+            name: 'EditorSetting',
+            component: EditorSetting,
+            meta: { title: '设置', hideSidebar: true, reflush: false },
+            children: [
+              {
+                path: 'regular',
+                name: 'SettingRegular',
+                component: SettingRegular,
+                meta: { title: '常规' }
+              },
+              {
+                path: 'interface',
+                name: 'SettingInterface',
+                component: SettingInterface,
+                meta: { title: '界面' }
+              },
+              {
+                path: 'about',
+                name: 'SettingAbout',
+                component: SettingAbout,
+                meta: { title: '关于' }
+              }
+            ]
           }
         ]
       }
@@ -210,15 +241,15 @@ const routes = [
     children: [
       {
         path: 'regular',
-        name: 'SettingRegular',
+        name: 'AppSettingRegular',
         component: SettingRegular,
         meta: { title: '常规' }
       },
       {
-        path: 'theme',
-        name: 'SettingTheme',
-        component: SettingTheme,
-        meta: { title: '主题' }
+        path: 'interface',
+        name: 'AppSettingInterface',
+        component: SettingInterface,
+        meta: { title: '界面' }
       }
     ]
   }
