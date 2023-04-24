@@ -20,14 +20,14 @@ const mTitle = computed(() => {
 <template>
   <header id="app-header-mini" class="app-header-mini app-drag layout-lr">
     <div class="header-left flex align-center">
-      <div class="ml-2 flex items-center leading-none">
+      <div class="pl-3 flex items-center leading-none">
         <AppFavicon
           v-if="!hideIcon"
           :icon="icon"
           :size="18"
-          class="flex-shrink-0"
+          class="flex-shrink-0 mr-2"
         ></AppFavicon>
-        <div class="ml-2">{{ mTitle }}</div>
+        <div>{{ mTitle }}</div>
       </div>
     </div>
 

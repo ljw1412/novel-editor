@@ -11,9 +11,9 @@ const { projectStore, cacheStore } = useStore()
 const appInfo = window.bridge.package
 
 const linkList = [
-  { title: '小说编辑器官网', url: '', icon: 'icon-edit' },
+  { title: '编辑器官网', url: '', icon: 'icon-edit' },
   {
-    title: '小说编辑器源代码',
+    title: '编辑器源代码',
     url: 'https://github.com/ljw1412/novel-editor',
     icon: 'icon-github'
   },
@@ -70,15 +70,23 @@ async function openRecentProject(item: Editor.RecentRecord) {
     <div class="welcome-left flex-shrink-0 w-2/3">
       <div>
         <a-typography-title :heading="4">启动</a-typography-title>
-        <a-space size="large" fill class="text-md">
-          <a-link @click="$router.push({ name: 'HomeCreate' })">
-            <icon-folder-add size="32" class="stroke-3 mr-2" />
-            <span class="block self-end">新建项目...</span>
-          </a-link>
-          <a-link @click="openProjectDir">
-            <icon-folder size="32" class="stroke-3 mr-2" />
-            <span class="block self-end">打开项目...</span>
-          </a-link>
+        <a-space size="small" fill class="text-md">
+          <Cell
+            icon="icon-folder-add"
+            title="新建项目..."
+            size="small"
+            type="link"
+            hide-link-icon
+            style="width: 140px"
+            :link="{ name: 'HomeCreate' }"
+          ></Cell>
+          <Cell
+            icon="icon-folder"
+            title="打开项目..."
+            size="small"
+            style="width: 140px"
+            @click="openProjectDir"
+          ></Cell>
         </a-space>
       </div>
 
@@ -87,13 +95,12 @@ async function openRecentProject(item: Editor.RecentRecord) {
         <a-grid :cols="3" :col-gap="8" :row-gap="8">
           <a-grid-item v-for="item of projectStore.recentList.slice(0, 5)">
             <a-tooltip :content="item.path" position="bl" mini>
-              <a-card
-                class="cursor-pointer rounded-md"
-                hoverable
+              <Cell
+                :title="item.title"
+                :desc="item.path"
+                size="small"
                 @click="openRecentProject(item)"
-              >
-                <a-card-meta :title="item.title"></a-card-meta>
-              </a-card>
+              ></Cell>
             </a-tooltip>
           </a-grid-item>
           <a-grid-item v-if="projectStore.recentList.length > 5">
@@ -113,31 +120,14 @@ async function openRecentProject(item: Editor.RecentRecord) {
           <p class="mt-2">当前版本：{{ appInfo.version }}</p>
         </div>
 
-        <a
+        <Cell
           v-for="link of linkList"
-          :key="link.title"
-          :href="link.url"
-          target="_blank"
-          class="link-card block text-color-2 hover:text-color-1"
-        >
-          <div class="flex items-center bg-color-4 text-base p-1 rounded-md">
-            <component
-              v-if="link.icon.startsWith('icon-')"
-              :is="link.icon"
-              :size="20"
-              class="link-icon"
-            />
-            <img
-              v-else
-              :src="link.icon"
-              class="link-icon text-xl inline-block w-[1em] h-[1em]"
-            />
-            <div class="layout-lr flex-grow link-text leading-5">
-              <span class="inline-block">{{ link.title }}</span>
-              <icon-launch class="mr-2" />
-            </div>
-          </div>
-        </a>
+          :icon="link.icon"
+          :link="link.url"
+          :title="link.title"
+          size="mini"
+          type="link"
+        ></Cell>
       </a-space>
     </div>
   </div>

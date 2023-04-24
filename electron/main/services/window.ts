@@ -210,6 +210,17 @@ const presetWindows = [
       maximizable: false,
       minimizable: false
     }
+  },
+  {
+    name: '关于',
+    config: { url: getVuePageUrl('/view/about') },
+    options: {
+      width: 720,
+      height: 540,
+      resizable: false,
+      maximizable: false,
+      minimizable: false
+    }
   }
 ] as PresetWindow[]
 

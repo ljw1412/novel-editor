@@ -37,6 +37,10 @@ const menu = reactive<AppHeaderMenuItem[]>([
       {
         label: '设置',
         fn: () => {
+          if ($route.matched.some((item) => item.name === 'AppEditor')) {
+            configStore.sidebar.activity = 'setting'
+            return $router.replace(editorStore.getActionRoute('setting'))
+          }
           $API.Electron.win.openPresetWindow('设置')
         }
       },
@@ -69,7 +73,9 @@ const menu = reactive<AppHeaderMenuItem[]>([
       },
       {
         label: '关于',
-        fn: () => {}
+        fn: () => {
+          $API.Electron.win.openPresetWindow('关于')
+        }
       }
     ]
   }

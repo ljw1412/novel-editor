@@ -50,9 +50,10 @@ const isDisplayInitDialog = ref(false)
 const initMsg = ref('')
 
 async function init() {
+  if (configStore.sidebar.activity === 'setting') {
+    configStore.sidebar.activity = 'bookshelf'
+  }
   const activity = configStore.sidebar.activity
-  const defaultRoute = editorStore.getActionRoute(activity, true)
-  $router.replace(defaultRoute)
   isDisplayInitDialog.value = true
   initMsg.value = '加载世界观数据……'
   await sleep(500)

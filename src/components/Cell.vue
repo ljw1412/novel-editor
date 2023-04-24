@@ -1,6 +1,6 @@
 <script setup lang="ts" name="Cell">
 import { computed, PropType, ref, TransitionProps, useAttrs } from 'vue'
-import { RouteLocationRaw } from 'vue-router'
+import { RouteLocationRaw, useRouter } from 'vue-router'
 import { ButtonProps, SelectOptionData } from '@arco-design/web-vue'
 import SVGInject from '@iconfu/svg-inject'
 
@@ -13,6 +13,11 @@ const props = defineProps({
   desc: String,
   // 图标
   icon: String,
+  // 大小
+  size: {
+    type: String as PropType<'mini' | 'small' | 'medium'>,
+    default: 'medium'
+  },
   // 类型
   type: String as PropType<
     'select' | 'input' | 'switch' | 'link' | 'button' | 'collapse'
@@ -23,6 +28,8 @@ const props = defineProps({
   options: { type: Array as PropType<SelectOptionData[]>, default: () => [] },
   // (link) 链接地址
   link: [Object, String] as PropType<RouteLocationRaw>,
+  // (link)隐藏右侧链接图标
+  hideLinkIcon: Boolean,
   // (select,input) 占位符
   placeholder: String,
   // (collapse) 是否收缩
@@ -38,6 +45,7 @@ const $emit = defineEmits([
   'buttom-click'
 ])
 const $attrs = useAttrs()
+const $router = useRouter()
 
 let defaultValue: string | boolean = false
 if (['select', 'input', 'button'].includes(props.type!)) defaultValue = ''
@@ -74,7 +82,11 @@ function handleCellClick() {
     return
   } else if (props.type === 'link') {
     if (!props.link) return
-    // TODO: 多种情况的打开
+    if (typeof props.link === 'string') {
+      window.open(props.link)
+    } else {
+      $router.replace(props.link)
+    }
   }
 }
 
@@ -86,7 +98,7 @@ function handleValueChange(v: any) {
 </script>
 
 <template>
-  <div class="cell">
+  <div class="cell" :class="`cell--${size}`">
     <div class="cell__item" :class="{ clickable }" @click="handleCellClick">
       <div v-if="icon || $slots.icon" class="cell__icon">
         <slot name="icon">
@@ -109,21 +121,17 @@ function handleValueChange(v: any) {
       <div class="cell__extra">
         <slot name="extra"></slot>
         <component
-          v-if="['collapse', 'link'].includes(type!)"
-          :is="
-            type === 'link'
-              ? 'icon-launch'
-              : isCollapsed
-              ? 'icon-down'
-              : 'icon-up'
-          "
+          v-if="type === 'collapse'"
+          :is="isCollapsed ? 'icon-down' : 'icon-up'"
           :size="16"
         />
+        <icon-launch v-else-if="type === 'link' && !hideLinkIcon" :size="16" />
         <a-select
           v-else-if="type === 'select'"
           :placeholder="placeholder"
           :model-value="value as string"
           style="min-width: 220px"
+          :size="size"
           @change="handleValueChange"
         >
           <a-option v-for="option of options" v-bind="option"></a-option>
@@ -131,17 +139,20 @@ function handleValueChange(v: any) {
         <a-switch
           v-else-if="type === 'switch'"
           :model-value="value"
+          :size="size === 'medium' ? 'medium' : 'small'"
           @change="handleValueChange"
         ></a-switch>
         <a-input
           v-else-if="type === 'input'"
           :placeholder="placeholder"
           :model-value="value as string"
+          :size="size"
           style="min-width: 220px"
           @change="handleValueChange"
         ></a-input>
         <a-button
           v-else-if="type === 'button'"
+          :size="size"
           v-bind="buttonProps"
           @click="$emit('buttom-click', $event)"
         >
@@ -167,6 +178,14 @@ body[arco-theme='dark'] {
 }
 
 .cell {
+  --cell-padding: 14px 14px 14px 20px;
+  --cell-icon-size: 24px;
+  --cell-gutter: 12px;
+  --cell-title-font-size: 14px;
+  --cell-title-line-height: 20px;
+  --cell-desc-font-size: 13px;
+  --cell-desc-line-height: 14px;
+
   display: flex;
   flex-direction: column;
   border: 1px solid var(--cell-border-color);
@@ -175,16 +194,33 @@ body[arco-theme='dark'] {
   overflow: hidden;
 
   & + & {
-    margin-top: 12px;
+    margin-top: 10px;
+  }
+
+  &--small {
+    --cell-padding: 6px 8px 6px 14px;
+    --cell-icon-size: 22px;
+    --cell-gutter: 10px;
+  }
+
+  &--mini {
+    --cell-padding: 2px 6px 2px 8px;
+    --cell-icon-size: 20px;
+    --cell-gutter: 8px;
+    --cell-title-font-size: 13px;
+    --cell-title-line-height: 16px;
+    --cell-desc-font-size: 12px;
+    --cell-desc-line-height: 13px;
   }
 
   &__item {
     display: flex;
     width: 100%;
-    padding: 14px 14px 14px 20px;
+    padding: var(--cell-padding);
     user-select: none;
 
     &.clickable {
+      cursor: pointer;
       &:hover {
         background-color: rgba(var(--app-color-common-rgb), 0.04);
       }
@@ -200,11 +236,11 @@ body[arco-theme='dark'] {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    margin-right: 12px;
+    margin-right: var(--cell-gutter);
 
     .arco-icon,
     .image-icon {
-      font-size: 24px;
+      font-size: var(--cell-icon-size);
     }
   }
 
@@ -218,16 +254,17 @@ body[arco-theme='dark'] {
   }
 
   &__title {
-    font-size: 14px;
-    line-height: 20px;
+    font-size: var(--cell-title-font-size);
+    line-height: var(--cell-title-line-height);
+    color: var(--color-text-1);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
   &__desc {
-    font-size: 13px;
-    line-height: 14px;
+    font-size: var(--cell-desc-font-size);
+    line-height: var(--cell-desc-line-height);
     color: var(--color-text-2);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -238,7 +275,7 @@ body[arco-theme='dark'] {
     flex-shrink: 0;
     display: flex;
     align-items: center;
-    margin-left: 12px;
+    margin-left: var(--cell-gutter);
   }
 
   &__panel {

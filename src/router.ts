@@ -26,8 +26,6 @@ import SettingInterface from '/@/pages/Editor/Content/Setting/Interface.vue'
 import SettingAbout from '/@/pages/Editor/Content/Setting/About.vue'
 
 import AppSetting from '/@/pages/Setting/index.vue'
-// import SettingTheme from '/@/pages/Setting/Theme.vue'
-// import SettingRegular from '/@/pages/Setting/Regular.vue'
 
 const routes = [
   { path: '/', redirect: { name: 'HomeWelcome' } },
@@ -224,7 +222,19 @@ const routes = [
     name: 'AppView',
     component: ContainerSeparate,
     meta: { separate: true },
-    children: []
+    children: [
+      {
+        path: 'about',
+        name: 'AppAbout',
+        component: SettingAbout,
+        meta: {
+          title: '关于',
+          minimizable: false,
+          hideIcon: true,
+          maximizable: false
+        }
+      }
+    ]
   },
   //? 自定义标题栏的独立界面
   // 设置页面
@@ -271,6 +281,10 @@ router.beforeEach((to, from, next) => {
     to.matched.some((item) => item.name === 'AppEditor')
   ) {
     return next({ name: 'HomeWelcome', replace: true })
+  }
+
+  if (to.fullPath === from.fullPath) {
+    return next(false)
   }
 
   next()

@@ -26,10 +26,11 @@ const bannerBg = getRandomBanner()
 
 <template>
   <div class="setting-about select-none">
-    <div
-      class="about-header relative flex flex-col justify-center px-7 flex-shrink-0 rounded-lg overflow-hidden text-white h-[360px] bg-no-repeat bg-cover bg-center mb-3"
-      :class="{ 'is-welcome': $route.name === 'HomeWelcome' }"
+    <acg-ratio-div
+      :ratio="[25, 9]"
+      class="about-header flex-shrink-0 rounded-lg overflow-hidden text-white bg-no-repeat bg-cover bg-center mb-3 max-h-[480px]"
       :style="{ backgroundImage: `url(${bannerBg})` }"
+      body-class="px-7 flex flex-col justify-center"
     >
       <h3>
         {{ APP_TITLE }}
@@ -39,7 +40,7 @@ const bannerBg = getRandomBanner()
       <span class="absolute right-2 bottom-2 text-gray-200 select-none text-xs">
         Background Created by AI
       </span>
-    </div>
+    </acg-ratio-div>
     <div class="text-center mb-3"></div>
     <a-grid :cols="3" :col-gap="8">
       <a-grid-item v-for="link of linkList">
@@ -47,6 +48,7 @@ const bannerBg = getRandomBanner()
           :icon="link.icon"
           :link="link.url"
           :title="link.title"
+          size="small"
           type="link"
         ></Cell>
       </a-grid-item>
@@ -59,6 +61,12 @@ const bannerBg = getRandomBanner()
   .about-header {
     background-color: rgb(var(--primary-6), 0.01);
     text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.75);
+  }
+}
+
+#app-separate {
+  .setting-about {
+    padding: 16px 20px;
   }
 }
 </style>
