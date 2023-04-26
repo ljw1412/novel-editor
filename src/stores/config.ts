@@ -1,6 +1,6 @@
 import { useLocalStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'
-import { RouteLocationRaw } from 'vue-router'
+import $API from '/@/apis'
 
 const themeList = [
   { name: '蓝色', value: '', type: 'light', variable: '--skin-blue' },
@@ -38,8 +38,10 @@ const view = useLocalStorage('APP_VIEW', {
   }
 })
 
+const appConfig = useLocalStorage('APP_CONFIG', {} as Record<string, any>)
+
 export const useConfigStore = defineStore('configStore', {
-  state: () => ({ view, theme, themeList }),
+  state: () => ({ app: appConfig, view, theme, themeList }),
 
   getters: {
     sidebar: (state) => state.view.sidebar,
@@ -71,6 +73,14 @@ export const useConfigStore = defineStore('configStore', {
      */
     flushBodyTheme() {
       document.body.setAttribute('arco-theme', this.theme.now)
+    },
+
+    async loadAppConfig() {
+      this.app = await $API.Electron.config.getConfig()
+    },
+
+    async setAppConfigOption(key: string, value: any) {
+      await $API.Electron.config.setOption(key, value)
     }
   }
 })

@@ -5,7 +5,6 @@ import $API from '/@/apis'
 
 const $route = useRoute()
 const $router = useRouter()
-const config = ref({})
 
 const tabList = [
   { title: '常规', name: 'AppSettingRegular' },
@@ -22,11 +21,9 @@ const tabKey = computed({
 if (!toTab || tabList.map((t) => t.name).includes(toTab)) {
   toTab = tabList[0].name
 }
-$router.replace({ name: toTab })
-;(async () => {
-  config.value = await $API.Electron.config.getConfig()
-  console.log('loadConifg')
-})()
+if ($route.name === 'AppSetting') {
+  $router.replace({ name: toTab })
+}
 </script>
 
 <template>
@@ -63,14 +60,9 @@ $router.replace({ name: toTab })
       <h5 class="h-[40px] mb-2 pt-[22px] px-3 leading-1">
         {{ $route.meta.title }}
       </h5>
-      <router-view v-slot="{ Component, route }">
-        <a-scrollbar
-          outer-class="h-full w-full"
-          class="h-full overflow-auto p-3"
-        >
-          <component :is="Component" :config="config"></component>
-        </a-scrollbar>
-      </router-view>
+      <a-scrollbar outer-class="h-full w-full" class="h-full overflow-auto p-3">
+        <router-view></router-view>
+      </a-scrollbar>
     </main>
   </div>
 </template>

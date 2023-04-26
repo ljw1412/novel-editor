@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import ContextView from '/@/components/ContextView.vue'
+import { useConfigStore } from './stores'
+
+const configStore = useConfigStore()
+configStore.loadAppConfig()
 </script>
 
 <template>
@@ -19,6 +23,13 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+
+  .novel-editor {
+    --editor-color: var(--color-text-0);
+    --block-bg: var(--color-fill-2);
+    --block-bg-hover: var(--color-fill-3);
+    --block-bg-focus: var(--color-bg-2);
+  }
 }
 
 #app-main,

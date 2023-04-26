@@ -7,7 +7,6 @@ import $API from '/@/apis'
 const $route = useRoute()
 const $router = useRouter()
 const { cacheStore } = useStore()
-const config = ref({})
 
 const paneList = [
   { key: 'SettingRegular', title: '常规' },
@@ -29,10 +28,6 @@ if ($route.name === 'EditorSetting') {
   }
   tabKey.value = tab
 }
-
-;(async () => {
-  config.value = await $API.Electron.config.getConfig()
-})()
 
 function handleTabChange(key: any) {
   cacheStore.setRouteCache('setting', { name: key })
@@ -58,7 +53,7 @@ function handleTabChange(key: any) {
       outer-class="flex-grow h-0 w-full"
       class="content h-full w-full py-4 px-5 overflow-y-auto"
     >
-      <router-view :config="config"></router-view>
+      <router-view></router-view>
     </a-scrollbar>
   </div>
 </template>

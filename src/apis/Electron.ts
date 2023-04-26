@@ -5,12 +5,12 @@ import * as logger from '/@/utils/logger'
 export const config = {
   channel: 'config',
 
-  async getConfig() {
-    return ipcInvoke<string>(this.channel, 'getConfig')
+  async getConfig(): Promise<Record<string, any>> {
+    return ipcInvoke(this.channel, 'getConfig')
   },
 
-  async setOption(key: string, value: any) {
-    return ipcInvoke<string>(this.channel, 'setOption', { key, value })
+  async setOption(key: string, value: any): Promise<Record<string, any>> {
+    return ipcInvoke(this.channel, 'setOption', { key, value })
   }
 }
 

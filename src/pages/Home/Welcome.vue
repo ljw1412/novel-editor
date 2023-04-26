@@ -77,14 +77,14 @@ async function openRecentProject(item: Editor.RecentRecord) {
             size="small"
             type="link"
             hide-link-icon
-            style="width: 140px"
+            style="width: 140px; color: var(--app-color-common)"
             :link="{ name: 'HomeCreate' }"
           ></Cell>
           <Cell
             icon="icon-folder"
             title="打开项目..."
             size="small"
-            style="width: 140px"
+            style="width: 140px; color: var(--app-color-common)"
             @click="openProjectDir"
           ></Cell>
         </a-space>

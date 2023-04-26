@@ -1,5 +1,12 @@
 <script setup lang="ts" name="Cell">
-import { computed, PropType, ref, TransitionProps, useAttrs } from 'vue'
+import {
+  computed,
+  PropType,
+  ref,
+  StyleValue,
+  TransitionProps,
+  useAttrs
+} from 'vue'
 import { RouteLocationRaw, useRouter } from 'vue-router'
 import { ButtonProps, SelectOptionData } from '@arco-design/web-vue'
 import SVGInject from '@iconfu/svg-inject'
@@ -35,7 +42,9 @@ const props = defineProps({
   // (collapse) 是否收缩
   collapsed: { type: Boolean, default: undefined },
   // (button) 按钮属性
-  buttonProps: { type: Object as PropType<ButtonProps> }
+  buttonProps: { type: Object as PropType<ButtonProps> },
+  // 折叠面板样式
+  panelStyle: [String, Object, Array] as PropType<StyleValue>
 })
 const $emit = defineEmits([
   'change',
@@ -161,7 +170,12 @@ function handleValueChange(v: any) {
       </div>
     </div>
     <transition name="cell-fold" v-bind="transitionEvents">
-      <div v-if="type === 'collapse'" v-show="!isCollapsed" class="cell__panel">
+      <div
+        v-if="type === 'collapse'"
+        v-show="!isCollapsed"
+        class="cell__panel"
+        :style="panelStyle"
+      >
         <slot name="panel"></slot>
       </div>
     </transition>
@@ -190,6 +204,7 @@ body[arco-theme='dark'] {
   flex-direction: column;
   border: 1px solid var(--cell-border-color);
   border-radius: var(--border-radius-medium);
+  color: var(--color-text-1);
   background-color: var(--color-bg-4);
   overflow: hidden;
 
@@ -256,7 +271,6 @@ body[arco-theme='dark'] {
   &__title {
     font-size: var(--cell-title-font-size);
     line-height: var(--cell-title-line-height);
-    color: var(--color-text-1);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

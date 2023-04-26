@@ -1,11 +1,13 @@
 <script setup lang="ts" name="SettingRegular">
 import { Message } from '@arco-design/web-vue'
+import { storeToRefs } from 'pinia'
+import { useConfigStore } from '/@/stores'
 import $API from '/@/apis'
 import { getPublicUrl } from '/@/utils/url'
 
-const props = defineProps({
-  config: { type: Object, default: () => ({}) }
-})
+const configStore = useConfigStore()
+const { setAppConfigOption } = configStore
+const { app } = storeToRefs(configStore)
 
 async function createAppShortcutLink() {
   try {
@@ -15,10 +17,6 @@ async function createAppShortcutLink() {
   } catch (error) {
     Message.error({ content: '添加失败…', position: 'bottom' })
   }
-}
-
-async function optionChange(key: string, value: any) {
-  await $API.Electron.config.setOption(key, value)
 }
 
 async function resetMenuCache() {
@@ -32,12 +30,12 @@ async function resetMenuCache() {
 <template>
   <div class="setting-Regular">
     <Cell
-      v-model="config.use_system_browser"
+      v-model="app.use_system_browser"
       :icon="getPublicUrl('/icons/icon-browser.svg')"
       title="使用系统浏览器"
       desc="开启后，将使用系统默认的浏览器打开外链。"
       type="switch"
-      @change="optionChange('use_system_browser', $event)"
+      @change="setAppConfigOption('use_system_browser', $event)"
     ></Cell>
     <Cell
       model-value="创建"

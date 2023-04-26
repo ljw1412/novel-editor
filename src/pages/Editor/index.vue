@@ -54,6 +54,10 @@ async function init() {
     configStore.sidebar.activity = 'bookshelf'
   }
   const activity = configStore.sidebar.activity
+  if (import.meta.env.DEV) {
+    const route = editorStore.getActionRoute(activity, true)
+    $router.replace(route)
+  }
   isDisplayInitDialog.value = true
   initMsg.value = '加载世界观数据……'
   await sleep(500)
@@ -105,7 +109,12 @@ init()
       </router-view>
     </a-resize-box>
     <!-- 主体 -->
-    <main class="editor-content relative h-full flex-grow overflow-hidden">
+    <main
+      class="editor-content relative h-full flex-grow overflow-hidden"
+      :style="{
+        '--editor-font-size': configStore.app.editor_font_size + 'px' || '14px'
+      }"
+    >
       <router-view v-slot="{ Component, route }">
         <component
           :is="Component"
