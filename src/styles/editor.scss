@@ -1,0 +1,61 @@
+.novel-editor {
+  --focused-outline-color: var(--app-color-common);
+  --editor-color: inherit;
+  --editor-caret-color: inherit;
+  --block-bg: transparent;
+  --block-bg-hover: transparent;
+  --block-bg-focus: transparent;
+
+  position: relative;
+  padding: 2px 6px;
+  color: var(--editor-color);
+  -webkit-text-fill-color: var(--editor-color);
+  background-color: var(--block-bg);
+  outline: none;
+  transition: color 0.1s cubic-bezier(0, 0, 1, 1),
+    outline 0.1s cubic-bezier(0, 0, 1, 1),
+    background-color 0.1s cubic-bezier(0, 0, 1, 1);
+
+  * {
+    box-sizing: content-box;
+  }
+
+  &:hover {
+    background-color: var(--block-bg-hover);
+  }
+
+  &:focus-within {
+    background-color: var(--block-bg-focus);
+    outline: 1px solid var(--focused-outline-color);
+    border-radius: 2px;
+  }
+
+  .novel-editor-text-block {
+    caret-color: var(--editor-caret-color);
+    line-height: 1.5;
+    font-size: var(--editor-font-size, 14px);
+
+    &:focus {
+      background-color: #fff;
+    }
+  }
+
+  [contenteditable] {
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+
+    &[data-focus]:empty:after {
+      content: attr(placeholder);
+      opacity: 0.6;
+      pointer-events: none;
+    }
+  }
+
+  .novel-editor-block:last-of-type:first-of-type {
+    [contenteditable]:empty:after {
+      content: attr(placeholder);
+      opacity: 0.6;
+      pointer-events: none;
+    }
+  }
+}

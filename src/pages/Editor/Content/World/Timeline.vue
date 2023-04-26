@@ -1,9 +1,11 @@
 <script setup lang="ts" name="WorldTimeline">
+import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useEventListener } from '@vueuse/core'
 import { useEditorStore } from '/@/stores'
 import ContentContainer from '../../components/ContentContainer.vue'
 import WorldItem from '/@/classes/WorldItem'
+import NovelEditor from '/@/utils/editor'
 
 const $route = useRoute()
 const editorStore = useEditorStore()
@@ -23,6 +25,17 @@ useEventListener('keydown', (e) => {
   }
   return false
 })
+
+const editor = new NovelEditor()
+const childEditorEl = ref<HTMLElement>()
+
+onMounted(() => {
+  if ($route.query.mode === 'child') {
+    if (childEditorEl.value) {
+      editor.mount(childEditorEl.value)
+    }
+  }
+})
 </script>
 
 <template>
@@ -36,12 +49,19 @@ useEventListener('keydown', (e) => {
         {{ page.title }}
       </a-typography-title>
       <template v-if="$route.query.mode === 'child'">
-        <a-textarea
+        <div
+          ref="childEditorEl"
+          class="child-editor"
+          placeholder="请记录这个时间点发生的关键事件"
+          :data-content="page.content"
+          style="min-height: 500px"
+        ></div>
+        <!-- <a-textarea
           v-model="page.content"
           :auto-size="{ minRows: 24 }"
           placeholder="请记录这个时间点发生的关键事件"
           @change="save"
-        ></a-textarea>
+        ></a-textarea> -->
       </template>
       <div v-else-if="$route.query.mode === 'root'" class="flex items-start">
         <a-timeline class="px-5 flex-grow">
@@ -73,8 +93,9 @@ useEventListener('keydown', (e) => {
               <a-anchor-link
                 v-for="child of page.children"
                 :href="`#timepoint-${child.id}`"
-                >{{ child.title }}</a-anchor-link
               >
+                {{ child.title }}
+              </a-anchor-link>
             </template>
           </a-anchor-link>
         </a-anchor>
