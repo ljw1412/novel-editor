@@ -43,7 +43,7 @@ function back() {
 <template>
   <div class="content-container flex flex-col h-full overflow-hidden">
     <header
-      class="content-header layout-lr select-none h-[40px] w-full mx-auto px-6 pt-4 flex-shrink-0 box-content"
+      class="content-header layout-lr select-none h-[56px] w-full mx-auto px-6 pt-4 flex-shrink-0"
       :class="{ 'max-w-[1200px]': !$route.meta.full }"
     >
       <div class="left flex items-center">

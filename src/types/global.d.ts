@@ -20,4 +20,8 @@ interface MouseEvent {
   path: HTMLElement[]
 }
 
+interface HTMLElement {
+  _editorBlock: import('/@/utils/editor').Block
+}
+
 declare module '@iconfu/svg-inject'

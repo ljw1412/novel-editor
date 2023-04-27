@@ -1,5 +1,5 @@
 <script setup lang="ts" name="WorldTimeline">
-import { onMounted, ref } from 'vue'
+import { getCurrentInstance, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useEventListener } from '@vueuse/core'
 import { useEditorStore } from '/@/stores'
@@ -9,6 +9,7 @@ import NovelEditor from '/@/utils/editor'
 
 const $route = useRoute()
 const editorStore = useEditorStore()
+const currentPage = ref<WorldItem>()
 
 async function save() {
   editorStore.setState('loading', '保存中…', 0)
@@ -28,6 +29,15 @@ useEventListener('keydown', (e) => {
 
 const editor = new NovelEditor()
 const childEditorEl = ref<HTMLElement>()
+editor.on('change', (content) => {
+  if (currentPage.value) {
+    currentPage.value.content = content
+  }
+})
+
+function syncPage(page: WorldItem) {
+  currentPage.value = page
+}
 
 onMounted(() => {
   if ($route.query.mode === 'child') {
@@ -41,6 +51,7 @@ onMounted(() => {
 <template>
   <ContentContainer>
     <template #default="{ page }: { page: WorldItem }">
+      {{ syncPage(page) }}
       <a-typography-title
         :id="`title`"
         class="mt-2 mb-1 pl-1"

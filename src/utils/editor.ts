@@ -1,3 +1,5 @@
+import { EventEmitter, Listener } from './events'
+
 interface NovelEditorOptions {
   el?: HTMLElement
 }
@@ -39,9 +41,11 @@ const logger = function (info: string, ...message: any[]) {
 
 export default class NovelEditor {
   editor: NovelEditor
-  el!: HTMLElement
+  root!: HTMLElement
   blocks: Block[] = []
   blockObserver: MutationObserver | null = null
+  contentObserver: MutationObserver | null = null
+  $emitter = new EventEmitter()
 
   constructor(options: NovelEditorOptions = {}) {
     const { el } = options
@@ -51,23 +55,20 @@ export default class NovelEditor {
     this.editor = this
   }
 
-  mount(el: HTMLElement) {
-    this.el = el
-    el.contentEditable = 'true'
-    el.classList.add('novel-editor')
-    el.setAttribute('data-novel-editor-root', 'true')
+  mount(root: HTMLElement) {
+    this.root = root
+    root.contentEditable = 'true'
+    root.classList.add('novel-editor')
+    root.setAttribute('data-novel-editor-root', 'true')
 
-    el.addEventListener('keydown', this.keyListener.bind(this))
-    el.addEventListener('paste', this.pasteListener.bind(this))
-    this.observeBlocks(el)
+    root.addEventListener('keydown', this.keyListener.bind(this))
+    root.addEventListener('paste', this.pasteListener.bind(this))
+    this.observeBlocks(root)
+    this.observeContent(root)
 
-    const textBlock = this.createBlock('text')
-    const defaultContent = (el as HTMLElement).dataset.content
-    if (defaultContent) {
-      textBlock!.content.innerHTML = defaultContent
-      el.removeAttribute('data-content')
-    }
-    el.replaceChildren(textBlock!.block)
+    const defaultContent = (root as HTMLElement).dataset.content || ''
+    this.setContent(defaultContent)
+    root.removeAttribute('data-content')
   }
 
   keyListener(e: KeyboardEvent) {
@@ -109,7 +110,7 @@ export default class NovelEditor {
         if (leafParent) {
           helper.insertAfter(textBlock!.block, leafParent)
         } else {
-          this.el.appendChild(textBlock!.block)
+          this.root.appendChild(textBlock!.block)
         }
         // 清除光标，并设置新光标到新的文字块开头位置
         selection.removeAllRanges()
@@ -138,7 +139,7 @@ export default class NovelEditor {
     console.log('pasteListener', e)
   }
 
-  observeBlocks(el: HTMLElement) {
+  observeBlocks(root: HTMLElement) {
     this.blockObserver = new MutationObserver((list, observer) => {
       list.forEach((item) => {
         const { addedNodes, removedNodes } = item
@@ -153,10 +154,10 @@ export default class NovelEditor {
           }
         })
 
-        removedNodes.forEach((el) => {
-          const index = this.blocks.findIndex((block) => block.block === el)
-          if (~index) this.blocks.splice(index, 1)
-        })
+        this.blocks = Array.from(this.root.children).map(
+          (child) => (child as HTMLElement)._editorBlock
+        )
+
         const filterNames = ['BR', 'SPAN']
         const f_addedNodes = Array.from(addedNodes).filter(
           (item) => !filterNames.includes(item.nodeName)
@@ -179,46 +180,71 @@ export default class NovelEditor {
       })
     })
 
-    this.blockObserver.observe(this.el, { childList: true, subtree: true })
+    this.blockObserver.observe(root, { childList: true, subtree: true })
+  }
+
+  observeContent(root: HTMLElement) {
+    this.contentObserver = new MutationObserver((list, observer) => {
+      const content = this.getContent()
+      const ev = new CustomEvent('change', { detail: { content } })
+      this.root.dispatchEvent(ev)
+      this.$emitter.emit('change', content)
+    })
+    this.contentObserver.observe(root, {
+      childList: true,
+      subtree: true,
+      characterData: true
+    })
   }
 
   createBlock(type: BlockTypes) {
-    if (type === 'text') {
-      const textBlock = new Block(this, 'text')
-      this.blocks.push(textBlock)
-      return textBlock
-    }
+    return new Block(this, type)
   }
 
   clear() {
-    this.el.innerHTML = ''
+    this.root.innerHTML = ''
     while (this.blocks.length) {
       const block = this.blocks.pop()
-      block!.destroyed()
     }
-    this.createBlock('text')
   }
 
-  setText(text: string, clear: boolean) {
-    if (clear) this.clear()
-    const lastBlock = this.blocks[this.blocks.length]
-    lastBlock.content.innerHTML = text
+  setContent(text: string) {
+    this.clear()
+    const textList = text.split('\r\n')
+    const blockNodeList = textList.map((str) => {
+      const block = this.createBlock('text')
+      block.setContent({ content: str })
+      return block.block
+    })
+    this.root.replaceChildren(...blockNodeList)
+    console.log('setText', text)
+  }
+
+  getContent() {
+    return this.blocks.map((block) => block.content.innerHTML).join('\r\n')
+  }
+
+  on(type: 'change', listener: Listener) {
+    return this.$emitter.on(type, listener)
+  }
+
+  off(type: 'change', listener: Listener) {
+    return this.$emitter.off(type, listener)
   }
 }
 
-class Block {
+export class Block {
   editor: NovelEditor
   type: BlockTypes
   block: HTMLElement
   wrap: HTMLElement
   content: HTMLElement
-  contentObserver: MutationObserver | null = null
-  textContent: string = ''
 
   constructor(editor: NovelEditor, type: BlockTypes = 'text') {
     this.editor = editor
     this.type = type
     this.block = document.createElement('div')
+    this.block._editorBlock = this
     this.block.className = `novel-editor-block novel-editor-${type}-block`
     this.block.style.cssText = 'margin-top: 2px; margin-bottom: 1px;'
     this.wrap = document.createElement('div')
@@ -250,7 +276,9 @@ class Block {
     }
   }
 
-  destroyed() {
-    this.contentObserver?.disconnect()
+  setContent(data: { content: string }) {
+    if (this.type === 'text') {
+      this.content.innerHTML = data.content
+    }
   }
 }
