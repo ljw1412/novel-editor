@@ -75,51 +75,7 @@ export default class NovelEditor {
     const { key, shiftKey } = e
     if (key === 'Enter' && !shiftKey) {
       e.preventDefault()
-      // 获取光标开始结束位置
-      const selection = getSelection()!
-      const { anchorNode, anchorOffset, focusOffset } = selection
-      const start = Math.min(anchorOffset, focusOffset)
-      const end = Math.max(anchorOffset, focusOffset)
-      // 如果由选中文字，则删除
-      if (start !== end) {
-        document.execCommand('delete')
-      }
-      const newNodeChild: Node[] = []
-      if (anchorNode) {
-        // 将原本的文字块拆成两块
-        const { nodeType } = anchorNode
-        if (nodeType === 3) {
-          const leftValue = anchorNode.nodeValue?.substring(end)
-          if (leftValue) {
-            newNodeChild.push(document.createTextNode(leftValue))
-          }
-          anchorNode.nodeValue = anchorNode.nodeValue?.substring(0, start) || ''
-        }
-        const nextNodes = helper.getNextNodes(anchorNode)
-        if (nextNodes.length) {
-          newNodeChild.push(...nextNodes)
-        }
-        // 创建新的文字块,并插入到当前光标之后
-        const textBlock = this.editor.createBlock('text')
-        textBlock!.content.replaceChildren(...newNodeChild)
-
-        const leafParent = helper.findParents(
-          anchorNode as HTMLElement,
-          '.novel-editor-block'
-        )
-        if (leafParent) {
-          helper.insertAfter(textBlock!.block, leafParent)
-        } else {
-          this.root.appendChild(textBlock!.block)
-        }
-        // 清除光标，并设置新光标到新的文字块开头位置
-        selection.removeAllRanges()
-        const range = document.createRange()
-        const selectTarget = textBlock!.content.firstChild || textBlock!.content
-        range.setStart(selectTarget, 0)
-        range.setEnd(selectTarget, 0)
-        selection.addRange(range)
-      }
+      this._insertContent()
     }
 
     if (key === 'Backspace') {
@@ -136,7 +92,15 @@ export default class NovelEditor {
   }
 
   pasteListener(e: ClipboardEvent) {
-    console.log('pasteListener', e)
+    e.preventDefault()
+    if (e.clipboardData) {
+      const text = e.clipboardData?.getData('text')
+
+      if (text) {
+        this._insertContent(text)
+        // document.execCommand('insertHTML', false, text)
+      }
+    }
   }
 
   observeBlocks(root: HTMLElement) {
@@ -208,6 +172,85 @@ export default class NovelEditor {
     }
   }
 
+  _insertContent(content?: string) {
+    let selectionOffset = 0
+    let insertContentList: string[] = []
+    if (content) insertContentList = content.split('\r\n')
+
+    // 获取光标开始结束位置
+    const selection = getSelection()!
+    const { anchorNode, anchorOffset, focusOffset } = selection
+    const start = Math.min(anchorOffset, focusOffset)
+    const end = Math.max(anchorOffset, focusOffset)
+    // 如果由选中文字，则删除
+    if (start !== end) {
+      document.execCommand('delete')
+    }
+    const newNodeChild: Node[] = []
+    if (anchorNode) {
+      // 将原本的文字块拆成两块
+      const { nodeType } = anchorNode
+      if (nodeType === 3) {
+        const nodeValue = anchorNode.nodeValue || ''
+        let leftValue = nodeValue.substring(0, start) || ''
+        let rightValue = nodeValue.substring(end) || ''
+        if (rightValue) {
+          // 如果有插入内容，将最后一段且非第一段内容与光标右边字符串合并
+          if (insertContentList.length > 1) {
+            const firstInsertText = insertContentList.pop() || ''
+            rightValue = firstInsertText + rightValue
+            selectionOffset = firstInsertText.length
+          }
+          newNodeChild.push(document.createTextNode(rightValue))
+        }
+        // 如果有插入内容，将第一段内容与光标左边字符串合并
+        if (insertContentList.length > 0) {
+          leftValue = leftValue + (insertContentList.shift() || '')
+        }
+        anchorNode.nodeValue = leftValue
+      }
+      // 遍历文字节点之后的所有其它节点
+      const nextNodes = helper.getNextNodes(anchorNode)
+      if (nextNodes.length) {
+        newNodeChild.push(...nextNodes)
+      }
+      // 创建新的文字块包裹右侧的所有内容
+      const lastBlock = this.editor.createBlock('text')
+      lastBlock!.content.replaceChildren(...newNodeChild)
+
+      // 准备光标之后要插入的所有块
+      const nextBlockList = insertContentList.map((item) => {
+        const block = this.editor.createBlock('text')
+        block.setContent({ content: item })
+        return block
+      })
+      nextBlockList.push(lastBlock)
+
+      const leafParent = helper.findParents(
+        anchorNode as HTMLElement,
+        '.novel-editor-block'
+      )
+      if (leafParent) {
+        let before = leafParent
+        for (const { block } of nextBlockList) {
+          helper.insertAfter(block, before)
+          before = block
+        }
+      } else {
+        nextBlockList.forEach(({ block }) => {
+          this.root.appendChild(block)
+        })
+      }
+      // 清除光标，并设置新光标到新的文字块开头位置
+      selection.removeAllRanges()
+      const range = document.createRange()
+      const selectTarget = lastBlock!.content.firstChild || lastBlock!.content
+      range.setStart(selectTarget, selectionOffset)
+      range.setEnd(selectTarget, selectionOffset)
+      selection.addRange(range)
+    }
+  }
+
   setContent(text: string) {
     this.clear()
     const textList = text.split('\r\n')
@@ -217,7 +260,6 @@ export default class NovelEditor {
       return block.block
     })
     this.root.replaceChildren(...blockNodeList)
-    console.log('setText', text)
   }
 
   getContent() {

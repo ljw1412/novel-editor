@@ -62,7 +62,7 @@ onMounted(() => {
       <template v-if="$route.query.mode === 'child'">
         <div
           ref="childEditorEl"
-          class="child-editor"
+          class="child-editor mb-2"
           placeholder="请记录这个时间点发生的关键事件"
           :data-content="page.content"
           style="min-height: 500px"
