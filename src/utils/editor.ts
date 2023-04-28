@@ -290,7 +290,8 @@ export default class NovelEditor {
           const rootRect = this.root.getBoundingClientRect()
           this.dropdown.show(
             rect.left - rootRect.left,
-            rect.bottom - rootRect.top
+            rect.bottom - rootRect.top,
+            rect.top - rootRect.top
           )
         }
       }, 0)
@@ -425,7 +426,7 @@ class Dropdown {
       style: 'display: none;',
       attrs: { 'data-novel-editor-dropdown': 'true' }
     })
-    const items = [{ label: '插入关键词', key: 'keyword' }]
+    const items = [{ label: '插入关键词 (/k)', key: 'keyword' }]
     items.forEach((item) => {
       const dropdownItem = document.createElement('div')
       dropdownItem.className = 'novel-editor-dropdown__item'
@@ -441,11 +442,26 @@ class Dropdown {
    * @param left
    * @param top
    */
-  show(left: number, top: number) {
+  show(x: number, y: number, y2?: number) {
     this.isDisplay = true
-    this.el.style.top = top + 'px'
-    this.el.style.left = left + 'px'
+    this.el.style.top = y + 2 + 'px'
+    this.el.style.left = x + 'px'
+    this.el.style.transform = 'none'
     this.el.style.display = 'block'
+    setTimeout(() => {
+      const { innerHeight, innerWidth } = window
+      const { right, bottom, height } = this.el.getBoundingClientRect()
+      let translateX = 0
+      let translateY = 0
+      if (right > innerWidth) {
+        translateX = innerWidth - right - 20
+      }
+      if (bottom > innerHeight) {
+        translateY = -height
+        if (y2) this.el.style.top = y2 - 2 + 'px'
+      }
+      this.el.style.transform = `translate(${translateX}px,${translateY}px)`
+    }, 0)
   }
 
   /**
@@ -457,11 +473,14 @@ class Dropdown {
   }
 
   _keyListener(e: KeyboardEvent) {
+    if (!this.isDisplay) return
     const { key } = e
     console.log(e)
-
     if (key === 'Escape') {
-      if (this.isDisplay) this.hide()
+      this.hide()
+    }
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
+      e.preventDefault()
     }
   }
 }
