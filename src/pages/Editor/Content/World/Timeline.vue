@@ -27,7 +27,7 @@ useEventListener('keydown', (e) => {
   return false
 })
 
-const editor = new NovelEditor()
+const editor = new NovelEditor({ style: 'min-height: 500px;' })
 const childEditorEl = ref<HTMLElement>()
 editor.on('change', (content) => {
   if (currentPage.value) {
@@ -43,6 +43,7 @@ onMounted(() => {
   if ($route.query.mode === 'child') {
     if (childEditorEl.value) {
       editor.mount(childEditorEl.value)
+      editor.setContent(currentPage.value!.content)
     }
   }
 })
@@ -64,8 +65,6 @@ onMounted(() => {
           ref="childEditorEl"
           class="child-editor mb-2"
           placeholder="请记录这个时间点发生的关键事件"
-          :data-content="page.content"
-          style="min-height: 500px"
         ></div>
         <!-- <a-textarea
           v-model="page.content"
