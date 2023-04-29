@@ -6,6 +6,7 @@ interface NovelEditorOptions {
 }
 
 type BlockTypes = 'text'
+type EventNames = 'change' | 'keyword-input' | 'keyword-click'
 
 const helper = {
   createHTMLElement<K extends keyof HTMLElementTagNameMap>(
@@ -14,19 +15,27 @@ const helper = {
       class?: string
       style?: string
       attrs?: Record<string, string>
+      children?: (string | Node)[]
       [K: string]: any
     } = {}
   ) {
     const el = document.createElement(tag)
-    const { class: className = '', attrs = {}, style = '' } = options
+    const {
+      class: className = '',
+      attrs = {},
+      style = '',
+      children = []
+    } = options
     if (className) el.className = className
     if (style) el.style.cssText = style
     for (const name in attrs) {
       el.setAttribute(name, attrs[name])
     }
-
+    if (children.length) {
+      el.replaceChildren(...children)
+    }
     Object.keys(options)
-      .filter((key) => !['class', 'attrs', 'style'].includes(key))
+      .filter((key) => !['class', 'attrs', 'style', 'children'].includes(key))
       .forEach((key) => {
         // @ts-ignore
         el[key] = options[key]
@@ -79,7 +88,7 @@ export default class NovelEditor {
   constructor(options: NovelEditorOptions = {}) {
     const { el } = options
     this._createRoot(options.style)
-    this.dropdown = new Dropdown()
+    this.dropdown = new Dropdown(this)
     if (el) this.mount(el)
     this.editor = this
   }
@@ -111,12 +120,23 @@ export default class NovelEditor {
     return this.blocks.map((block) => block.content.innerHTML).join('\r\n')
   }
 
-  on(type: 'change', listener: Listener) {
+  on(type: EventNames, listener: Listener) {
     return this.$emitter.on(type, listener)
   }
 
-  off(type: 'change', listener: Listener) {
+  off(type: EventNames, listener: Listener) {
     return this.$emitter.off(type, listener)
+  }
+
+  insertKeyword(item: { key: string; title: string }) {
+    const el = this._createKeyword(item.key, item.title)
+    const selection = getSelection()
+    if (selection) {
+      selection.getRangeAt(0).insertNode(el)
+      setTimeout(() => {
+        selection.collapseToEnd()
+      }, 0)
+    }
   }
 
   /**
@@ -136,6 +156,19 @@ export default class NovelEditor {
     this.root = root
   }
 
+  _createKeyword(key: string, word: string) {
+    const keyword = helper.createHTMLElement('div', {
+      class: 'novel-editor-keyword',
+      attrs: { 'data-key': key, 'data-title': word },
+      contentEditable: false,
+      children: [word]
+    })
+    keyword.addEventListener('click', () => {
+      this.$emitter.emit('keyword-click', word)
+    })
+    return keyword
+  }
+
   /**
    * 创建内容块
    * @param type
@@ -145,6 +178,11 @@ export default class NovelEditor {
     return new Block(type)
   }
 
+  /**
+   * 插入内容或换行
+   * @param content
+   * @returns
+   */
   _insertContent(content?: string) {
     let insertContentList: string[] = []
     if (content) insertContentList = content.split('\r\n')
@@ -222,12 +260,13 @@ export default class NovelEditor {
         lastBlock.content.replaceChildren(...newNodeChild)
         nextBlockList.push(lastBlock)
       }
-      console.log('nextBlockList', nextBlockList)
+      // console.log('nextBlockList', nextBlockList)
 
       const leafParent = helper.findParents(
         anchorNode as HTMLElement,
-        '.novel-editor-block'
+        '[data-novel-editor-block]'
       )
+
       if (leafParent) {
         let before = leafParent
         for (const { block } of nextBlockList) {
@@ -241,7 +280,7 @@ export default class NovelEditor {
         })
       }
 
-      console.log('lastBlock', lastBlock, 'offset', selectionOffset)
+      // console.log('lastBlock', lastBlock, 'offset', selectionOffset)
 
       if (lastBlock) {
         // 清除光标，并设置新光标到新的文字块开头位置
@@ -251,6 +290,11 @@ export default class NovelEditor {
         range.setStart(selectTarget, selectionOffset)
         range.setEnd(selectTarget, selectionOffset)
         selection.addRange(range)
+        try {
+          ;(selectTarget as HTMLElement).scrollIntoView()
+        } catch (error) {
+          console.error(error)
+        }
       }
     }
   }
@@ -277,12 +321,12 @@ export default class NovelEditor {
         selection.focusOffset === 0 &&
         this.blocks.length === 1
       ) {
+        // 如果是第一个块则无法删除
         e.preventDefault()
       }
     }
 
     if (key === '/') {
-      console.log(e, '/')
       setTimeout(() => {
         const selection = getSelection()
         if (selection) {
@@ -375,18 +419,23 @@ export class Block {
 
   constructor(type: BlockTypes = 'text') {
     this.type = type
-    this.block = document.createElement('div')
-    this.block._editorBlock = this
-    this.block.className = `novel-editor-block novel-editor-${type}-block`
-    this.block.style.cssText = 'margin-top: 2px; margin-bottom: 1px;'
-    this.wrap = document.createElement('div')
-    this.wrap.style.cssText = 'color: inherit; fill: inherit;'
-    this.content = document.createElement('div')
-    this.content.contentEditable = 'true'
-    this.content.style.cssText =
-      'max-width: 100%; width: 100%; white-space: pre-wrap; word-break: break-word; padding:4px 2px; min-height: 1.5em;'
-    this.content.setAttribute('data-novel-editor-leaf', 'true')
-    this.content.spellcheck = false
+    this.block = helper.createHTMLElement('div', {
+      _editorBlock: this,
+      class: `novel-editor-${type}-block`,
+      style: 'margin-top: 2px; margin-bottom: 1px;',
+      attrs: { 'data-novel-editor-block': type }
+    })
+    this.wrap = helper.createHTMLElement('div', {
+      style: 'color: inherit; fill: inherit;'
+    })
+    this.content = helper.createHTMLElement('div', {
+      spellcheck: false,
+      contentEditable: 'true',
+      style:
+        'max-width: 100%; width: 100%; white-space: pre-wrap; word-break: break-word; padding:4px 2px; min-height: 1.5em;',
+      attrs: { 'data-novel-editor-leaf': 'true' }
+    })
+
     this.wrap.appendChild(this.content)
     this.block.appendChild(this.wrap)
 
@@ -416,25 +465,58 @@ export class Block {
 }
 
 class Dropdown {
+  editor: NovelEditor
   el: HTMLElement
+  menu: Record<'default' | 'keyword', HTMLElement | null> = {
+    default: null,
+    keyword: null
+  }
   isDisplay = false
+  inputTarget: Text | null = null
+  inputStart = -1
+  inputAfterLength = 0
+  inputText = ''
+  action: 'default' | 'keyword' = 'default'
 
-  constructor() {
+  constructor(editor: NovelEditor) {
+    this.editor = editor
     this.el = helper.createHTMLElement('div', {
       contentEditable: 'false',
       class: 'novel-editor-dropdown',
       style: 'display: none;',
       attrs: { 'data-novel-editor-dropdown': 'true' }
     })
-    const items = [{ label: '插入关键词 (/k)', key: 'keyword' }]
-    items.forEach((item) => {
-      const dropdownItem = document.createElement('div')
-      dropdownItem.className = 'novel-editor-dropdown__item'
-      dropdownItem.setAttribute('data-action', item.key)
-      dropdownItem.innerText = item.label
-      this.el.appendChild(dropdownItem)
+    this.menu.default = helper.createHTMLElement('div', {
+      class: 'dropdown-menu default-menu',
+      children: [{ label: '插入关键词 (“/k关键词”)', key: 'keyword' }].map(
+        (item) => {
+          return helper.createHTMLElement('div', {
+            class: 'dropdown-menu-item',
+            attrs: { 'data-action': item.key },
+            children: [item.label]
+          })
+        }
+      )
     })
+    this.menu.keyword = helper.createHTMLElement('div', {
+      class: 'dropdown-menu keyword-menu',
+      style: 'display: none;',
+      attrs: {
+        placeholder: '插入关键词:'
+      }
+    })
+    this.el.replaceChildren(this.menu.default, this.menu.keyword)
     window.addEventListener('keydown', this._keyListener.bind(this))
+    window.addEventListener('click', this._clickListener.bind(this))
+    window.addEventListener('input', this._inputListener.bind(this))
+  }
+
+  reset() {
+    this.inputTarget = null
+    this.inputStart = -1
+    this.inputAfterLength = 0
+    this.inputText = ''
+    this.switchMenu('default')
   }
 
   /**
@@ -462,6 +544,19 @@ class Dropdown {
       }
       this.el.style.transform = `translate(${translateX}px,${translateY}px)`
     }, 0)
+
+    this.reset()
+    const selection = getSelection()
+    if (selection) {
+      const { anchorNode } = selection
+      if (anchorNode && anchorNode.nodeType === 3) {
+        this.inputTarget = anchorNode as Text
+        this.inputStart = selection.anchorOffset - 1
+        this.inputAfterLength = this.inputTarget.data.substring(
+          selection.anchorOffset
+        ).length
+      }
+    }
   }
 
   /**
@@ -470,17 +565,173 @@ class Dropdown {
   hide() {
     this.isDisplay = false
     this.el.style.display = 'none'
+    this.reset()
+  }
+
+  switchMenu(name: 'default' | 'keyword') {
+    this.action = name
+    Object.keys(this.menu).forEach((key) => {
+      const el = this.menu[key as typeof name]
+      if (el) {
+        el.style.display = key === name ? 'block' : 'none'
+      }
+    })
+  }
+
+  getInputText() {
+    if (!this.inputTarget) return ''
+    const { data } = this.inputTarget
+    if (~this.inputStart) {
+      return data.substring(
+        this.inputStart,
+        data.length - this.inputAfterLength
+      )
+    }
+    return ''
+  }
+
+  removeInputText() {
+    if (!this.inputTarget) return
+    const { data } = this.inputTarget
+    if (~this.inputStart) {
+      this.inputTarget.data =
+        data.substring(0, this.inputStart) +
+        data.substring(data.length - this.inputAfterLength)
+      const selection = window.getSelection()
+      if (selection) {
+        const range = selection.getRangeAt(0)
+        range.setStart(this.inputTarget, this.inputStart)
+        range.setEnd(this.inputTarget, this.inputStart)
+      }
+    }
+  }
+
+  setKeyWordItem(items: { key: string; title: string }[]) {
+    const keywordItems = items.slice(0, 10).map((item) => {
+      const el = helper.createHTMLElement('div', {
+        class: 'dropdown-menu-item',
+        attrs: {
+          'data-key': item.key,
+          'data-title': item.title
+        },
+        children: [item.title]
+      })
+      if (this.inputText) {
+        el.innerHTML = el.innerHTML.replace(
+          this.inputText,
+          `<b style="-webkit-text-fill-color:var(--keyword-color);">${this.inputText}</b>`
+        )
+      }
+      el.addEventListener('mouseenter', () => {
+        this._selectItem('none')
+        el.classList.add('hover')
+      })
+      el.addEventListener('mouseleave', () => {
+        el.classList.remove('hover')
+      })
+      return el
+    })
+
+    this.menu.keyword!.replaceChildren(...keywordItems)
+  }
+
+  _selectItem(action: 'prev' | 'next' | 'none' | 'click') {
+    const menu = this.menu[this.action]
+    if (menu) {
+      const children = Array.from(menu.children)
+      if (!children.length) return
+      if (action === 'none') {
+        children.forEach((child) => child.classList.remove('hover'))
+        return
+      }
+      const el = children.find((item) => item.classList.contains('hover'))
+      if (!el) {
+        if (action === 'prev') {
+          children[children.length - 1].classList.add('hover')
+        } else if (action === 'next') {
+          children[0].classList.add('hover')
+        }
+        return
+      }
+
+      if (action === 'click') {
+        ;(el as HTMLElement).click()
+        return
+      }
+
+      if (children.length > 1) {
+        if (action === 'next') {
+          el.classList.remove('hover')
+          if (el.nextElementSibling) {
+            el.nextElementSibling.classList.add('hover')
+          } else {
+            children[0].classList.add('hover')
+          }
+        }
+
+        if (action === 'prev') {
+          el.classList.remove('hover')
+          if (el.previousElementSibling) {
+            el.previousElementSibling.classList.add('hover')
+          } else {
+            children[children.length - 1].classList.add('hover')
+          }
+        }
+      }
+    }
+  }
+
+  _inputListener(e: Event) {
+    if (!this.isDisplay) return
+    const text = this.getInputText()
+    if (!text) return this.hide()
+    // console.log('inputText',text)
+    if (text.startsWith('/k')) {
+      this.switchMenu('keyword')
+      this.inputText = text.replace(/^\/k/, '')
+      this.editor.$emitter.emit('keyword-input', this, this.inputText)
+      return
+    }
+
+    this.switchMenu('default')
   }
 
   _keyListener(e: KeyboardEvent) {
     if (!this.isDisplay) return
     const { key } = e
-    console.log(e)
+    // console.log(e)
     if (key === 'Escape') {
       this.hide()
     }
+    if (key === 'Enter') {
+      e.preventDefault()
+      this._selectItem('click')
+    }
+
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
       e.preventDefault()
+      if (['ArrowLeft', 'ArrowRight'].includes(key)) {
+        this._selectItem('none')
+      } else {
+        this._selectItem(key === 'ArrowUp' ? 'prev' : 'next')
+      }
+    }
+  }
+
+  _clickListener(e: MouseEvent) {
+    if (!this.isDisplay) return
+    if (!e.path.includes(this.el)) {
+      this.hide()
+      return
+    }
+    if ((e.target as HTMLElement).classList.contains('dropdown-menu-item')) {
+      const item = {
+        key: (e.target as HTMLElement).dataset.key || '',
+        title: (e.target as HTMLElement).dataset.title || ''
+      }
+      this.removeInputText()
+      this.editor.insertKeyword(item)
+      this.hide()
     }
   }
 }

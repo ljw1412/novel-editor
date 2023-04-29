@@ -27,12 +27,20 @@ useEventListener('keydown', (e) => {
   return false
 })
 
+const keywordList = editorStore
+  .getWorldPaneData('keywords')
+  .map((item) => ({ key: item.id, title: item.title }))
 const editor = new NovelEditor({ style: 'min-height: 500px;' })
 const childEditorEl = ref<HTMLElement>()
 editor.on('change', (content) => {
   if (currentPage.value) {
     currentPage.value.content = content
   }
+})
+editor.on('keyword-input', (dropdown, text) => {
+  dropdown.setKeyWordItem(
+    keywordList.filter((item) => item.title.includes(text))
+  )
 })
 
 function syncPage(page: WorldItem) {

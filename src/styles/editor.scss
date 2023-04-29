@@ -2,6 +2,7 @@
   --focused-outline-color: var(--app-color-common, #333);
   --editor-color: inherit;
   --editor-caret-color: inherit;
+  --keyword-color: inherit;
   --block-bg: transparent;
   --block-bg-hover: transparent;
   --block-bg-focus: transparent;
@@ -35,11 +36,19 @@
     padding: 2px 6px;
   }
 
+  .novel-editor-keyword {
+    display: inline;
+    color: var(--keyword-color);
+    -webkit-text-fill-color: var(--keyword-color);
+    user-select: text;
+    cursor: pointer;
+  }
+
   .novel-editor-dropdown {
     position: absolute;
     left: 0;
     top: 0;
-    width: 150px;
+    width: 200px;
     max-height: 200px;
     background-color: var(--dropdown-bg);
     box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
@@ -47,12 +56,27 @@
     border: 1px solid rgba(123, 123, 123, 0.5);
     overflow: hidden;
 
-    &__item {
+    .dropdown-menu.keyword-menu {
+      &::before {
+        display: block;
+        content: attr(placeholder);
+        padding: 4px 6px;
+      }
+      &:empty:after {
+        display: block;
+        content: '没有找到对应的关键词';
+        padding: 12px 6px;
+        text-align: center;
+        opacity: 0.5;
+      }
+    }
+
+    .dropdown-menu-item {
       padding: 8px 12px;
       user-select: none;
       cursor: pointer;
 
-      &:hover {
+      &.hover {
         background-color: var(--dropdown-item-hover-bg);
       }
     }
@@ -79,7 +103,7 @@
     }
   }
 
-  .novel-editor-block:last-of-type:first-of-type {
+  [data-novel-editor-block]:last-of-type:first-of-type {
     [contenteditable]:empty:after {
       content: attr(placeholder);
       opacity: 0.6;

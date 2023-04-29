@@ -25,7 +25,8 @@ body {
   flex-direction: column;
 
   .novel-editor {
-    --editor-color: var(--color-text-0);
+    --editor-color: var(--color-text-1);
+    --keyword-color: var(--app-color-common);
     --block-bg: var(--color-fill-2);
     --block-bg-hover: var(--color-fill-3);
     --block-bg-focus: var(--color-bg-2);
