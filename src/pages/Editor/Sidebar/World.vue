@@ -16,6 +16,7 @@ const isChildDrag = ref(false)
 const activeKey = ref([configStore.sidebar.state.worldPane || 'summary'])
 const paneList = editorStore.worldPaneList
 const allPageList = computed(() => editorStore.allWorldPageList)
+const isEditing = computed(() => allPageList.value.some((page) => page.isEdit))
 
 function handeCollapseChange([activeKey]: (string | number)[]) {
   configStore.sidebar.state.worldPane = activeKey as string
@@ -164,8 +165,8 @@ function handleCollapseChange(page: WorldItem, collapsed: boolean) {
               item-key="id"
               group="year-group"
               handle=".page-item"
-              filter=".children,.btn-collapse,.btn-child-add"
-              :disabled="item.key === 'summary'"
+              filter=".children,.btn-collapse,.btn-child-add,.title-input"
+              :disabled="item.key === 'summary' || isEditing"
               @start="handleDragStart"
               @end="handleDragEnd"
               @change="handleDragChange"
@@ -194,7 +195,8 @@ function handleCollapseChange(page: WorldItem, collapsed: boolean) {
                       group="year"
                       ghost-class="ghost"
                       handle=".page-item"
-                      filter=".children"
+                      filter=".children,.title-input"
+                      :disabled="isEditing"
                       @start="isChildDrag = true"
                       @end="isChildDrag = false"
                       @change="handleDragChange"
