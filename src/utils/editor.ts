@@ -114,6 +114,14 @@ export default class NovelEditor {
       return block.block
     })
     this.root.replaceChildren(...blockNodeList)
+    this.root.querySelectorAll('.novel-editor-keyword').forEach((el) => {
+      el.addEventListener('click', () => {
+        this.$emitter.emit('keyword-click', {
+          key: (el as HTMLElement).dataset.key || '',
+          title: (el as HTMLElement).dataset.title || ''
+        })
+      })
+    })
   }
 
   getContent() {
@@ -156,15 +164,15 @@ export default class NovelEditor {
     this.root = root
   }
 
-  _createKeyword(key: string, word: string) {
+  _createKeyword(key: string, title: string) {
     const keyword = helper.createHTMLElement('div', {
       class: 'novel-editor-keyword',
-      attrs: { 'data-key': key, 'data-title': word },
+      attrs: { 'data-key': key, 'data-title': title },
       contentEditable: false,
-      children: [word]
+      children: [title]
     })
     keyword.addEventListener('click', () => {
-      this.$emitter.emit('keyword-click', word)
+      this.$emitter.emit('keyword-click', { key, title })
     })
     return keyword
   }

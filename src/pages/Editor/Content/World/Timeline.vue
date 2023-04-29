@@ -1,15 +1,18 @@
 <script setup lang="ts" name="WorldTimeline">
-import { getCurrentInstance, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useEventListener } from '@vueuse/core'
 import { useEditorStore } from '/@/stores'
 import ContentContainer from '../../components/ContentContainer.vue'
 import WorldItem from '/@/classes/WorldItem'
 import NovelEditor from '/@/utils/editor'
+import { Notification } from '@arco-design/web-vue'
 
 const $route = useRoute()
 const editorStore = useEditorStore()
 const currentPage = ref<WorldItem>()
+const currentKeyword = ref<WorldItem>()
+const isDisplayKeywordInfo = ref(false)
 
 async function save() {
   editorStore.setState('loading', '保存中…', 0)
@@ -41,6 +44,24 @@ editor.on('keyword-input', (dropdown, text) => {
   dropdown.setKeyWordItem(
     keywordList.filter((item) => item.title.includes(text))
   )
+})
+editor.on('keyword-click', ({ key, title }) => {
+  console.log(key, title)
+
+  const keyword = editorStore
+    .getWorldPaneData('keywords')
+    .find((item) => item.id === key)
+  if (!keyword) {
+    return Notification.error({
+      title: `无效关键词`,
+      content: `未找到关键词“${title}”…`,
+      position: 'bottomRight',
+      duration: 3 * 1000,
+      closable: true
+    })
+  }
+  currentKeyword.value = keyword
+  isDisplayKeywordInfo.value = true
 })
 
 function syncPage(page: WorldItem) {
@@ -118,6 +139,20 @@ onMounted(() => {
           </a-anchor-link>
         </a-anchor>
       </div>
+
+      <a-drawer
+        v-model:visible="isDisplayKeywordInfo"
+        :width="360"
+        :footer="false"
+        :title="currentKeyword ? currentKeyword.title : ''"
+        :drawer-style="{ top: 'var(--app-header-height)' }"
+        placement="right"
+        unmountOnClose
+      >
+        <div>
+          {{ currentKeyword ? currentKeyword.content : '' }}
+        </div>
+      </a-drawer>
     </template>
   </ContentContainer>
 </template>
