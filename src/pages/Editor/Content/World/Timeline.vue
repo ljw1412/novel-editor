@@ -149,7 +149,7 @@ onMounted(() => {
         placement="right"
         unmountOnClose
       >
-        <div>
+        <div class="whitespace-pre-wrap">
           {{ currentKeyword ? currentKeyword.content : '' }}
         </div>
       </a-drawer>
