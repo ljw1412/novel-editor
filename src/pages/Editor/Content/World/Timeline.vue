@@ -35,6 +35,7 @@ const keywordList = editorStore
   .map((item) => ({ key: item.id, title: item.title }))
 const editor = new NovelEditor({ style: 'min-height: 500px;' })
 const childEditorEl = ref<HTMLElement>()
+const timepointEditorEl = ref<HTMLElement[]>()
 editor.on('change', (content) => {
   if (currentPage.value) {
     currentPage.value.content = content
@@ -74,6 +75,18 @@ onMounted(() => {
       editor.mount(childEditorEl.value)
       editor.setContent(currentPage.value!.content)
     }
+  } else {
+    let els = timepointEditorEl.value || []
+    if (!Array.isArray(els) && els) {
+      els = [els as HTMLElement]
+    }
+    els.forEach((el) => {
+      const editor = new NovelEditor({
+        style: 'min-height: 30px;',
+        readonly: true
+      })
+      editor.mount(el)
+    })
   }
 })
 </script>
@@ -95,12 +108,6 @@ onMounted(() => {
           class="child-editor mb-2"
           placeholder="请记录这个时间点发生的关键事件"
         ></div>
-        <!-- <a-textarea
-          v-model="page.content"
-          :auto-size="{ minRows: 24 }"
-          placeholder="请记录这个时间点发生的关键事件"
-          @change="save"
-        ></a-textarea> -->
       </template>
       <div v-else-if="$route.query.mode === 'root'" class="flex items-start">
         <a-timeline class="px-5 flex-grow">
@@ -113,12 +120,17 @@ onMounted(() => {
             >
               {{ child.title }}
             </a-typography-paragraph>
-            <a-textarea
+            <!-- <a-textarea
               v-model="child.content"
               :auto-size="{ minRows: 2 }"
               placeholder="请记录这个时间点发生的关键"
               @change="save"
-            ></a-textarea>
+            ></a-textarea> -->
+            <div
+              ref="timepointEditorEl"
+              class="timepoint-editor"
+              :data-content="child.content"
+            ></div>
           </a-timeline-item>
         </a-timeline>
         <a-anchor

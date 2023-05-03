@@ -108,10 +108,19 @@
   }
 
   [data-novel-editor-block]:last-of-type:first-of-type {
-    [contenteditable]:empty:after {
+    [contenteditable]:empty::after {
       content: attr(placeholder);
       opacity: 0.6;
       pointer-events: none;
+    }
+  }
+
+  &.readonly {
+    --block-bg-hover: var(--block-bg) !important;
+    --block-bg-focus: transparent !important;
+
+    [contenteditable]:empty::after {
+      display: none;
     }
   }
 }

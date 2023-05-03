@@ -2,6 +2,7 @@ import { EventEmitter, Listener } from './events'
 
 interface NovelEditorOptions {
   el?: HTMLElement
+  readonly?: boolean
   style?: string
 }
 
@@ -79,6 +80,7 @@ export default class NovelEditor {
   el!: HTMLElement
   root!: HTMLElement
   dropdown!: Dropdown
+  readonly = false
   isDisplayDropdown = false
   blocks: Block[] = []
   blockObserver: MutationObserver | null = null
@@ -86,16 +88,29 @@ export default class NovelEditor {
   $emitter = new EventEmitter()
 
   constructor(options: NovelEditorOptions = {}) {
-    const { el } = options
+    const { el, readonly = false } = options
+    this.readonly = readonly
     this._createRoot(options.style)
     this.dropdown = new Dropdown(this)
     if (el) this.mount(el)
     this.editor = this
   }
 
+  editable(allowEdit: boolean) {
+    this.readonly = !allowEdit
+    this.root.contentEditable = allowEdit + ''
+    if (allowEdit) {
+      this.el.classList.remove('readonly')
+    } else {
+      this.el.classList.add('readonly')
+    }
+    this.blocks.forEach((block) => block.editable(allowEdit))
+  }
+
   mount(el: HTMLElement) {
     this.el = el
     el.classList.add('novel-editor')
+    if (this.readonly) el.classList.add('readonly')
 
     // 将编辑器根节点置入
     this.el.replaceChildren(this.root, this.dropdown.el)
@@ -178,7 +193,7 @@ export default class NovelEditor {
       style,
       class: 'novel-editor-core',
       attrs: { 'data-novel-editor-root': 'true' },
-      contentEditable: 'true'
+      contentEditable: this.readonly ? 'false' : 'true'
     })
     root.addEventListener('keydown', this._keyListener.bind(this))
     root.addEventListener('paste', this._pasteListener.bind(this))
@@ -212,7 +227,7 @@ export default class NovelEditor {
    * @returns
    */
   _createBlock(type: BlockTypes) {
-    return new Block(type)
+    return new Block(this, type)
   }
 
   /**
@@ -442,12 +457,14 @@ export default class NovelEditor {
 }
 
 export class Block {
+  editor: NovelEditor
   type: BlockTypes
   block: HTMLElement
   wrap: HTMLElement
   content: HTMLElement
 
-  constructor(type: BlockTypes = 'text') {
+  constructor(editor: NovelEditor, type: BlockTypes = 'text') {
+    this.editor = editor
     this.type = type
     this.block = helper.createHTMLElement('div', {
       _editorBlock: this,
@@ -460,7 +477,7 @@ export class Block {
     })
     this.content = helper.createHTMLElement('div', {
       spellcheck: false,
-      contentEditable: 'true',
+      contentEditable: editor.readonly ? 'false' : 'true',
       style:
         'max-width: 100%; width: 100%; white-space: pre-wrap; word-break: break-word; padding:4px 2px; min-height: 1.5em;',
       attrs: { 'data-novel-editor-leaf': 'true' }
@@ -491,6 +508,10 @@ export class Block {
     if (this.type === 'text') {
       this.content.innerHTML = data.content
     }
+  }
+
+  editable(allowEdit: boolean) {
+    this.content.contentEditable = allowEdit + ''
   }
 }
 
