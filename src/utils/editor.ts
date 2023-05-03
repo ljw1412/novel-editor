@@ -109,6 +109,10 @@ export default class NovelEditor {
     this._clear()
     const textList = text.split('\r\n')
     const blockNodeList = textList.map((str) => {
+      // 处理关键词数据
+      str = str.replace(/\{keyword:(.+?)\|(.+?)\}/g, (str, $1, $2) => {
+        return this._createKeyword($1, $2, false).outerHTML
+      })
       const block = this._createBlock('text')
       block.setContent({ content: str })
       return block.block
@@ -125,7 +129,26 @@ export default class NovelEditor {
   }
 
   getContent() {
-    return this.blocks.map((block) => block.content.innerHTML).join('\r\n')
+    return this.blocks
+      .map((block) => {
+        return Array.from(block.content.childNodes)
+          .map((node) => {
+            if (node.nodeType === 3) {
+              return (node as Text).data
+            } else if (node.nodeType === 1) {
+              if (
+                (node as HTMLElement).classList.contains('novel-editor-keyword')
+              ) {
+                return (node as HTMLElement).dataset.content || ''
+              } else {
+                return (node as HTMLElement).textContent
+              }
+            }
+            return ''
+          })
+          .join('')
+      })
+      .join('\r\n')
   }
 
   on(type: EventNames, listener: Listener) {
@@ -164,7 +187,7 @@ export default class NovelEditor {
     this.root = root
   }
 
-  _createKeyword(key: string, title: string) {
+  _createKeyword(key: string, title: string, needListen = true) {
     const keyword = helper.createHTMLElement('div', {
       class: 'novel-editor-keyword',
       attrs: {
@@ -175,9 +198,11 @@ export default class NovelEditor {
       contentEditable: false,
       children: [title]
     })
-    keyword.addEventListener('click', () => {
-      this.$emitter.emit('keyword-click', { key, title })
-    })
+    if (needListen) {
+      keyword.addEventListener('click', () => {
+        this.$emitter.emit('keyword-click', { key, title })
+      })
+    }
     return keyword
   }
 
@@ -615,12 +640,6 @@ class Dropdown {
     if (!this.inputTarget) return
     const { data } = this.inputTarget
     if (~this.inputStart) {
-      console.log(this.inputStart, data.length, this.inputAfterLength)
-      console.log(
-        data.substring(0, this.inputStart),
-        data.substring(data.length - this.inputAfterLength)
-      )
-
       this.inputTarget.data =
         data.substring(0, this.inputStart) +
         data.substring(data.length - this.inputAfterLength)
