@@ -56,6 +56,10 @@
     border: 1px solid rgba(123, 123, 123, 0.5);
     overflow: hidden;
 
+    .dropdown-menu.default-menu {
+      pointer-events: none;
+    }
+
     .dropdown-menu.keyword-menu {
       &::before {
         display: block;

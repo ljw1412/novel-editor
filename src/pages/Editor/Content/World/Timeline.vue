@@ -145,7 +145,11 @@ onMounted(() => {
         :width="360"
         :footer="false"
         :title="currentKeyword ? currentKeyword.title : ''"
-        :drawer-style="{ top: 'var(--app-header-height)' }"
+        :drawer-style="{
+          top: 'var(--app-header-height)',
+          bottom: 0,
+          height: 'auto'
+        }"
         placement="right"
         unmountOnClose
       >

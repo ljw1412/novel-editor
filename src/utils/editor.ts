@@ -167,7 +167,11 @@ export default class NovelEditor {
   _createKeyword(key: string, title: string) {
     const keyword = helper.createHTMLElement('div', {
       class: 'novel-editor-keyword',
-      attrs: { 'data-key': key, 'data-title': title },
+      attrs: {
+        'data-key': key,
+        'data-title': title,
+        'data-content': `{keyword:${key}|${title}}`
+      },
       contentEditable: false,
       children: [title]
     })
@@ -294,12 +298,12 @@ export default class NovelEditor {
         // 清除光标，并设置新光标到新的文字块开头位置
         selection.removeAllRanges()
         const range = document.createRange()
-        const selectTarget = lastBlock!.content.firstChild || lastBlock!.content
+        const selectTarget = lastBlock.content.firstChild || lastBlock.content
         range.setStart(selectTarget, selectionOffset)
         range.setEnd(selectTarget, selectionOffset)
         selection.addRange(range)
         try {
-          ;(selectTarget as HTMLElement).scrollIntoView()
+          lastBlock.content.scrollIntoView()
         } catch (error) {
           console.error(error)
         }
@@ -318,7 +322,9 @@ export default class NovelEditor {
     const { key, shiftKey } = e
     if (key === 'Enter' && !shiftKey) {
       e.preventDefault()
-      this._insertContent()
+      if (!this.dropdown.isDisplay) {
+        this._insertContent()
+      }
     }
 
     if (key === 'Backspace') {
@@ -336,16 +342,7 @@ export default class NovelEditor {
 
     if (key === '/') {
       setTimeout(() => {
-        const selection = getSelection()
-        if (selection) {
-          const rect = selection.getRangeAt(0).getBoundingClientRect()
-          const rootRect = this.root.getBoundingClientRect()
-          this.dropdown.show(
-            rect.left - rootRect.left,
-            rect.bottom - rootRect.top,
-            rect.top - rootRect.top
-          )
-        }
+        this.dropdown.show()
       }, 0)
     }
   }
@@ -485,6 +482,8 @@ class Dropdown {
   inputAfterLength = 0
   inputText = ''
   action: 'default' | 'keyword' = 'default'
+  popupRect = { left: 0, right: 0, bottom: 0, top: 0 }
+  selectionPos = { left: 0, bottom: 0, top: 0 }
 
   constructor(editor: NovelEditor) {
     this.editor = editor
@@ -532,38 +531,29 @@ class Dropdown {
    * @param left
    * @param top
    */
-  show(x: number, y: number, y2?: number) {
-    this.isDisplay = true
-    this.el.style.top = y + 2 + 'px'
-    this.el.style.left = x + 'px'
-    this.el.style.transform = 'none'
-    this.el.style.display = 'block'
-    setTimeout(() => {
-      const { innerHeight, innerWidth } = window
-      const { right, bottom, height } = this.el.getBoundingClientRect()
-      let translateX = 0
-      let translateY = 0
-      if (right > innerWidth) {
-        translateX = innerWidth - right - 20
-      }
-      if (bottom > innerHeight) {
-        translateY = -height
-        if (y2) this.el.style.top = y2 - 2 + 'px'
-      }
-      this.el.style.transform = `translate(${translateX}px,${translateY}px)`
-    }, 0)
-
-    this.reset()
+  show() {
     const selection = getSelection()
-    if (selection) {
-      const { anchorNode } = selection
-      if (anchorNode && anchorNode.nodeType === 3) {
-        this.inputTarget = anchorNode as Text
-        this.inputStart = selection.anchorOffset - 1
-        this.inputAfterLength = this.inputTarget.data.substring(
-          selection.anchorOffset
-        ).length
-      }
+    if (!selection) return
+    const rect = selection.getRangeAt(0).getBoundingClientRect()
+    const rootRect = this.editor.root.getBoundingClientRect()
+    this.selectionPos.left = rect.left - rootRect.left
+    this.selectionPos.bottom = rect.bottom - rootRect.top
+    this.selectionPos.top = rect.top - rootRect.top
+
+    this.isDisplay = true
+    this.el.style.top = this.selectionPos.bottom + 2 + 'px'
+    this.el.style.left = this.selectionPos.left + 'px'
+    this.el.style.display = 'block'
+
+    this.popupRect = this.el.getBoundingClientRect()
+    this.updatePosition()
+    const { anchorNode } = selection
+    if (anchorNode && anchorNode.nodeType === 3) {
+      this.inputTarget = anchorNode as Text
+      this.inputStart = selection.anchorOffset - 1
+      this.inputAfterLength = this.inputTarget.data.substring(
+        selection.anchorOffset
+      ).length
     }
   }
 
@@ -573,7 +563,28 @@ class Dropdown {
   hide() {
     this.isDisplay = false
     this.el.style.display = 'none'
+    this.el.style.transform = 'none'
     this.reset()
+  }
+
+  /**
+   * 更新下拉框位置
+   */
+  updatePosition() {
+    this.el.style.transform = 'none'
+
+    const { innerHeight, innerWidth } = window
+    const { height, width } = this.el.getBoundingClientRect()
+    let translateX = '0'
+    let translateY = '0'
+    if (this.popupRect.left + width > innerWidth) {
+      translateX = innerWidth - (this.popupRect.left + width) - 20 + 'px'
+    }
+    if (this.popupRect.top + height > innerHeight) {
+      translateY = '-100%'
+      this.el.style.top = this.selectionPos.top - 6 + 'px'
+    }
+    this.el.style.transform = `translate(${translateX},${translateY})`
   }
 
   switchMenu(name: 'default' | 'keyword') {
@@ -584,6 +595,8 @@ class Dropdown {
         el.style.display = key === name ? 'block' : 'none'
       }
     })
+
+    this.updatePosition()
   }
 
   getInputText() {
@@ -602,6 +615,12 @@ class Dropdown {
     if (!this.inputTarget) return
     const { data } = this.inputTarget
     if (~this.inputStart) {
+      console.log(this.inputStart, data.length, this.inputAfterLength)
+      console.log(
+        data.substring(0, this.inputStart),
+        data.substring(data.length - this.inputAfterLength)
+      )
+
       this.inputTarget.data =
         data.substring(0, this.inputStart) +
         data.substring(data.length - this.inputAfterLength)
@@ -644,6 +663,7 @@ class Dropdown {
   }
 
   _selectItem(action: 'prev' | 'next' | 'none' | 'click') {
+    if (this.action === 'default') return
     const menu = this.menu[this.action]
     if (menu) {
       const children = Array.from(menu.children)
@@ -732,7 +752,10 @@ class Dropdown {
       this.hide()
       return
     }
-    if ((e.target as HTMLElement).classList.contains('dropdown-menu-item')) {
+    if (
+      (e.target as HTMLElement).classList.contains('dropdown-menu-item') &&
+      this.action !== 'default'
+    ) {
       const item = {
         key: (e.target as HTMLElement).dataset.key || '',
         title: (e.target as HTMLElement).dataset.title || ''
