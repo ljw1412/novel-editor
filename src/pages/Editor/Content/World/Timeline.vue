@@ -2,17 +2,14 @@
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useEventListener } from '@vueuse/core'
-import { useEditorStore } from '/@/stores'
+import useStore from '/@/stores'
 import ContentContainer from '../../components/ContentContainer.vue'
 import WorldItem from '/@/classes/WorldItem'
 import NovelEditor from '/@/utils/editor'
-import { Notification } from '@arco-design/web-vue'
 
 const $route = useRoute()
-const editorStore = useEditorStore()
+const { editorStore, dialogStore } = useStore()
 const currentPage = ref<WorldItem>()
-const currentKeyword = ref<WorldItem>()
-const isDisplayKeywordInfo = ref(false)
 
 async function save() {
   editorStore.setState('loading', '保存中…', 0)
@@ -30,40 +27,8 @@ useEventListener('keydown', (e) => {
   return false
 })
 
-const keywordList = editorStore
-  .getWorldPaneData('keywords')
-  .map((item) => ({ key: item.id, title: item.title }))
-const editor = new NovelEditor({ style: 'min-height: 500px;' })
 const childEditorEl = ref<HTMLElement>()
 const timepointEditorEl = ref<HTMLElement[]>()
-editor.on('change', (content) => {
-  if (currentPage.value) {
-    currentPage.value.content = content
-  }
-})
-editor.on('keyword-input', (dropdown, text) => {
-  dropdown.setKeyWordItem(
-    keywordList.filter((item) => item.title.includes(text))
-  )
-})
-editor.on('keyword-click', ({ key, title }) => {
-  console.log(key, title)
-
-  const keyword = editorStore
-    .getWorldPaneData('keywords')
-    .find((item) => item.id === key)
-  if (!keyword) {
-    return Notification.error({
-      title: `无效关键词`,
-      content: `未找到关键词“${title}”…`,
-      position: 'bottomRight',
-      duration: 3 * 1000,
-      closable: true
-    })
-  }
-  currentKeyword.value = keyword
-  isDisplayKeywordInfo.value = true
-})
 
 function syncPage(page: WorldItem) {
   currentPage.value = page
@@ -71,6 +36,23 @@ function syncPage(page: WorldItem) {
 
 onMounted(() => {
   if ($route.query.mode === 'child') {
+    const keywordList = editorStore
+      .getWorldPaneData('keywords')
+      .map((item) => ({ key: item.id, title: item.title }))
+    const editor = new NovelEditor({ style: 'min-height: 500px;' })
+    editor.on('change', (content) => {
+      if (currentPage.value) {
+        currentPage.value.content = content
+      }
+    })
+    editor.on('keyword-input', (dropdown, text) => {
+      dropdown.setKeyWordItem(
+        keywordList.filter((item) => item.title.includes(text))
+      )
+    })
+    editor.on('keyword-click', (item) => {
+      dialogStore.keywordDialog(true, item)
+    })
     if (childEditorEl.value) {
       editor.mount(childEditorEl.value)
       editor.setContent(currentPage.value!.content)
@@ -86,6 +68,9 @@ onMounted(() => {
         readonly: true
       })
       editor.mount(el)
+      editor.on('keyword-click', (item) => {
+        dialogStore.keywordDialog(true, item)
+      })
     })
   }
 })
@@ -151,24 +136,6 @@ onMounted(() => {
           </a-anchor-link>
         </a-anchor>
       </div>
-
-      <a-drawer
-        v-model:visible="isDisplayKeywordInfo"
-        :width="360"
-        :footer="false"
-        :title="currentKeyword ? currentKeyword.title : ''"
-        :drawer-style="{
-          top: 'var(--app-header-height)',
-          bottom: 0,
-          height: 'auto'
-        }"
-        placement="right"
-        unmountOnClose
-      >
-        <div class="whitespace-pre-wrap">
-          {{ currentKeyword ? currentKeyword.content : '' }}
-        </div>
-      </a-drawer>
     </template>
   </ContentContainer>
 </template>
