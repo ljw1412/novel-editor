@@ -11,7 +11,8 @@ import HomeOpener from '/@/pages/Home/Opener.vue'
 import AppEditor from '/@/pages/Editor/index.vue'
 import EmptyContent from '/@/pages/Editor/Content/Empty.vue'
 import BookshelfSidebar from '/@/pages/Editor/Sidebar/Bookshelf.vue'
-import BookshelfContent from '/@/pages/Editor/Content/Bookshelf/Bookshelf.vue'
+import BookshelfBook from '/@/pages/Editor/Content/Bookshelf/Book.vue'
+import BookshelfChapter from '/@/pages/Editor/Content/Bookshelf/Chapter.vue'
 import CharacterSidebar from '/@/pages/Editor/Sidebar/Character.vue'
 import CharacterEditor from '/@/pages/Editor/Content/Character/Editor.vue'
 import CharacterRelationships from '/@/pages/Editor/Content/Character/Relationships.vue'
@@ -75,6 +76,24 @@ const routes = [
               default: EmptyContent
             },
             meta: { title: '小说' }
+          },
+          {
+            path: 'book',
+            name: 'BookshelfBook',
+            components: {
+              sidebar: BookshelfSidebar,
+              default: BookshelfBook
+            },
+            meta: { title: '小说', subtitle: '书卷', action: 'bookshelf' }
+          },
+          {
+            path: 'chapter',
+            name: 'BookshelfChapter',
+            components: {
+              sidebar: BookshelfSidebar,
+              default: BookshelfChapter
+            },
+            meta: { title: '小说', subtitle: '章节', action: 'bookshelf' }
           },
           // 世界观
           {

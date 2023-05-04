@@ -200,7 +200,7 @@ export const useEditorStore = defineStore('EditorStore', {
      * @param action
      * @returns
      */
-    async saveActionData(action: 'character') {
+    async saveActionData(action: 'character' | 'bookshelf') {
       const path = useProjectStore().project.path
       if (!this[action]) {
         logger.error('saveActionData', `action=${action}不存在`)
@@ -265,7 +265,27 @@ export const useEditorStore = defineStore('EditorStore', {
     /**
      * 加载小说书架的文件数据
      */
-    async loadBookshelfData() {},
+    async loadBookshelfData() {
+      const moduleName = 'bookshelf'
+      const path = this.project.path
+      const exists = await $API.Electron.project.hasData(moduleName, path)
+      if (!exists) return
+      let data = await $API.Electron.project.getData(moduleName, path)
+      data = data.map((page: VolumeObject | ChapterObject) => {
+        if (page.type === 'chapter') {
+          return new Chapter(page as ChapterObject)
+        } else if (page.type === 'volume') {
+          const volume = page as VolumeObject
+          volume.children = volume.children.map(
+            (child: ChapterObject) => new Chapter(child)
+          )
+          return new Volume(volume)
+        }
+      })
+      const bookshelfList = this.bookshelf.list
+      bookshelfList.length = 0
+      bookshelfList.push(...data)
+    },
 
     /**
      * 加载角色的文件数据

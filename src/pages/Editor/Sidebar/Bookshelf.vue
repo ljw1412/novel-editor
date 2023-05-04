@@ -27,7 +27,11 @@ const isAdding = ref(false)
 const isDragging = ref(false)
 const allPageList = computed(() => editorStore.allBookshelfPageList)
 
-async function save() {}
+async function save() {
+  // editorStore.setState('loading', '保存中…', 0)
+  await editorStore.saveActionData('bookshelf')
+  // editorStore.setState('success', '保存成功')
+}
 
 function createPage(isVolume = true) {
   isAdding.value = true
@@ -93,13 +97,12 @@ function handlePageClick(page: Volume | Chapter) {
   allPageList.value.forEach((page) => (page.isSelected = false))
   page.isSelected = true
   editorStore.switchPage('bookshelf', page)
-  // TODO
-  // const route = {
-  //   name: ``,
-  //   query: { id: page.id }
-  // }
-  // $router.replace(route)
-  // cacheStore.setRouteCache('bookshelf', route)
+  const route = {
+    name: page.type === 'chapter' ? 'BookshelfChapter' : 'BookshelfBook',
+    query: { id: page.id }
+  }
+  $router.replace(route)
+  cacheStore.setRouteCache('bookshelf', route)
 }
 
 function handleCollapseChange(page: Volume, collapsed: boolean) {

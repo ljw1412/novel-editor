@@ -58,6 +58,9 @@ async function init() {
   }
   dialogStore.initDialog(true, '加载世界观数据……')
   await sleep(500)
+  await editorStore.loadBookshelfData()
+  dialogStore.initDialog(true, '加载小说数据……')
+  await sleep(500)
   await editorStore.loadWorldData()
   dialogStore.initDialog(true, '加载角色数据……')
   await sleep(300)
