@@ -712,13 +712,14 @@ class Dropdown {
         children.forEach((child) => child.classList.remove('hover'))
         return
       }
-      const el = children.find((item) => item.classList.contains('hover'))
+      let el = children.find((item) => item.classList.contains('hover'))
       if (!el) {
         if (action === 'prev') {
-          children[children.length - 1].classList.add('hover')
+          el = children[children.length - 1]
         } else if (action === 'next') {
-          children[0].classList.add('hover')
+          el = children[0]
         }
+        if (el) el.classList.add('hover')
         return
       }
 
@@ -728,22 +729,17 @@ class Dropdown {
       }
 
       if (children.length > 1) {
+        let nextEl: Element | null = null
         if (action === 'next') {
-          el.classList.remove('hover')
-          if (el.nextElementSibling) {
-            el.nextElementSibling.classList.add('hover')
-          } else {
-            children[0].classList.add('hover')
-          }
+          nextEl = el.nextElementSibling || children[0]
+        } else if (action === 'prev') {
+          nextEl = el.previousElementSibling || children[children.length - 1]
         }
 
-        if (action === 'prev') {
+        if (nextEl) {
           el.classList.remove('hover')
-          if (el.previousElementSibling) {
-            el.previousElementSibling.classList.add('hover')
-          } else {
-            children[children.length - 1].classList.add('hover')
-          }
+          nextEl.classList.add('hover')
+          nextEl.scrollIntoView({ inline: 'end' })
         }
       }
     }

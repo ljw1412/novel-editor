@@ -94,7 +94,7 @@ function handleCellClick() {
     if (typeof props.link === 'string') {
       window.open(props.link)
     } else {
-      $router.replace(props.link)
+      $router.push(props.link)
     }
   }
 }

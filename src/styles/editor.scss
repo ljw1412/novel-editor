@@ -54,7 +54,17 @@
     box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
     border-radius: 4px;
     border: 1px solid rgba(123, 123, 123, 0.5);
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+      width: 15px;
+      height: 15px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--color-neutral-4);
+    }
 
     .dropdown-menu.default-menu {
       pointer-events: none;
@@ -64,9 +74,13 @@
       &::before {
         display: block;
         content: attr(placeholder);
+        height: 24px;
+        width: 100%;
         padding: 4px 6px;
+        box-sizing: border-box;
+        background-color: var(--dropdown-bg);
       }
-      &:empty:after {
+      &:empty::after {
         display: block;
         content: '没有找到对应的关键词';
         padding: 12px 6px;
