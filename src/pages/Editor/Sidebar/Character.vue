@@ -123,27 +123,29 @@ function handleDragEnd(e: Event & { item: HTMLElement }) {
       </div>
     </template>
 
-    <draggable
-      v-model="characterList"
-      item-key="id"
-      group="character"
-      class="sidebar-character"
-      @start="handleDragStart"
-      @move="handleDragMove"
-      @end="handleDragEnd"
-    >
-      <template #item="{ element: character }">
-        <CharacterItem
-          :character="character"
-          :is-dragging="isDragging"
-          :is-adding="isAdding"
-          @text-change="handlePageTextChange"
-          @cancel="handlePageCancel"
-          @page-click="handlePageClick"
-          @delete="handlePageDelete"
-        ></CharacterItem>
-      </template>
-    </draggable>
+    <a-scrollbar outer-class="sidebar-info h-full" class="h-full overflow-auto">
+      <draggable
+        v-model="characterList"
+        item-key="id"
+        group="character"
+        class="sidebar-character"
+        @start="handleDragStart"
+        @move="handleDragMove"
+        @end="handleDragEnd"
+      >
+        <template #item="{ element: character }">
+          <CharacterItem
+            :character="character"
+            :is-dragging="isDragging"
+            :is-adding="isAdding"
+            @text-change="handlePageTextChange"
+            @cancel="handlePageCancel"
+            @page-click="handlePageClick"
+            @delete="handlePageDelete"
+          ></CharacterItem>
+        </template>
+      </draggable>
+    </a-scrollbar>
   </EditorSidebar>
 </template>
 

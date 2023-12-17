@@ -143,41 +143,43 @@ function handleDragEnd(e: Event & { item: HTMLElement }) {
       </div>
     </template>
 
-    <draggable
-      v-model="bookList"
-      item-key="id"
-      group="volume"
-      class="sidebar-bookshelf"
-      @start="handleDragStart"
-      @move="handleDragMove"
-      @end="handleDragEnd"
-    >
-      <template #item="{ element: page }">
-        <VolumeItem
-          v-if="page.type === 'volume'"
-          :page="page"
-          :is-adding="isAdding"
-          :is-dragging="isDragging"
-          :collapsed="isDragging || page.isCollapsed"
-          @text-change="handlePageTextChange"
-          @cancel="handlePageCancel"
-          @add-child="addChildChapter"
-          @page-click="handlePageClick"
-          @delete="handlePageDelete"
-          @collapse-change="handleCollapseChange(page, $event)"
-        ></VolumeItem>
-        <ChapterItem
-          v-else
-          :page="page"
-          :is-adding="isAdding"
-          :is-dragging="isDragging"
-          @text-change="handlePageTextChange"
-          @cancel="handlePageCancel"
-          @page-click="handlePageClick"
-          @delete="handlePageDelete"
-        ></ChapterItem>
-      </template>
-    </draggable>
+    <a-scrollbar outer-class="sidebar-info h-full" class="h-full overflow-auto">
+      <draggable
+        v-model="bookList"
+        item-key="id"
+        group="volume"
+        class="sidebar-bookshelf"
+        @start="handleDragStart"
+        @move="handleDragMove"
+        @end="handleDragEnd"
+      >
+        <template #item="{ element: page }">
+          <VolumeItem
+            v-if="page.type === 'volume'"
+            :page="page"
+            :is-adding="isAdding"
+            :is-dragging="isDragging"
+            :collapsed="isDragging || page.isCollapsed"
+            @text-change="handlePageTextChange"
+            @cancel="handlePageCancel"
+            @add-child="addChildChapter"
+            @page-click="handlePageClick"
+            @delete="handlePageDelete"
+            @collapse-change="handleCollapseChange(page, $event)"
+          ></VolumeItem>
+          <ChapterItem
+            v-else
+            :page="page"
+            :is-adding="isAdding"
+            :is-dragging="isDragging"
+            @text-change="handlePageTextChange"
+            @cancel="handlePageCancel"
+            @page-click="handlePageClick"
+            @delete="handlePageDelete"
+          ></ChapterItem>
+        </template>
+      </draggable>
+    </a-scrollbar>
   </EditorSidebar>
 </template>
 
