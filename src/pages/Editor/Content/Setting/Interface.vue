@@ -23,7 +23,7 @@ const { app } = storeToRefs(configStore)
           <a-grid-item v-for="theme of themeList" :key="theme.value">
             <acg-ratio-div
               class="color-item cursor-pointer"
-              body-class="color-item-content"
+              content-class="color-item-content"
               :class="{ active: theme.value === configStore.theme.now }"
               :style="{ backgroundColor: `var(${theme.variable})` }"
               :title="theme.name"

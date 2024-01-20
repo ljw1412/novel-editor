@@ -30,7 +30,7 @@ const bannerBg = getRandomBanner()
       :ratio="[25, 9]"
       class="about-header flex-shrink-0 rounded-lg overflow-hidden text-white bg-no-repeat bg-cover bg-center mb-3 max-h-[480px]"
       :style="{ backgroundImage: `url(${bannerBg})` }"
-      body-class="px-7 flex flex-col justify-center"
+      content-class="px-7 flex flex-col justify-center"
     >
       <h3>
         {{ APP_TITLE }}

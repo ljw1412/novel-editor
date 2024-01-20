@@ -14,6 +14,7 @@ import BookshelfSidebar from '/@/pages/Editor/Sidebar/Bookshelf.vue'
 import BookshelfBook from '/@/pages/Editor/Content/Bookshelf/Book.vue'
 import BookshelfChapter from '/@/pages/Editor/Content/Bookshelf/Chapter.vue'
 import CharacterSidebar from '/@/pages/Editor/Sidebar/Character.vue'
+import CharacterHome from '/@/pages/Editor/Content/Character/Home.vue'
 import CharacterEditor from '/@/pages/Editor/Content/Character/Editor.vue'
 import CharacterRelationships from '/@/pages/Editor/Content/Character/Relationships.vue'
 import WorldSidebar from '/@/pages/Editor/Sidebar/World.vue'
@@ -158,7 +159,7 @@ const routes = [
             name: 'EditorCharacter',
             components: {
               sidebar: CharacterSidebar,
-              default: EmptyContent
+              default: CharacterHome
             },
             meta: { title: '人物' }
           },

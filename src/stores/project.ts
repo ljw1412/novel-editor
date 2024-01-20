@@ -23,6 +23,7 @@ export const useProjectStore = defineStore('ProjectStore', {
     },
 
     getLocalUrl(path: string, addUnix = true) {
+      if (!path) return ''
       if (path.startsWith('http')) return path
       const prjDir = this.getProjectPath()
       if (!prjDir) return path

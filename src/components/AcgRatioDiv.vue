@@ -6,8 +6,8 @@ export default defineComponent({
   props: {
     // [宽，长]
     ratio: { type: Array, default: () => [1, 1] },
-    bodyStyle: [Object, String],
-    bodyClass: [Object, String],
+    contentStyle: [Object, String],
+    contentClass: [Object, String],
     disabled: Boolean
   },
 
@@ -24,8 +24,8 @@ export default defineComponent({
     const children = h(
       'div',
       {
-        className: normalizeClass(['acg-ratio-content', this.bodyClass]),
-        style: normalizeStyle(this.bodyStyle)
+        className: normalizeClass(['acg-ratio-content', this.contentClass]),
+        style: normalizeStyle([this.contentStyle])
       },
       defaultSlot
     )
@@ -48,7 +48,6 @@ export default defineComponent({
 <style lang="scss">
 .acg-ratio-div {
   position: relative;
-
   .acg-ratio-content {
     position: absolute;
     top: 50%;
@@ -61,11 +60,6 @@ export default defineComponent({
       width: 100%;
       height: 100%;
       object-fit: cover;
-    }
-
-    .arco-image {
-      width: 100%;
-      height: 100%;
     }
   }
 }
